@@ -39,17 +39,30 @@ namespace TOMI.Data.Database
                 .WithOne(s => s.Store)
                 .HasForeignKey<User>(x => x.StoreId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            this.SeedUsers(modelBuilder);
         }
         private void SeedUsers(ModelBuilder builder)
         {
+            Customer customer = new Customer()
+            {
+                Id = Guid.Parse("b74ddd14-6340-4840-95c2-db12554843e5"),
+                Name = "Test"
+            };
+            builder.Entity<Customer>().HasData(customer);
             User user = new User()
             {
-                Id = new Guid(),
-               
+                Id = Guid.Parse("b74ddd14-6340-4840-95c2-db12554843e5"),
+                FirstName = "Admin",
+                LastName="Admin",
+                Email = "admin@gmail.com",
+                Role = RoleType.SuperAdmin.ToString(),
+                PhoneNumber = "1234567890",
+                CustomerId = Guid.Parse("b74ddd14-6340-4840-95c2-db12554843e5"),
             };
 
             PasswordHasher<User> passwordHasher = new PasswordHasher<User>();
-            passwordHasher.HashPassword(user, "Admin*123");
+            passwordHasher.HashPassword(user, "Sss1234!");
 
             builder.Entity<User>().HasData(user);
         }

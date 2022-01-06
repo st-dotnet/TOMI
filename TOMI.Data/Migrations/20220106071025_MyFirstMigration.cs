@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace TOMI.Data.Migrations
 {
-    public partial class InitalCreate : Migration
+    public partial class MyFirstMigration : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -44,7 +44,13 @@ namespace TOMI.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    StoreId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    StoreId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Password = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Role = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -62,6 +68,16 @@ namespace TOMI.Data.Migrations
                         principalColumn: "Id");
                 });
 
+            migrationBuilder.InsertData(
+                table: "Customers",
+                columns: new[] { "Id", "Name" },
+                values: new object[] { new Guid("b74ddd14-6340-4840-95c2-db12554843e5"), "Test" });
+
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "CustomerId", "Email", "FirstName", "LastName", "Password", "PhoneNumber", "Role", "StoreId" },
+                values: new object[] { new Guid("b74ddd14-6340-4840-95c2-db12554843e5"), new Guid("b74ddd14-6340-4840-95c2-db12554843e5"), "admin@gmail.com", "Admin", "Admin", null, "1234567890", "SuperAdmin", null });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Stores_CustomerId",
                 table: "Stores",
@@ -76,7 +92,8 @@ namespace TOMI.Data.Migrations
                 name: "IX_Users_StoreId",
                 table: "Users",
                 column: "StoreId",
-                unique: true);
+                unique: true,
+                filter: "[StoreId] IS NOT NULL");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

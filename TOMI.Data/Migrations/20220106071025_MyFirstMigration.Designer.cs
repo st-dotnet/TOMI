@@ -10,8 +10,8 @@ using TOMI.Data.Database;
 namespace TOMI.Data.Migrations
 {
     [DbContext(typeof(TOMIDataContext))]
-    [Migration("20220105115058_InitalCreate")]
-    partial class InitalCreate
+    [Migration("20220106071025_MyFirstMigration")]
+    partial class MyFirstMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -33,6 +33,13 @@ namespace TOMI.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Customers");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("b74ddd14-6340-4840-95c2-db12554843e5"),
+                            Name = "Test"
+                        });
                 });
 
             modelBuilder.Entity("TOMI.Data.Database.Entities.Store", b =>
@@ -63,7 +70,25 @@ namespace TOMI.Data.Migrations
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("StoreId")
+                    b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FirstName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("StoreId")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -71,9 +96,22 @@ namespace TOMI.Data.Migrations
                     b.HasIndex("CustomerId");
 
                     b.HasIndex("StoreId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[StoreId] IS NOT NULL");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("b74ddd14-6340-4840-95c2-db12554843e5"),
+                            CustomerId = new Guid("b74ddd14-6340-4840-95c2-db12554843e5"),
+                            Email = "admin@gmail.com",
+                            FirstName = "Admin",
+                            LastName = "Admin",
+                            PhoneNumber = "1234567890",
+                            Role = "SuperAdmin"
+                        });
                 });
 
             modelBuilder.Entity("TOMI.Data.Database.Entities.Store", b =>
@@ -98,8 +136,7 @@ namespace TOMI.Data.Migrations
                     b.HasOne("TOMI.Data.Database.Entities.Store", "Store")
                         .WithOne("User")
                         .HasForeignKey("TOMI.Data.Database.Entities.User", "StoreId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Customer");
 

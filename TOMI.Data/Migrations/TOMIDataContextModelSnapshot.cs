@@ -31,6 +31,13 @@ namespace TOMI.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Customers");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("b74ddd14-6340-4840-95c2-db12554843e5"),
+                            Name = "Test"
+                        });
                 });
 
             modelBuilder.Entity("TOMI.Data.Database.Entities.Store", b =>
@@ -76,6 +83,9 @@ namespace TOMI.Data.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("Role")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid?>("StoreId")
                         .HasColumnType("uniqueidentifier");
 
@@ -88,6 +98,18 @@ namespace TOMI.Data.Migrations
                         .HasFilter("[StoreId] IS NOT NULL");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("b74ddd14-6340-4840-95c2-db12554843e5"),
+                            CustomerId = new Guid("b74ddd14-6340-4840-95c2-db12554843e5"),
+                            Email = "admin@gmail.com",
+                            FirstName = "Admin",
+                            LastName = "Admin",
+                            PhoneNumber = "1234567890",
+                            Role = "SuperAdmin"
+                        });
                 });
 
             modelBuilder.Entity("TOMI.Data.Database.Entities.Store", b =>
