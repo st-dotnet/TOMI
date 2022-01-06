@@ -44,12 +44,15 @@ namespace TOMI.Data.Database
         }
         private void SeedUsers(ModelBuilder builder)
         {
+            // add first  organization for user customer id 
             Customer customer = new Customer()
             {
                 Id = Guid.Parse("b74ddd14-6340-4840-95c2-db12554843e5"),
                 Name = "Test"
             };
             builder.Entity<Customer>().HasData(customer);
+
+            // add  first User in Database User table
             User user = new User()
             {
                 Id = Guid.Parse("b74ddd14-6340-4840-95c2-db12554843e5"),
