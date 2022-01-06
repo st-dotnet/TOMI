@@ -6,9 +6,8 @@ using TOMI.Data.Database.Entities;
 
 namespace TOMI.Services.Models
 {
-    public class CustomerModel: BaseResponse
+    public class CustomerModel
     {
-        public Guid Id { get; set; }
         public string Name { get; set; }
     }
     public class CustomerModelResponse : BaseResponse

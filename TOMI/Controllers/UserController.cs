@@ -8,6 +8,8 @@ using System.Security.Claims;
 using System.Text;
 using TOMI.Data.Database.Entities;
 using TOMI.Services.Interfaces;
+using TOMI.Services.Models;
+
 namespace TOMI.Web.Controllers
 {
     [Route("api/[controller]")]
@@ -24,31 +26,15 @@ namespace TOMI.Web.Controllers
         }
         [AllowAnonymous]
         [HttpPost("authenticate")]
-        public IActionResult Authenticate(string username, string password)
+        public IActionResult Authenticate(UserModel users)
         {
 
-            if (username == null || password == null)
+            
+            if (users.Email == null || users.Password == null)
                 return BadRequest(new { message = "Username or password is incorrect" });
-
-            var user = _userService.Authenticate(username, password);
-
-            if (user == null)
-                return BadRequest(new { message = "Username or password is incorrect" });
-
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, user.Id.ToString())
-                }),
-                Expires = DateTime.UtcNow.AddDays(7)
-            };
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            var tokenString = tokenHandler.WriteToken(token);
-
+            var user = _mapper.Map<User>(users);
             // return basic user info and authentication token
-            return Ok(user);
+            return Ok(_userService.Authenticate(user.Email, user.Password));
         }
     }
 }

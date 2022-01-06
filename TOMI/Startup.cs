@@ -1,3 +1,4 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -10,6 +11,7 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using TOMI.Data.Database;
 using TOMI.Services.Common.Extensions;
+using TOMI.Services.Helpers;
 using TOMI.Services.Interfaces;
 using TOMI.Services.Interfaces.CustomerService;
 using TOMI.Services.Repository;
@@ -29,11 +31,32 @@ namespace TOMI
         {
             string connectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContextPool<TOMIDataContext>(options => options.UseSqlServer(connectionString));
+
+            // Add CORS policy
+            services.AddCors(options =>
+            {
+                options.AddPolicy("foo",
+                builder =>
+                {
+                    builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
+                });
+            });
+
             services.AddControllers();
-            services.AddAutoMapper(typeof(Startup));
+
+            var mappingConfig = new MapperConfiguration(mc =>
+            {
+                mc.AddProfile(new AutoMapperProfile());
+            });
+           
+ 
+            IMapper mapper = mappingConfig.CreateMapper();
+
+            services.AddSingleton(mapper);
             //  services.AddTomiServiceExtension(Configuration.GetConnectionString("DefaultConnection"));
             services.AddTransient<ICustomerService, CustomerRepository>();
             services.AddTransient<IUserService, UserRepository>();
+            // add Swagger 
             services.AddSwaggerGen(setup =>
             {
                 setup.SwaggerDoc(
@@ -68,8 +91,14 @@ namespace TOMI
                     }
                 });
             });
-            var secret = Configuration.GetSection("Settings:JwtSettings:Key").Value;
-            var key = Encoding.ASCII.GetBytes(secret);
+
+            // configure strongly typed settings objects
+            var appSettingsSection = Configuration.GetSection("AppSettings");
+            services.Configure<AppSettings>(appSettingsSection);
+
+            // configure jwt authentication
+            var appSettings = appSettingsSection.Get<AppSettings>();
+            var key = Encoding.ASCII.GetBytes(appSettings.Secret);
             services.AddAuthentication(x =>
             {
                 x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -102,7 +131,7 @@ namespace TOMI
             app.UseHttpsRedirection();
 
             app.UseRouting();
-
+            app.UseCors("foo"); // second
             app.UseAuthentication();
 
             app.UseAuthorization();

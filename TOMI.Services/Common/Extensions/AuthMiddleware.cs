@@ -8,19 +8,20 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using TOMI.Data.Database.Entities;
-using TOMI.Services.Common.Setting;
+
+using TOMI.Services.Helpers;
 
 namespace TOMI.Services.Common.Extensions
 {
     public class AuthMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly IOptions<ConfigSettings> _configSettings;
+        private readonly AppSettings _configSettings;
 
-        public AuthMiddleware(RequestDelegate next, IOptions<ConfigSettings> configSettings)
+        public AuthMiddleware(RequestDelegate next, IOptions<AppSettings> configSettings)
         {
             _next = next;
-            _configSettings = configSettings;
+            _configSettings = configSettings.Value;
         }
 
         public async Task Invoke(HttpContext context)
@@ -36,7 +37,7 @@ namespace TOMI.Services.Common.Extensions
             try
             {
                 var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.ASCII.GetBytes(_configSettings.Value.JwtSettings.Key);
+                var key = Encoding.ASCII.GetBytes(_configSettings.Secret);
                 tokenHandler.ValidateToken(token, new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
@@ -49,14 +50,14 @@ namespace TOMI.Services.Common.Extensions
 
                 var jwtToken = (JwtSecurityToken)validatedToken;
 
-                var customer = new Customer
-                {
+                //var customer = new Customer
+                //{
                    
-                    Name = jwtToken.Claims.First(x => x.Type == "Name").Value,
+                //    Name = jwtToken.Claims.First(x => x.Type == "Name").Value,
                  
-                };
-                // attach user to context on successful jwt validation
-                context.Items["Customer"] = customer;
+                //};
+                //// attach user to context on successful jwt validation
+                //context.Items["Customer"] = customer;
 
             }
             catch (Exception ex)

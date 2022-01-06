@@ -9,13 +9,12 @@ using System.Net;
 using System.Threading.Tasks;
 using TOMI.Data.Database.Entities;
 using TOMI.Services.Interfaces.CustomerService;
-using TOMI.Web.Models;
+using TOMI.Services.Models;
 
 namespace TOMI.Web.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class CustomerController : ControllerBase
     {
         private readonly ICustomerService _customerService;
@@ -36,13 +35,11 @@ namespace TOMI.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("AddCustomer")]
-        [ProducesResponseType(typeof(bool), (int)HttpStatusCode.OK)]
-        [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public async Task<IActionResult> AddCustomerAsync(Customer customer)
+        public async Task<IActionResult> AddCustomerAsync(CustomerModel customer)
         {
             try
             {
-                //var CustomerRequest = _mapper.Map<Customer>(customer);
+                var CustomerRequest = _mapper.Map<Customer>(customer);
                 var result = await _customerService.SaveCustomer(customer);
                 return Ok(result);
             }

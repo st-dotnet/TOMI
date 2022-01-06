@@ -10,7 +10,7 @@ namespace TOMI.Services.Interfaces.CustomerService
 {
     public interface ICustomerService
     {
-        Task<Customer> SaveCustomer(Customer customer);
+        Task<Customer> SaveCustomer(CustomerModel customer);
         Task<Customer> DeleteCustomer(Guid id);
         Task<Customer> GetCustomer(Guid id);
         Task<List<Customer>> GetCustomersAsync();

@@ -35,13 +35,15 @@ namespace TOMI.Services.Repository
         {
             return await _context.Customers.ToListAsync();
         }
-        public async Task<Customer> SaveCustomer(Customer customer)
+        public async Task<Customer> SaveCustomer(CustomerModel customer)
         {
             Customer exsitingCustomer = await _context.Customers.FirstOrDefaultAsync(c => c.Name == customer.Name);
 
+            var customers = _mapper.Map<Customer>(customer);
             if (exsitingCustomer == null)
             {
-                Customer result = _context.Customers.Add(customer).Entity;
+                Customer result = _context.Customers.Add(customers).Entity;
+                _context.SaveChanges();
                 return result;
             }
             throw new ValidationException("Customer not found!");
