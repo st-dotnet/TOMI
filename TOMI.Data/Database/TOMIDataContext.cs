@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using System;
 using TOMI.Data.Database.Entities;
 
 namespace TOMI.Data.Database
@@ -37,6 +39,19 @@ namespace TOMI.Data.Database
                 .WithOne(s => s.Store)
                 .HasForeignKey<User>(x => x.StoreId)
                 .OnDelete(DeleteBehavior.NoAction);
+        }
+        private void SeedUsers(ModelBuilder builder)
+        {
+            User user = new User()
+            {
+                Id = new Guid(),
+               
+            };
+
+            PasswordHasher<User> passwordHasher = new PasswordHasher<User>();
+            passwordHasher.HashPassword(user, "Admin*123");
+
+            builder.Entity<User>().HasData(user);
         }
     }
 }
