@@ -49,6 +49,9 @@ namespace TOMI.Data.Migrations
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("uniqueidentifier");
 
@@ -107,6 +110,7 @@ namespace TOMI.Data.Migrations
                             Email = "admin@gmail.com",
                             FirstName = "Admin",
                             LastName = "Admin",
+                            Password = "AQAAAAEAACcQAAAAEOk4Dt5Xqpivmw4WGF4qpNrC8VzdXoC1IOFTCuueCwu3wYXzHXz+zeyIkjxKPT08+w==",
                             PhoneNumber = "1234567890",
                             Role = "SuperAdmin"
                         });

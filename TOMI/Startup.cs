@@ -10,6 +10,7 @@ using Microsoft.OpenApi.Models;
 using System.Text;
 using TOMI.Data.Database;
 using TOMI.Services.Common.Extensions;
+using TOMI.Services.Interfaces;
 using TOMI.Services.Interfaces.CustomerService;
 using TOMI.Services.Repository;
 
@@ -32,6 +33,7 @@ namespace TOMI
             services.AddAutoMapper(typeof(Startup));
             //  services.AddTomiServiceExtension(Configuration.GetConnectionString("DefaultConnection"));
             services.AddTransient<ICustomerService, CustomerRepository>();
+            services.AddTransient<IUserService, UserRepository>();
             services.AddSwaggerGen(setup =>
             {
                 setup.SwaggerDoc(

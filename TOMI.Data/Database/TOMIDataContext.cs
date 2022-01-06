@@ -65,8 +65,8 @@ namespace TOMI.Data.Database
             };
 
             PasswordHasher<User> passwordHasher = new PasswordHasher<User>();
-            passwordHasher.HashPassword(user, "Sss1234!");
-
+          
+            user.Password = passwordHasher.HashPassword(user, "Sss1234!");
             builder.Entity<User>().HasData(user);
         }
     }
