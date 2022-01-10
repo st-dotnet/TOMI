@@ -12,5 +12,7 @@ namespace TOMI.Services.Interfaces
 
         Task<UserModelResponse> CreateCustomerStore(User user);
 
+        Task<UserModelResponse> ForgotPassword(UserModel userModel);
+
     }
 }

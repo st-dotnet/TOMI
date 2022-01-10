@@ -68,5 +68,18 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(UserModel userModel)
+        {
+            try
+            {
+               return Ok(await _userService.ForgotPassword(userModel));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
     }
 }

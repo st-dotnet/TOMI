@@ -165,5 +165,29 @@ namespace TOMI.Services.Repository
             }
 
         }
+
+        /// <summary>
+        /// ForgotPassword
+        /// </summary>
+        /// <param name="userModel"></param>
+        /// <returns></returns>
+        public async Task<UserModelResponse> ForgotPassword(UserModel userModel)
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(c => c.Email == userModel.Email);
+
+            if (user == null)
+            {
+                return new UserModelResponse { Error = "Email not Exist in db" };
+            }
+            else
+            {
+                return new UserModelResponse
+                {
+                    User = user,
+                    Success = true
+                };
+
+            }
+        }
     }
 }
