@@ -33,7 +33,9 @@ namespace TOMI.Services.Repository
         }
         public async Task<List<Customer>> GetCustomersAsync()
         {
-            return await _context.Customers.ToListAsync();
+            var courses = _context.Customers.Include(c => c.Users).Include(c=>c.Stores);
+
+            return await courses.ToListAsync(); 
         }
         public async Task<Customer> SaveCustomer(CustomerModel customer)
         {
@@ -47,6 +49,12 @@ namespace TOMI.Services.Repository
                 return result;
             }
             throw new ValidationException("Customer not found!");
+        }
+
+
+        public async Task<Customer> GetUserByCustomereAsync(string customerId)
+        {
+            return await _context.Customers.Include(c => c.Users).FirstOrDefaultAsync(x => x.Id.ToString() == customerId) ;
         }
     }
 }

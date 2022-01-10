@@ -28,11 +28,7 @@ namespace TOMI.Data.Database
                 .WithOne(s => s.Customer)
                 .HasForeignKey(x => x.CustomerId);
 
-            modelBuilder.Entity<User>()
-                .HasOne(c => c.Store)
-                .WithOne(s => s.User)
-                .HasForeignKey<Store>(x => x.UserId)
-                .OnDelete(DeleteBehavior.NoAction);
+        
 
             modelBuilder.Entity<Store>()
                 .HasOne(c => c.User)

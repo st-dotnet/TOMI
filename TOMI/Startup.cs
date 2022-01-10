@@ -9,6 +9,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Text.Json.Serialization;
 using TOMI.Data.Database;
 using TOMI.Services.Common.Extensions;
 using TOMI.Services.Helpers;
@@ -41,21 +42,24 @@ namespace TOMI
                     builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader();
                 });
             });
+            services.AddControllers().AddNewtonsoftJson(options =>
+              options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                    );
 
-            services.AddControllers();
 
             var mappingConfig = new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new AutoMapperProfile());
             });
-           
- 
+
+
             IMapper mapper = mappingConfig.CreateMapper();
 
             services.AddSingleton(mapper);
             //  services.AddTomiServiceExtension(Configuration.GetConnectionString("DefaultConnection"));
             services.AddTransient<ICustomerService, CustomerRepository>();
             services.AddTransient<IUserService, UserRepository>();
+            services.AddTransient<IStoreService, StoreRepository>();
             // add Swagger 
             services.AddSwaggerGen(setup =>
             {

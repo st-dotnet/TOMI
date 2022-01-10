@@ -14,5 +14,7 @@ namespace TOMI.Services.Interfaces.CustomerService
         Task<Customer> DeleteCustomer(Guid id);
         Task<Customer> GetCustomer(Guid id);
         Task<List<Customer>> GetCustomersAsync();
+
+        Task<Customer> GetUserByCustomereAsync(string customerId);
     }
 }

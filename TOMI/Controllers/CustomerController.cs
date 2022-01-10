@@ -41,6 +41,8 @@ namespace TOMI.Web.Controllers
             {
                 var CustomerRequest = _mapper.Map<Customer>(customer);
                 var result = await _customerService.SaveCustomer(customer);
+
+
                 return Ok(result);
             }
             catch (Exception ex)
@@ -100,6 +102,22 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
+
+        [HttpGet("GetUsersById/{customerId}")]
+        public async Task<IActionResult> GetUsersByIdAsync(string customerId)
+        {
+            try
+            {
+                return Ok(await _customerService.GetUserByCustomereAsync(customerId));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+
+
         #endregion
     }
 }
