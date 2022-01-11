@@ -10,7 +10,7 @@ using TOMI.Data.Database;
 namespace TOMI.Data.Migrations
 {
     [DbContext(typeof(TOMIDataContext))]
-    [Migration("20220110152748_MyFirstMigration")]
+    [Migration("20220111104029_MyFirstMigration")]
     partial class MyFirstMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -42,31 +42,11 @@ namespace TOMI.Data.Migrations
                         });
                 });
 
-            modelBuilder.Entity("TOMI.Data.Database.Entities.Store", b =>
+            modelBuilder.Entity("TOMI.Data.Database.Entities.Stock", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CustomerId");
-
-                    b.ToTable("Stores");
-                });
-
-            modelBuilder.Entity("TOMI.Data.Database.Entities.StoreDetails", b =>
-                {
-                    b.Property<int?>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<string>("Area")
                         .HasColumnType("nvarchar(max)");
@@ -75,6 +55,9 @@ namespace TOMI.Data.Migrations
                         .HasColumnType("datetimeoffset");
 
                     b.Property<Guid>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CustomerId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTime?>("Date")
@@ -119,6 +102,9 @@ namespace TOMI.Data.Migrations
                     b.Property<string>("SKU")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime?>("StockDate")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Store")
                         .HasColumnType("nvarchar(max)");
 
@@ -136,7 +122,26 @@ namespace TOMI.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("StoreDetails");
+                    b.ToTable("Stocks");
+                });
+
+            modelBuilder.Entity("TOMI.Data.Database.Entities.Store", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.ToTable("Stores");
                 });
 
             modelBuilder.Entity("TOMI.Data.Database.Entities.User", b =>
@@ -187,7 +192,7 @@ namespace TOMI.Data.Migrations
                             Email = "admin@gmail.com",
                             FirstName = "Admin",
                             LastName = "Admin",
-                            Password = "AQAAAAEAACcQAAAAEK4hKRSNCGGoJ9F6+TYTI6TB4rs6ecyKZUyKJipeeGqRxe310f06mmXhGiy8yqi4kw==",
+                            Password = "AQAAAAEAACcQAAAAEAbHICwhlwktMnLt4NALGeZnobjgOLgMrLdm6lDPuXpoQ1GXW8vmUs+Z96UTzPLhVw==",
                             PhoneNumber = "1234567890",
                             Role = "SuperAdmin"
                         });

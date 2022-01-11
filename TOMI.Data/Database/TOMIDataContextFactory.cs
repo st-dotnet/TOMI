@@ -8,7 +8,7 @@ namespace TOMI.Data.Database
         public TOMIDataContext CreateDbContext(string[] args)
         {
             var builder = new DbContextOptionsBuilder<TOMIDataContext>();
-            builder.UseSqlServer("Server=DESKTOP-H0MH6QI;Database=TOMIDB;Integrated Security=True");
+            builder.UseSqlServer("Server=(local);Database=TOMIDB;Integrated Security=True");
             return new TOMIDataContext(builder.Options);
         }
     }

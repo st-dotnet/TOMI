@@ -10,6 +10,6 @@ namespace TOMI.Services.Interfaces
     {
         Task<StoreModelResponse> CreateStore(StoreModel user);
         Task<GetStoreListResponse> GetUserByCustomereAsync(string customerId);
-        Task<bool> WriteFile(IFormFile file);
+        Task<bool> StocksData(StockModel stockModel);
     }
 }

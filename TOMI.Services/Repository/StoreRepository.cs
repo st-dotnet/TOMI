@@ -70,13 +70,14 @@ namespace TOMI.Services.Repository
         }
 
 
-        public async Task<bool> WriteFile(IFormFile file)
+        public async Task<bool> StocksData(StockModel stockModel )
         {
             bool isSaveSuccess = false;
             string fileName;
+            
             try
             {
-                var extension = "." + file.FileName.Split('.')[file.FileName.Split('.').Length - 1];
+                var extension = "." + stockModel.File.FileName.Split('.')[stockModel.File.FileName.Split('.').Length - 1];
                 fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
 
                 var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
@@ -92,7 +93,7 @@ namespace TOMI.Services.Repository
 
                 using (var stream = new FileStream(path, FileMode.Create))
                 {
-                    await file.CopyToAsync(stream);
+                    await stockModel.File.CopyToAsync(stream);
                 }
                 var config = new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
@@ -106,11 +107,16 @@ namespace TOMI.Services.Repository
                 {
                     records = csv.GetRecords<StoreDetailsResponse>().ToList();
 
-                    var storedetails = _mapper.Map<List<StoreDetails>>(records);
+                    var storedetails = _mapper.Map<List<Stock>>(records);
                     //Loop and insert records.  
-                    foreach (StoreDetails storedetail in storedetails)
+                    foreach (Stock storedetail in storedetails)
                     {
-                        _context.StoreDetails.Add(storedetail);
+                        storedetail.CustomerId = stockModel.CustomerId;
+                        storedetail.StoreId = stockModel.StoreId;
+                        storedetail.StockDate =stockModel.StockDate;
+
+
+                        _context.Stocks .Add(storedetail);
                     }
                 }
                 // Submit the change to the database.

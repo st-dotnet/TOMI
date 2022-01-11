@@ -10,9 +10,7 @@ namespace TOMI.Data.Database
         public DbSet<Customer> Customers { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Store> Stores { get; set; }
-        public DbSet<StoreDetails> StoreDetails { get; set; }
-
-
+        public DbSet<Stock> Stocks { get; set; }
 
         public TOMIDataContext(DbContextOptions<TOMIDataContext> options)
             : base(options)
@@ -31,7 +29,7 @@ namespace TOMI.Data.Database
                 .WithOne(s => s.Customer)
                 .HasForeignKey(x => x.CustomerId);
 
-        
+
 
             modelBuilder.Entity<Store>()
                 .HasOne(c => c.User)

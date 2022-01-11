@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using CsvHelper.Configuration.Attributes;
-using TOMI.Data.Database.Entities;
 
 namespace TOMI.Services.Models
 {
-   public class StoreDetailsResponse:BaseResponse
+    public class StoreDetailsResponse
     {
         [Index(0)]
         public string Store { get; set; }
@@ -40,6 +35,9 @@ namespace TOMI.Services.Models
         public string Department { get; set; }
         [Index(14)]
         public string Departmentname { get; set; }
+        
+      
+
     }
 
 

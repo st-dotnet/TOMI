@@ -20,11 +20,10 @@ namespace TOMI.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "StoreDetails",
+                name: "Stocks",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Store = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Date = table.Column<DateTime>(type: "datetime2", nullable: true),
                     Time = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -40,6 +39,8 @@ namespace TOMI.Data.Migrations
                     Metro = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Department = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Departmentname = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    StockDate = table.Column<DateTime>(type: "datetime2", nullable: true),
                     CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
@@ -50,7 +51,7 @@ namespace TOMI.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_StoreDetails", x => x.Id);
+                    table.PrimaryKey("PK_Stocks", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -110,7 +111,7 @@ namespace TOMI.Data.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "CustomerId", "Email", "FirstName", "LastName", "Password", "PhoneNumber", "Role", "StoreId" },
-                values: new object[] { new Guid("b74ddd14-6340-4840-95c2-db12554843e5"), new Guid("b74ddd14-6340-4840-95c2-db12554843e5"), "admin@gmail.com", "Admin", "Admin", "AQAAAAEAACcQAAAAEK4hKRSNCGGoJ9F6+TYTI6TB4rs6ecyKZUyKJipeeGqRxe310f06mmXhGiy8yqi4kw==", "1234567890", "SuperAdmin", null });
+                values: new object[] { new Guid("b74ddd14-6340-4840-95c2-db12554843e5"), new Guid("b74ddd14-6340-4840-95c2-db12554843e5"), "admin@gmail.com", "Admin", "Admin", "AQAAAAEAACcQAAAAEAbHICwhlwktMnLt4NALGeZnobjgOLgMrLdm6lDPuXpoQ1GXW8vmUs+Z96UTzPLhVw==", "1234567890", "SuperAdmin", null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Stores_CustomerId",
@@ -133,7 +134,7 @@ namespace TOMI.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "StoreDetails");
+                name: "Stocks");
 
             migrationBuilder.DropTable(
                 name: "Users");
