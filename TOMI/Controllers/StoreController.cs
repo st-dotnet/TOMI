@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using TOMI.Services.Interfaces;
 using TOMI.Services.Models;
+using TOMI.Web.Models;
 
 namespace TOMI.Web.Controllers
 {
@@ -49,12 +50,12 @@ namespace TOMI.Web.Controllers
         }
 
         [HttpPost("upload")]
-        public async Task<IActionResult> UploadFile(IFormFile file)
+        public async Task<IActionResult> UploadFile([FromForm] StockModel stockModel )
         {
             try
             {
-                if (file != null)
-                    return Ok(await _storeService.WriteFile(file));
+                if (stockModel != null)
+                    return Ok(await _storeService.StocksData(stockModel));
                 else
                     return BadRequest(new { message = "please at least upload one file " });
             }
