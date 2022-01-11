@@ -6,7 +6,7 @@ namespace TOMI.Data.Database.Entities
     public class StoreDetails:EntityBase
     {
         [Key]
-        public int? Id { get; set; } 
+        public Guid Id { get; set; }
         public string Store { get; set; }
         public DateTime? Date { get; set; }
         public DateTime? Time { get; set; }
@@ -22,5 +22,9 @@ namespace TOMI.Data.Database.Entities
         public string Metro { get; set; }
         public string Department { get; set; }
         public string Departmentname { get; set; }
+
+        public Guid customerId { get; set; }
+
+         public DateTime? StockDate { get; set; }
     }
 }

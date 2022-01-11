@@ -14,7 +14,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using TOMI.Data.Database;
 using TOMI.Data.Database.Entities;
-using TOMI.Services.Common.DTOs;
 using TOMI.Services.Interfaces;
 using TOMI.Services.Models;
 
@@ -98,28 +97,35 @@ namespace TOMI.Services.Repository
                 var config = new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
                     HasHeaderRecord = false,
-                    BadDataFound = null
+                    BadDataFound = null,
+                    Delimiter = "|",
                 };
-                List<StoreDetailsResponse> records = new();
+                List<StoreDetailsResponse> records = new List<StoreDetailsResponse>();
                 using (var reader = new StreamReader(path))
                 using (var csv = new CsvReader(reader, config))
                 {
                     records = csv.GetRecords<StoreDetailsResponse>().ToList();
+
+                    var storedetails = _mapper.Map<List<StoreDetails>>(records);
+                    //Loop and insert records.  
+                    foreach (StoreDetails storedetail in storedetails)
+                    {
+                        _context.StoreDetails.Add(storedetail);
+                    }
                 }
-
-                //var ReadCSV = File.ReadAllText(path);
-                //foreach (string csvRow in ReadCSV.Split('\n'))
-                //{
-                //    if (!string.IsNullOrEmpty(csvRow))
-                //    {
-                //        var temp = csvRow.Split('|').ToList();
-                //        List<StoreDetails> stores = new List<StoreDetails>();
-                //        var storesDetail = new StoreDetails();
-                        
-                //        //Adding each row into datatable  
-
-                //    }
-                //}
+                // Submit the change to the database.
+                try
+                {
+                  await  _context.SaveChangesAsync();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    // Make some adjustments.
+                    // ...
+                    // Try again.
+                    _context.SaveChanges();
+                }
                 isSaveSuccess = true;
             }
             catch (Exception e)

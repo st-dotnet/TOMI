@@ -185,7 +185,7 @@ namespace TOMI.Data.Migrations
                             Email = "admin@gmail.com",
                             FirstName = "Admin",
                             LastName = "Admin",
-                            Password = "AQAAAAEAACcQAAAAEK4hKRSNCGGoJ9F6+TYTI6TB4rs6ecyKZUyKJipeeGqRxe310f06mmXhGiy8yqi4kw==",
+                            Password = "AQAAAAEAACcQAAAAEInPBehMSBbjPeEO7R9DBvLzZLpwzp0A7fzLAxNhKAHqxh6ddHnE3WvspqdIieX9fg==",
                             PhoneNumber = "1234567890",
                             Role = "SuperAdmin"
                         });
