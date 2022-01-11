@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using CsvHelper;
+using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using TOMI.Data.Database;
 using TOMI.Data.Database.Entities;
+using TOMI.Services.Common.DTOs;
 using TOMI.Services.Interfaces;
 using TOMI.Services.Models;
 
@@ -85,20 +89,37 @@ namespace TOMI.Services.Repository
 
                 var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
                    fileName);
+              
 
                 using (var stream = new FileStream(path, FileMode.Create))
                 {
                     await file.CopyToAsync(stream);
                 }
-                 var ReadCSV = System.IO.File.ReadAllText(path);
-                foreach (string csvRow in ReadCSV.Split('\n'))
+                var config = new CsvConfiguration(CultureInfo.InvariantCulture)
                 {
-                    if (!string.IsNullOrEmpty(csvRow))
-                    {
-                        //Adding each row into datatable  
-                    
-                    }
+                    HasHeaderRecord = false,
+                    BadDataFound = null
+                };
+                List<StoreDetailsResponse> records = new();
+                using (var reader = new StreamReader(path))
+                using (var csv = new CsvReader(reader, config))
+                {
+                    records = csv.GetRecords<StoreDetailsResponse>().ToList();
                 }
+
+                //var ReadCSV = File.ReadAllText(path);
+                //foreach (string csvRow in ReadCSV.Split('\n'))
+                //{
+                //    if (!string.IsNullOrEmpty(csvRow))
+                //    {
+                //        var temp = csvRow.Split('|').ToList();
+                //        List<StoreDetails> stores = new List<StoreDetails>();
+                //        var storesDetail = new StoreDetails();
+                        
+                //        //Adding each row into datatable  
+
+                //    }
+                //}
                 isSaveSuccess = true;
             }
             catch (Exception e)
