@@ -21,7 +21,6 @@ namespace TOMI.Services.Repository
 {
     public class StoreRepository : IStoreService
     {
-
         private readonly IMapper _mapper;
         private readonly ILogger<StoreRepository> _logger;
         private readonly TOMIDataContext _context;
@@ -54,7 +53,7 @@ namespace TOMI.Services.Repository
             {
                 return new StoreModelResponse { Error = ex.Message };
             }
-         
+
         }
         public async Task<GetStoreListResponse> GetUserByCustomereAsync(string customerId)
         {
@@ -68,13 +67,11 @@ namespace TOMI.Services.Repository
 
             }
         }
-
-
-        public async Task<bool> StocksData(StockModel stockModel )
+        public async Task<bool> StocksData(StockModel stockModel)
         {
             bool isSaveSuccess = false;
             string fileName;
-            
+
             try
             {
                 var extension = "." + stockModel.File.FileName.Split('.')[stockModel.File.FileName.Split('.').Length - 1];
@@ -89,7 +86,7 @@ namespace TOMI.Services.Repository
 
                 var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
                    fileName);
-              
+
 
                 using (var stream = new FileStream(path, FileMode.Create))
                 {
@@ -113,16 +110,17 @@ namespace TOMI.Services.Repository
                     {
                         storedetail.CustomerId = stockModel.CustomerId;
                         storedetail.StoreId = stockModel.StoreId;
-                        storedetail.StockDate =stockModel.StockDate;
+                        storedetail.StockDate = stockModel.StockDate;
 
 
-                        _context.Stocks .Add(storedetail);
+                        _context.Stocks.Add(storedetail);
                     }
                 }
                 // Submit the change to the database.
                 try
                 {
-                  await  _context.SaveChangesAsync();
+                    await _context.SaveChangesAsync();
+                    File.Delete(path);
                 }
                 catch (Exception e)
                 {
@@ -140,6 +138,88 @@ namespace TOMI.Services.Repository
             }
 
             return isSaveSuccess;
+        }
+        public async Task<bool> MasterData(MasterDataModel masterData)
+        {
+            bool isSaveSuccess = false;
+            string fileName;
+
+            try
+            {
+                var extension = "." + masterData.File.FileName.Split('.')[masterData.File.FileName.Split('.').Length - 1];
+                fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
+
+                var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
+
+                if (!Directory.Exists(pathBuilt))
+                {
+                    Directory.CreateDirectory(pathBuilt);
+                }
+
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
+                   fileName);
+
+
+                using (var stream = new FileStream(path, FileMode.Create))
+                {
+                    await masterData.File.CopyToAsync(stream);
+                }
+                var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    HasHeaderRecord = false,
+                    BadDataFound = null,
+                    Delimiter = "|",
+                };
+                List<MasterDataResponse> records = new List<MasterDataResponse>();
+                using (var reader = new StreamReader(path))
+                using (var csv = new CsvReader(reader, config))
+                {
+                    records = csv.GetRecords<MasterDataResponse>().ToList();
+
+                    var storedetails = _mapper.Map<List<Master>>(records);
+                    //Loop and insert records.  
+                    foreach (Master storedetail in storedetails)
+                    {
+                        storedetail.CustomerId = masterData.CustomerId;
+                        storedetail.StoreId = masterData.StoreId;
+                        storedetail.StockDate = masterData.StockDate;
+
+
+                        _context.MasterData.Add(storedetail);
+                    }
+                }
+                // Submit the change to the database.
+                try
+                {
+                    await _context.SaveChangesAsync();
+                    File.Delete(path);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    // Make some adjustments.
+                    // ...
+                    // Try again.
+                    _context.SaveChanges();
+                }
+                isSaveSuccess = true;
+            }
+            catch (Exception e)
+            {
+                //log error
+            }
+
+            return isSaveSuccess;
+        }
+        public async Task<List<Stock>> GetStockData(StockModelRequest request)
+        {
+            var response = await _context.Stocks.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate == request.StockDate).ToListAsync();
+            return response;
+        }
+        public async Task<List<Master>> GetMasterData(MasterModelRequest request)
+        {
+            var response = await _context.MasterData.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate == request.StockDate).ToListAsync();
+            return response;
         }
     }
 }

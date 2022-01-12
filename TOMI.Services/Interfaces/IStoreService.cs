@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using TOMI.Data.Database.Entities;
@@ -11,5 +12,10 @@ namespace TOMI.Services.Interfaces
         Task<StoreModelResponse> CreateStore(StoreModel user);
         Task<GetStoreListResponse> GetUserByCustomereAsync(string customerId);
         Task<bool> StocksData(StockModel stockModel);
+        Task<bool> MasterData(MasterDataModel masterData);
+        Task<List<Stock>> GetStockData(StockModelRequest request);
+        Task<List<Master>> GetMasterData(MasterModelRequest request);
+
+
     }
 }

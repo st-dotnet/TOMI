@@ -1,12 +1,9 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Threading;
 using System.Threading.Tasks;
 using TOMI.Services.Interfaces;
 using TOMI.Services.Models;
-using TOMI.Web.Models;
 
 namespace TOMI.Web.Controllers
 {
@@ -64,6 +61,62 @@ namespace TOMI.Web.Controllers
                 return BadRequest(new { message = "Invalid file extension" });
                 throw;
             }  
+        }
+
+        [HttpPost("MasterFile")]
+        public async Task<IActionResult> MasterFile([FromForm] MasterDataModel masterData)
+        {
+            try
+            {
+                if (masterData != null)
+                    return Ok(await _storeService.MasterData(masterData));
+                else
+                    return BadRequest(new { message = "please at least upload one file " });
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "Invalid file extension" });
+                throw;
+            }
+        }
+
+
+        /// <summary>
+        ///  this is used for get stock data by customerid, storeId and date
+        /// </summary>
+        /// <param name="request">StockModelRequest</param>
+        /// <returns></returns>
+        [HttpPost("GetStockData")]
+        public async Task<IActionResult> GetStockData(StockModelRequest request)
+        {
+            try
+            {
+                return Ok(await _storeService.GetStockData(request));
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "Invalid Id" });
+                throw;
+            }
+        }
+
+        /// <summary>
+        ///  this is used for get stock data by customerid, storeId and date
+        /// </summary>
+        /// <param name="request">StockModelRequest</param>
+        /// <returns></returns>
+        [HttpPost("GetMasterData")]
+        public async Task<IActionResult> GetMasterData(MasterModelRequest request)
+        {
+            try
+            {
+                return Ok(await _storeService.GetMasterData(request));
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "Invalid Id" });
+                throw;
+            }
         }
     }
 }

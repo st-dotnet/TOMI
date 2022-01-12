@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace TOMI.Services.Models
 {
-    public class StockModel
+    public class MasterDataModel
     {
         public IFormFile File { get; set; }
         public Guid? CustomerId { get; set; }
