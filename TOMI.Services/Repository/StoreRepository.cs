@@ -67,11 +67,11 @@ namespace TOMI.Services.Repository
 
             }
         }
-        public async Task<FileUplaodRespone> StocksData(StockModel stockModel)
+        public async Task<FileUplaodRespone> SalesData(SalesDataModel stockModel)
         {
             bool isSaveSuccess = false;
             string fileName;
-            List<StoreDetailsResponse> records = new List<StoreDetailsResponse>();
+            List<SalesDetailResponse> records = new List<SalesDetailResponse>();
             try
             {
                 var extension = "." + stockModel.File.FileName.Split('.')[stockModel.File.FileName.Split('.').Length - 1];
@@ -102,7 +102,7 @@ namespace TOMI.Services.Repository
                 using (var reader = new StreamReader(path))
                 using (var csv = new CsvReader(reader, config))
                 {
-                    records = csv.GetRecords<StoreDetailsResponse>().ToList();
+                    records = csv.GetRecords<SalesDetailResponse>().ToList();
 
                     var storedetails = _mapper.Map<List<Sales>>(records);
                     //Loop and insert records.  
@@ -234,7 +234,95 @@ namespace TOMI.Services.Repository
                 Success = isSaveSuccess
             }; ; ;
         }
-        public async Task<List<Sales>> GetStockData(StockModelRequest request)
+
+        public async Task<FileUplaodRespone> StocksData(StocksDataModel stocksData)
+        {
+            bool isSaveSuccess = false;
+            string fileName;
+            List<StocksDataResponse> records = new List<StocksDataResponse>();
+            try
+            {
+                var extension = "." + stocksData.File.FileName.Split('.')[stocksData.File.FileName.Split('.').Length - 1];
+                fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
+
+                var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
+
+                if (!Directory.Exists(pathBuilt))
+                {
+                    Directory.CreateDirectory(pathBuilt);
+                }
+
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
+                 fileName);
+
+
+                using (var stream = new FileStream(path, FileMode.Create))
+                {
+                    await stocksData.File.CopyToAsync(stream);
+                }
+                var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    HasHeaderRecord = false,
+                    BadDataFound = null,
+                    Delimiter = "|",
+                };
+                var temp = File.ReadAllLines(path);
+
+                foreach (string line in temp)
+                {
+                    var delimitedLine = line.Split('\t'); //set ur separator, in this case tab
+                    StocksDataResponse masterdata = new StocksDataResponse();
+                    masterdata.SKU = line.Substring(0, 26);
+                    masterdata.Barcode = line.Substring(27, 30);
+                    masterdata.RetailPrice = line.Substring(58, 11);
+                    masterdata.Description = line.Substring(70, 40);
+                    masterdata.Department = line.Substring(110, 02);
+                    masterdata.Blank = line.Substring(112, 11);
+                    masterdata.OHQuantity = line.Substring(122, 11);
+                    masterdata.Unity = line.Substring(134, 3);
+                    records.Add(masterdata);
+                }
+               
+                var storedetails = _mapper.Map<List<Stocks>>(records);
+                //Loop and insert records.  
+                foreach (Stocks storedetail in storedetails)
+                {
+                    storedetail.CustomerId = stocksData.CustomerId;
+                    storedetail.StoreId = stocksData.StoreId;
+                    storedetail.StockDate = stocksData.StockDate;
+
+
+                    _context.Stocks.Add(storedetail);
+                }
+
+                // Submit the change to the database.
+                try
+                {
+                    await _context.SaveChangesAsync();
+                    File.Delete(path);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    // Make some adjustments.
+                    // ...
+                    // Try again.
+                    _context.SaveChanges();
+                }
+                isSaveSuccess = true;
+            }
+            catch (Exception e)
+            {
+                //log error
+            }
+
+            return new FileUplaodRespone
+            {
+                stockRecordCount = records.Count.ToString(),
+                Success = isSaveSuccess
+            }; ; ;
+        }
+        public async Task<List<Sales>> GetSalesData(SalesModelRequest request)
         {
             var response = await _context.Sales.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate == request.StockDate).ToListAsync();
             return response;
@@ -242,6 +330,12 @@ namespace TOMI.Services.Repository
         public async Task<List<Master>> GetMasterData(MasterModelRequest request)
         {
             var response = await _context.MasterData.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate == request.StockDate).ToListAsync();
+            return response;
+        }
+
+        public async Task<List<Stocks>> GetStocksData(StocksModelRequest request)
+        {
+            var response = await _context.Stocks.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate == request.StockDate).ToListAsync();
             return response;
         }
     }

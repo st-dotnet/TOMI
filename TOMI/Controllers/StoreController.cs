@@ -46,13 +46,13 @@ namespace TOMI.Web.Controllers
             }
         }
 
-        [HttpPost("ImportStockFile")]
-        public async Task<IActionResult> UploadFile([FromForm] StockModel stockModel )
+        [HttpPost("ImportSalesFile")]
+        public async Task<IActionResult> UploadFile([FromForm] SalesDataModel stockModel )
         {
             try
             {
                 if (stockModel != null)
-                    return Ok(await _storeService.StocksData(stockModel));
+                    return Ok(await _storeService.SalesData(stockModel));
                 else
                     return BadRequest(new { message = "please at least upload one file " });
             }
@@ -80,18 +80,35 @@ namespace TOMI.Web.Controllers
             }
         }
 
-
-        /// <summary>
-        ///  this is used for get stock data by customerid, storeId and date
-        /// </summary>
-        /// <param name="request">StockModelRequest</param>
-        /// <returns></returns>
-        [HttpPost("GetStockData")]
-        public async Task<IActionResult> GetStockData(StockModelRequest request)
+        [HttpPost("ImportStockFile")]
+        public async Task<IActionResult> StockFile([FromForm] StocksDataModel stockData)
         {
             try
             {
-                return Ok(await _storeService.GetStockData(request));
+                if (stockData != null)
+                    return Ok(await _storeService.StocksData(stockData));
+                else
+                    return BadRequest(new { message = "please at least upload one file " });
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "Invalid file extension" });
+                throw;
+            }
+        }
+
+
+        /// <summary>
+        ///  this is used for get Sales data by customerid, storeId and date
+        /// </summary>
+        /// <param name="request">SalesModelRequest</param>
+        /// <returns></returns>
+        [HttpPost("GetSalesData")]
+        public async Task<IActionResult> GetSalesData(SalesModelRequest request)
+        {
+            try
+            {
+                return Ok(await _storeService.GetSalesData(request));
             }
             catch (Exception)
             {
@@ -101,9 +118,9 @@ namespace TOMI.Web.Controllers
         }
 
         /// <summary>
-        ///  this is used for get stock data by customerid, storeId and date
+        ///  this is used for get Master data by customerid, storeId and date
         /// </summary>
-        /// <param name="request">StockModelRequest</param>
+        /// <param name="request">MasterModelRequest</param>
         /// <returns></returns>
         [HttpPost("GetMasterData")]
         public async Task<IActionResult> GetMasterData(MasterModelRequest request)
@@ -118,5 +135,26 @@ namespace TOMI.Web.Controllers
                 throw;
             }
         }
+
+        /// <summary>
+        ///  this is used for get Stocks data by customerid, storeId and date
+        /// </summary>
+        /// <param name="request">StocksModelRequest</param>
+        /// <returns></returns>
+        [HttpPost("GetStocksData")]
+        public async Task<IActionResult> GetStocksData(StocksModelRequest request)
+        {
+            try
+            {
+                return Ok(await _storeService.GetStocksData(request));
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "Invalid Id" });
+                throw;
+            }
+        }
+
+
     }
 }
