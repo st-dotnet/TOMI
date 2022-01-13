@@ -11,7 +11,7 @@ namespace TOMI.Services.Helpers
             CreateMap<CustomerModel, Customer>();
             CreateMap<UserModel, User>();
             CreateMap<StoreModel, Store>();
-            CreateMap<StoreDetailsResponse, Stock>();
+            CreateMap<StoreDetailsResponse, Sales>();
             CreateMap<MasterDataResponse, Master>();
         }
     }

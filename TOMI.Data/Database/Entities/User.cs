@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TOMI.Data.Database.Entities
 {
-    public class User
+    public class User : EntityBase
     {
         [Key]
         public Guid Id { get; set; }

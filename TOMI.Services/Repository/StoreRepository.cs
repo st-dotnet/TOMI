@@ -39,7 +39,7 @@ namespace TOMI.Services.Repository
                 {
                     var customers = _mapper.Map<Store>(store);
                     Store result = _context.Stores.Add(customers).Entity;
-                    _context.SaveChanges();
+                   await  _context.SaveChangesAsync();
                     return new StoreModelResponse
                     {
                         store = result,
@@ -104,16 +104,16 @@ namespace TOMI.Services.Repository
                 {
                     records = csv.GetRecords<StoreDetailsResponse>().ToList();
 
-                    var storedetails = _mapper.Map<List<Stock>>(records);
+                    var storedetails = _mapper.Map<List<Sales>>(records);
                     //Loop and insert records.  
-                    foreach (Stock storedetail in storedetails)
+                    foreach (Sales storedetail in storedetails)
                     {
                         storedetail.CustomerId = stockModel.CustomerId;
                         storedetail.StoreId = stockModel.StoreId;
                         storedetail.StockDate = stockModel.StockDate;
 
 
-                        _context.Stocks.Add(storedetail);
+                        _context.Sales.Add(storedetail);
                     }
                 }
                 // Submit the change to the database.
@@ -128,7 +128,7 @@ namespace TOMI.Services.Repository
                     // Make some adjustments.
                     // ...
                     // Try again.
-                    _context.SaveChanges();
+                   await _context.SaveChangesAsync();
                 }
                 isSaveSuccess = true;
             }
@@ -234,9 +234,9 @@ namespace TOMI.Services.Repository
                 Success = isSaveSuccess
             }; ; ;
         }
-        public async Task<List<Stock>> GetStockData(StockModelRequest request)
+        public async Task<List<Sales>> GetStockData(StockModelRequest request)
         {
-            var response = await _context.Stocks.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate == request.StockDate).ToListAsync();
+            var response = await _context.Sales.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate == request.StockDate).ToListAsync();
             return response;
         }
         public async Task<List<Master>> GetMasterData(MasterModelRequest request)

@@ -13,7 +13,7 @@ namespace TOMI.Services.Interfaces
         Task<GetStoreListResponse> GetUserByCustomereAsync(string customerId);
         Task<FileUplaodRespone> StocksData(StockModel stockModel);
         Task<FileUplaodRespone> MasterData(MasterDataModel masterData);
-        Task<List<Stock>> GetStockData(StockModelRequest request);
+        Task<List<Sales>> GetStockData(StockModelRequest request);
         Task<List<Master>> GetMasterData(MasterModelRequest request);
 
 

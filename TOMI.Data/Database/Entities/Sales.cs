@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TOMI.Data.Database.Entities
 {
-    public class Stock
+    public class Sales:EntityBase
     {
         [Key]
         public Guid Id { get; set; }
@@ -24,7 +24,7 @@ namespace TOMI.Data.Database.Entities
         public string Departmentname { get; set; }
         public Guid? CustomerId { get; set; }
         public Guid? StoreId { get; set; }
-        public DateTime? StockDate { get; set; }
+        public DateTimeOffset? StockDate { get; set; }
 
 
 

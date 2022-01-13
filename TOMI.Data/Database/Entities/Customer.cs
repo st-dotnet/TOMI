@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace TOMI.Data.Database.Entities
 {
-    public class Customer
+    public class Customer: EntityBase
     {
         [Key]
         public Guid Id { get; set; }

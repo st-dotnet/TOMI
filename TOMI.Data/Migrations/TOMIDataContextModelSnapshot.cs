@@ -25,8 +25,29 @@ namespace TOMI.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("Deletedby")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -36,6 +57,7 @@ namespace TOMI.Data.Migrations
                         new
                         {
                             Id = new Guid("b74ddd14-6340-4840-95c2-db12554843e5"),
+                            IsActive = false,
                             Name = "Test"
                         });
                 });
@@ -46,29 +68,47 @@ namespace TOMI.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Barcode")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Blank")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid?>("CustomerId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Filler")
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("Deletedby")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Department")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Quantity")
+                    b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RecordId")
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("OHQuantity")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RetailPrice")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SKU")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("StockDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Store")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTimeOffset?>("StockDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<Guid?>("StoreId")
                         .HasColumnType("uniqueidentifier");
@@ -76,12 +116,18 @@ namespace TOMI.Data.Migrations
                     b.Property<string>("Unity")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.ToTable("MasterData");
                 });
 
-            modelBuilder.Entity("TOMI.Data.Database.Entities.Stock", b =>
+            modelBuilder.Entity("TOMI.Data.Database.Entities.Sales", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -90,11 +136,23 @@ namespace TOMI.Data.Migrations
                     b.Property<string>("Area")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid?>("CustomerId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Date")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("Deletedby")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Department")
                         .HasColumnType("nvarchar(max)");
@@ -111,6 +169,9 @@ namespace TOMI.Data.Migrations
                     b.Property<string>("HUA")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Lineal")
                         .HasColumnType("nvarchar(max)");
 
@@ -126,8 +187,8 @@ namespace TOMI.Data.Migrations
                     b.Property<string>("SKU")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime?>("StockDate")
-                        .HasColumnType("datetime2");
+                    b.Property<DateTimeOffset?>("StockDate")
+                        .HasColumnType("datetimeoffset");
 
                     b.Property<string>("Store")
                         .HasColumnType("nvarchar(max)");
@@ -141,6 +202,77 @@ namespace TOMI.Data.Migrations
                     b.Property<string>("Total")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Sales");
+                });
+
+            modelBuilder.Entity("TOMI.Data.Database.Entities.Stocks", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Barcode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Blank")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("Deletedby")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Department")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("OHQuantity")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RetailPrice")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SKU")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("StockDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("StoreId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Unity")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
                     b.HasKey("Id");
 
                     b.ToTable("Stocks");
@@ -152,11 +284,32 @@ namespace TOMI.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("Deletedby")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -171,7 +324,19 @@ namespace TOMI.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("Deletedby")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Email")
@@ -179,6 +344,9 @@ namespace TOMI.Data.Migrations
 
                     b.Property<string>("FirstName")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<string>("LastName")
                         .HasColumnType("nvarchar(max)");
@@ -193,6 +361,12 @@ namespace TOMI.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<Guid?>("StoreId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("UpdatedBy")
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
@@ -212,8 +386,9 @@ namespace TOMI.Data.Migrations
                             CustomerId = new Guid("b74ddd14-6340-4840-95c2-db12554843e5"),
                             Email = "admin@gmail.com",
                             FirstName = "Admin",
+                            IsActive = false,
                             LastName = "Admin",
-                            Password = "AQAAAAEAACcQAAAAEP1cZvUrkonirlrRIkO1aUURGKmKE13WPjb+UWingoIqXAmomcbjur+kbXgIxTyb3g==",
+                            Password = "AQAAAAEAACcQAAAAEFM6byPsXgri6RW7E8qgQD9r4U6rN8pwGYWGpJ5jFXJfKFgpdL5DBpVr6JnuWmz6oQ==",
                             PhoneNumber = "1234567890",
                             Role = "SuperAdmin"
                         });
