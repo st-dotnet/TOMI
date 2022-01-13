@@ -23,4 +23,9 @@ namespace TOMI.Services.Models
         public IList<Store> store { get; set; }
     }
 
+
+    public class FileUplaodRespone : BaseResponse
+    {
+        public string stockRecordCount { get; set; }
+    }
 }

@@ -11,8 +11,8 @@ namespace TOMI.Services.Interfaces
     {
         Task<StoreModelResponse> CreateStore(StoreModel user);
         Task<GetStoreListResponse> GetUserByCustomereAsync(string customerId);
-        Task<bool> StocksData(StockModel stockModel);
-        Task<bool> MasterData(MasterDataModel masterData);
+        Task<FileUplaodRespone> StocksData(StockModel stockModel);
+        Task<FileUplaodRespone> MasterData(MasterDataModel masterData);
         Task<List<Stock>> GetStockData(StockModelRequest request);
         Task<List<Master>> GetMasterData(MasterModelRequest request);
 

@@ -1,26 +1,23 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TOMI.Data.Database.Entities
 {
-    public class Master
+    public class Master:EntityBase
     {
         [Key]
         public Guid Id { get; set; }
-        public string Store { get; set; }
         public string SKU { get; set; }
-        public string Filler { get; set; }
+        public string Barcode { get; set; }
+        public string RetailPrice { get; set; }
+        public string Description { get; set; }
+        public string Department { get; set; }
         public string Blank { get; set; }
-        public string RecordId { get; set; }
-        public string Quantity { get; set; }
+        public string OHQuantity { get; set; }
         public string Unity { get; set; }
         public Guid? CustomerId { get; set; }
         public Guid? StoreId { get; set; }
-        public DateTime? StockDate { get; set; }
+        public DateTimeOffset? StockDate { get; set; }
 
 
 

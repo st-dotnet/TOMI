@@ -67,11 +67,11 @@ namespace TOMI.Services.Repository
 
             }
         }
-        public async Task<bool> StocksData(StockModel stockModel)
+        public async Task<FileUplaodRespone> StocksData(StockModel stockModel)
         {
             bool isSaveSuccess = false;
             string fileName;
-
+            List<StoreDetailsResponse> records = new List<StoreDetailsResponse>();
             try
             {
                 var extension = "." + stockModel.File.FileName.Split('.')[stockModel.File.FileName.Split('.').Length - 1];
@@ -98,7 +98,7 @@ namespace TOMI.Services.Repository
                     BadDataFound = null,
                     Delimiter = "|",
                 };
-                List<StoreDetailsResponse> records = new List<StoreDetailsResponse>();
+              
                 using (var reader = new StreamReader(path))
                 using (var csv = new CsvReader(reader, config))
                 {
@@ -137,18 +137,22 @@ namespace TOMI.Services.Repository
                 //log error
             }
 
-            return isSaveSuccess;
+             return new FileUplaodRespone
+            {
+                 stockRecordCount = records.Count.ToString(),
+                Success = isSaveSuccess
+             }; ;
         }
-        public async Task<bool> MasterData(MasterDataModel masterData)
+        public async Task<FileUplaodRespone> MasterData(MasterDataModel masterData)
         {
             bool isSaveSuccess = false;
             string fileName;
-
+            List<MasterDataResponse> records = new List<MasterDataResponse>();
             try
             {
                 var extension = "." + masterData.File.FileName.Split('.')[masterData.File.FileName.Split('.').Length - 1];
                 fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
-
+          
                 var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
 
                 if (!Directory.Exists(pathBuilt))
@@ -156,7 +160,7 @@ namespace TOMI.Services.Repository
                     Directory.CreateDirectory(pathBuilt);
                 }
 
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
+                  var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
                    fileName);
 
 
@@ -170,12 +174,27 @@ namespace TOMI.Services.Repository
                     BadDataFound = null,
                     Delimiter = "|",
                 };
-                List<MasterDataResponse> records = new List<MasterDataResponse>();
-                using (var reader = new StreamReader(path))
-                using (var csv = new CsvReader(reader, config))
+                var temp = File.ReadAllLines(path);
+               
+                foreach (string line in temp)
                 {
-                    records = csv.GetRecords<MasterDataResponse>().ToList();
-
+                    var delimitedLine = line.Split('\t'); //set ur separator, in this case tab
+                    MasterDataResponse masterdata = new MasterDataResponse();
+                    masterdata.SKU = line.Substring(0, 26);
+                    masterdata.Barcode = line.Substring(27, 30);
+                    masterdata.RetailPrice = line.Substring(58 , 11);
+                    masterdata.Description = line.Substring(70, 40);
+                    masterdata.Department = line.Substring(110, 02);
+                    masterdata.Blank = line.Substring(112,11);
+                    masterdata.OHQuantity = line.Substring(122, 11);
+                    masterdata.Unity = line.Substring(134, 3);
+                    records.Add(masterdata);
+                }
+                //using (var reader = new StreamReader(path))
+                //using (var csv = new CsvReader(reader, config))
+                //{
+                //    records = csv.GetRecords<MasterDataResponse>().ToList();
+                //}
                     var storedetails = _mapper.Map<List<Master>>(records);
                     //Loop and insert records.  
                     foreach (Master storedetail in storedetails)
@@ -187,7 +206,7 @@ namespace TOMI.Services.Repository
 
                         _context.MasterData.Add(storedetail);
                     }
-                }
+                
                 // Submit the change to the database.
                 try
                 {
@@ -209,7 +228,11 @@ namespace TOMI.Services.Repository
                 //log error
             }
 
-            return isSaveSuccess;
+             return new FileUplaodRespone
+            {
+                stockRecordCount = records.Count.ToString(),
+                Success = isSaveSuccess
+            }; ; ;
         }
         public async Task<List<Stock>> GetStockData(StockModelRequest request)
         {

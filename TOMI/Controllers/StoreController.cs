@@ -46,7 +46,7 @@ namespace TOMI.Web.Controllers
             }
         }
 
-        [HttpPost("upload")]
+        [HttpPost("ImportStockFile")]
         public async Task<IActionResult> UploadFile([FromForm] StockModel stockModel )
         {
             try
@@ -63,7 +63,7 @@ namespace TOMI.Web.Controllers
             }  
         }
 
-        [HttpPost("MasterFile")]
+        [HttpPost("ImportMasterFile")]
         public async Task<IActionResult> MasterFile([FromForm] MasterDataModel masterData)
         {
             try
