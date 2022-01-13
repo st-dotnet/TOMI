@@ -322,6 +322,9 @@ namespace TOMI.Services.Repository
                 Success = isSaveSuccess
             }; ; ;
         }
+
+
+
         public async Task<List<Sales>> GetSalesData(SalesModelRequest request)
         {
             var response = await _context.Sales.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate == request.StockDate).ToListAsync();
