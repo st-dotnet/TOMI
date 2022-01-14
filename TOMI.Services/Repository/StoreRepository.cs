@@ -173,19 +173,20 @@ namespace TOMI.Services.Repository
                     Delimiter = "|",
                 };
                 var temp = File.ReadAllLines(path);
+               
+
                 string regex = "^0+(?!$)";
                 foreach (string line in temp)
                 {
-           
                     MasterDataResponse masterdata = new MasterDataResponse();
                     masterdata.SKU = Regex.Replace(line.Substring(0, 26), regex, "");
-                    masterdata.Barcode = line.Substring(27, 30);
-                    masterdata.RetailPrice = line.Substring(58 , 11);
-                    masterdata.Description = line.Substring(70, 40);
-                    masterdata.Department = line.Substring(110, 02);
-                    masterdata.Blank = line.Substring(112,11);
-                    masterdata.OHQuantity = line.Substring(122, 11);
-                    masterdata.Unity = line.Substring(134, 3);
+                    masterdata.Barcode = (line.Substring(27, 30).Trim());
+                    masterdata.RetailPrice = Regex.Replace(line.Substring(58, 11), regex, ""); 
+                    masterdata.Description = (line.Substring(70, 40).Trim());
+                    masterdata.Department = (line.Substring(110, 02).Trim());
+                    masterdata.Blank = (line.Substring(112,11).Trim());
+                    masterdata.OHQuantity = "0";
+                    masterdata.Unity = (line.Substring(134, 3).Trim());
                     records.Add(masterdata);
                 }
             
@@ -264,18 +265,16 @@ namespace TOMI.Services.Repository
                 string regex = "^0+(?!$)";
                 foreach (string line in temp)
                 {
-
-                
                     StocksDataResponse stockdata = new StocksDataResponse();
                     stockdata.SKU = Regex.Replace(line.Substring(0, 26), regex, "");
-                    stockdata.Barcode = line.Substring(27, 30);
-                    stockdata.RetailPrice = line.Substring(58, 11);
-                    stockdata.Description = line.Substring(70, 40);
-                    stockdata.Department = line.Substring(110, 02);
-                    stockdata.Blank = line.Substring(112, 11);
-                    stockdata.OHQuantity = line.Substring(122, 11);
-                    stockdata.Unity = line.Substring(134, 3);
-              
+                    stockdata.Barcode = (line.Substring(27, 30).Trim());
+                    stockdata.RetailPrice = Regex.Replace(line.Substring(58, 11), regex, "");
+                    stockdata.Description = (line.Substring(70, 40).Trim());
+                    stockdata.Department = (line.Substring(110, 02).Trim());
+                    stockdata.Blank = (line.Substring(112, 11).Trim());
+                    stockdata.OHQuantity = (line.Substring(122, 11).Trim());
+                    stockdata.Unity = (line.Substring(134, 3).Trim());
+
                     records.Add(stockdata);
                 }
                

@@ -388,7 +388,7 @@ namespace TOMI.Data.Migrations
                             FirstName = "Admin",
                             IsActive = false,
                             LastName = "Admin",
-                            Password = "AQAAAAEAACcQAAAAEMWa0uieWGDuAfflWXpbeTX5pG/qNiCuxzLzPv65L0jIIy1SuUwzwh3y1dO8SEN8Ng==",
+                            Password = "AQAAAAEAACcQAAAAENv8fJmGdPeOAYXwSiPM2XyrJ2ON/BxcI/5RXxQPx+rV2Go/CLq7qZloFwUn+zTUNg==",
                             PhoneNumber = "1234567890",
                             Role = "SuperAdmin"
                         });
