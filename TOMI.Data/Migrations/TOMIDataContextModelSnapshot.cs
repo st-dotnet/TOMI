@@ -124,7 +124,7 @@ namespace TOMI.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("MasterData");
+                    b.ToTable("Master");
                 });
 
             modelBuilder.Entity("TOMI.Data.Database.Entities.Sales", b =>
@@ -388,7 +388,7 @@ namespace TOMI.Data.Migrations
                             FirstName = "Admin",
                             IsActive = false,
                             LastName = "Admin",
-                            Password = "AQAAAAEAACcQAAAAEGHqOuCNxbglBQ8cWZJr1TvpACErfK7UpxkNWLd/APTWA7X1d+83OYMEiH6R/WheWg==",
+                            Password = "AQAAAAEAACcQAAAAEMWa0uieWGDuAfflWXpbeTX5pG/qNiCuxzLzPv65L0jIIy1SuUwzwh3y1dO8SEN8Ng==",
                             PhoneNumber = "1234567890",
                             Role = "SuperAdmin"
                         });

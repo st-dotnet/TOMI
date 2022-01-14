@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using CsvHelper;
 using CsvHelper.Configuration;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using TOMI.Data.Database;
@@ -175,12 +173,12 @@ namespace TOMI.Services.Repository
                     Delimiter = "|",
                 };
                 var temp = File.ReadAllLines(path);
-               
+                string regex = "^0+(?!$)";
                 foreach (string line in temp)
                 {
-                    var delimitedLine = line.Split('\t'); //set ur separator, in this case tab
+           
                     MasterDataResponse masterdata = new MasterDataResponse();
-                    masterdata.SKU = line.Substring(0, 26);
+                    masterdata.SKU = Regex.Replace(line.Substring(0, 26), regex, "");
                     masterdata.Barcode = line.Substring(27, 30);
                     masterdata.RetailPrice = line.Substring(58 , 11);
                     masterdata.Description = line.Substring(70, 40);
@@ -190,11 +188,7 @@ namespace TOMI.Services.Repository
                     masterdata.Unity = line.Substring(134, 3);
                     records.Add(masterdata);
                 }
-                //using (var reader = new StreamReader(path))
-                //using (var csv = new CsvReader(reader, config))
-                //{
-                //    records = csv.GetRecords<MasterDataResponse>().ToList();
-                //}
+            
                     var storedetails = _mapper.Map<List<Master>>(records);
                     //Loop and insert records.  
                     foreach (Master storedetail in storedetails)
@@ -204,7 +198,7 @@ namespace TOMI.Services.Repository
                         storedetail.StockDate = masterData.StockDate;
 
 
-                        _context.MasterData.Add(storedetail);
+                        _context.Master.Add(storedetail);
                     }
                 
                 // Submit the change to the database.
@@ -267,33 +261,35 @@ namespace TOMI.Services.Repository
                     Delimiter = "|",
                 };
                 var temp = File.ReadAllLines(path);
-
+                string regex = "^0+(?!$)";
                 foreach (string line in temp)
                 {
-                    var delimitedLine = line.Split('\t'); //set ur separator, in this case tab
-                    StocksDataResponse masterdata = new StocksDataResponse();
-                    masterdata.SKU = line.Substring(0, 26);
-                    masterdata.Barcode = line.Substring(27, 30);
-                    masterdata.RetailPrice = line.Substring(58, 11);
-                    masterdata.Description = line.Substring(70, 40);
-                    masterdata.Department = line.Substring(110, 02);
-                    masterdata.Blank = line.Substring(112, 11);
-                    masterdata.OHQuantity = line.Substring(122, 11);
-                    masterdata.Unity = line.Substring(134, 3);
-                    records.Add(masterdata);
+
+                
+                    StocksDataResponse stockdata = new StocksDataResponse();
+                    stockdata.SKU = Regex.Replace(line.Substring(0, 26), regex, "");
+                    stockdata.Barcode = line.Substring(27, 30);
+                    stockdata.RetailPrice = line.Substring(58, 11);
+                    stockdata.Description = line.Substring(70, 40);
+                    stockdata.Department = line.Substring(110, 02);
+                    stockdata.Blank = line.Substring(112, 11);
+                    stockdata.OHQuantity = line.Substring(122, 11);
+                    stockdata.Unity = line.Substring(134, 3);
+              
+                    records.Add(stockdata);
                 }
                
                 var storedetails = _mapper.Map<List<Stocks>>(records);
-                //Loop and insert records.  
-                foreach (Stocks storedetail in storedetails)
+               //Loop and insert records.  
+               foreach (Stocks storedetail in storedetails)
                 {
                     storedetail.CustomerId = stocksData.CustomerId;
-                    storedetail.StoreId = stocksData.StoreId;
-                    storedetail.StockDate = stocksData.StockDate;
+                  storedetail.StoreId = stocksData.StoreId;
+                  storedetail.StockDate = stocksData.StockDate;
 
 
-                    _context.Stocks.Add(storedetail);
-                }
+                 _context.Stocks.Add(storedetail);
+               }
 
                 // Submit the change to the database.
                 try
@@ -304,9 +300,7 @@ namespace TOMI.Services.Repository
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
-                    // Make some adjustments.
-                    // ...
-                    // Try again.
+                  
                     _context.SaveChanges();
                 }
                 isSaveSuccess = true;
@@ -332,7 +326,7 @@ namespace TOMI.Services.Repository
         }
         public async Task<List<Master>> GetMasterData(MasterModelRequest request)
         {
-            var response = await _context.MasterData.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate == request.StockDate).ToListAsync();
+            var response = await _context.Master.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate == request.StockDate).ToListAsync();
             return response;
         }
 

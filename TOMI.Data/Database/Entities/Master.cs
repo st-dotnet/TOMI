@@ -18,9 +18,5 @@ namespace TOMI.Data.Database.Entities
         public Guid? CustomerId { get; set; }
         public Guid? StoreId { get; set; }
         public DateTimeOffset? StockDate { get; set; }
-
-
-
-
     }
 }

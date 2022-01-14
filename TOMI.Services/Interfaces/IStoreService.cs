@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using TOMI.Data.Database.Entities;
 using TOMI.Services.Models;
 
@@ -17,11 +15,5 @@ namespace TOMI.Services.Interfaces
         Task<List<Sales>> GetSalesData(SalesModelRequest request);
         Task<List<Master>> GetMasterData(MasterModelRequest request);
         Task<List<Stocks>> GetStocksData(StocksModelRequest request);
-
-
-
-
-
-
     }
 }
