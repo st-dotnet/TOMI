@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using TOMI.Data.Database.Entities;
 
 namespace TOMI.Services.Models
 {
-   public class StoreModel
+    public class StoreModel
     {
         public Guid CustomerId { get; set; }
 
