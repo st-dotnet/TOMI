@@ -14,6 +14,7 @@ namespace TOMI.Services.Helpers
             CreateMap<SalesDetailResponse, Sales>();
             CreateMap<MasterDataResponse, Master>();
             CreateMap<StocksDataResponse, Stocks>();
+            CreateMap<RangesModel, Ranges>();
         }
     }
 }

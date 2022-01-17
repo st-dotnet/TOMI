@@ -15,6 +15,7 @@ using TOMI.Services.Common.Extensions;
 using TOMI.Services.Helpers;
 using TOMI.Services.Interfaces;
 using TOMI.Services.Interfaces.CustomerService;
+using TOMI.Services.Interfaces.RangesService;
 using TOMI.Services.Repository;
 
 namespace TOMI
@@ -60,6 +61,7 @@ namespace TOMI
             services.AddTransient<ICustomerService, CustomerRepository>();
             services.AddTransient<IUserService, UserRepository>();
             services.AddTransient<IStoreService, StoreRepository>();
+            services.AddTransient<IRangesService, RangeRepository>();
             // add Swagger 
             services.AddSwaggerGen(setup =>
             {
