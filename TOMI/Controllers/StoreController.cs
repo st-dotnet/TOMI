@@ -47,7 +47,7 @@ namespace TOMI.Web.Controllers
         }
 
         [HttpPost("ImportSalesFile")]
-        public async Task<IActionResult> UploadFile([FromForm] SalesDataModel stockModel )
+        public async Task<IActionResult> UploadFile([FromForm] FilterDataModel stockModel )
         {
             try
             {
@@ -64,7 +64,7 @@ namespace TOMI.Web.Controllers
         }
 
         [HttpPost("ImportMasterFile")]
-        public async Task<IActionResult> MasterFile([FromForm] MasterDataModel masterData)
+        public async Task<IActionResult> MasterFile([FromForm] FilterDataModel masterData)
         {
             try
             {
@@ -81,7 +81,7 @@ namespace TOMI.Web.Controllers
         }
 
         [HttpPost("ImportStockFile")]
-        public async Task<IActionResult> StockFile([FromForm] StocksDataModel stockData)
+        public async Task<IActionResult> StockFile([FromForm] FilterDataModel stockData)
         {
             try
             {
@@ -104,7 +104,7 @@ namespace TOMI.Web.Controllers
         /// <param name="request">SalesModelRequest</param>
         /// <returns></returns>
         [HttpPost("GetSalesData")]
-        public async Task<IActionResult> GetSalesData(SalesModelRequest request)
+        public async Task<IActionResult> GetSalesData(FilterDataRequest request)
         {
             try
             {
@@ -123,7 +123,7 @@ namespace TOMI.Web.Controllers
         /// <param name="request">MasterModelRequest</param>
         /// <returns></returns>
         [HttpPost("GetMasterData")]
-        public async Task<IActionResult> GetMasterData(MasterModelRequest request)
+        public async Task<IActionResult> GetMasterData(FilterDataRequest request)
         {
             try
             {
@@ -142,7 +142,7 @@ namespace TOMI.Web.Controllers
         /// <param name="request">StocksModelRequest</param>
         /// <returns></returns>
         [HttpPost("GetStocksData")]
-        public async Task<IActionResult> GetStocksData(StocksModelRequest request)
+        public async Task<IActionResult> GetStocksData(FilterDataRequest request)
         {
             try
             {

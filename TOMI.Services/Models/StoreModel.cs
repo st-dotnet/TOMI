@@ -17,12 +17,10 @@ namespace TOMI.Services.Models
     {
         public Store store { get; set; }
     }
-
     public class GetStoreListResponse : BaseResponse
     {
         public IList<Store> store { get; set; }
     }
-
 
     public class FileUplaodRespone : BaseResponse
     {

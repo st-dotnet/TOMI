@@ -65,7 +65,7 @@ namespace TOMI.Services.Repository
 
             }
         }
-        public async Task<FileUplaodRespone> SalesData(SalesDataModel stockModel)
+        public async Task<FileUplaodRespone> SalesData(FilterDataModel stockModel)
         {
             bool isSaveSuccess = false;
             string fileName;
@@ -141,7 +141,7 @@ namespace TOMI.Services.Repository
                 Success = isSaveSuccess
              }; ;
         }
-        public async Task<FileUplaodRespone> MasterData(MasterDataModel masterData)
+        public async Task<FileUplaodRespone> MasterData(FilterDataModel masterData)
         {
             bool isSaveSuccess = false;
             string fileName;
@@ -230,7 +230,7 @@ namespace TOMI.Services.Repository
             }; ; ;
         }
 
-        public async Task<FileUplaodRespone> StocksData(StocksDataModel stocksData)
+        public async Task<FileUplaodRespone> StocksData(FilterDataModel stocksData)
         {
             bool isSaveSuccess = false;
             string fileName;
@@ -318,20 +318,20 @@ namespace TOMI.Services.Repository
 
 
 
-        public async Task<List<Sales>> GetSalesData(SalesModelRequest request)
+        public async Task<List<Sales>> GetSalesData(FilterDataRequest request)
         {
             var response = await _context.Sales.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate == request.StockDate).ToListAsync();
             return response;
         }
-        public async Task<List<Master>> GetMasterData(MasterModelRequest request)
+        public async Task<List<Master>> GetMasterData(FilterDataRequest request)
         {
-            var response = await _context.Master.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate == request.StockDate).ToListAsync();
+            var response = await _context.Master.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate == request.StockDate).Take(500).ToListAsync();
             return response;
         }
 
-        public async Task<List<Stocks>> GetStocksData(StocksModelRequest request)
+        public async Task<List<Stocks>> GetStocksData(FilterDataRequest request)
         {
-            var response = await _context.Stocks.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate == request.StockDate).ToListAsync();
+            var response = await _context.Stocks.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate == request.StockDate).Take(500).ToListAsync();
             return response;
         }
     }

@@ -11,9 +11,9 @@ namespace TOMI.Data.Database
         public DbSet<User> Users { get; set; }
         public DbSet<Store> Stores { get; set; }
         public DbSet<Sales> Sales { get; set; }
-
         public DbSet<Stocks> Stocks { get; set; }
         public DbSet<Master> Master { get; set; }
+        public DbSet<Ranges> Ranges { get; set; }
 
         public TOMIDataContext(DbContextOptions<TOMIDataContext> options)
             : base(options)

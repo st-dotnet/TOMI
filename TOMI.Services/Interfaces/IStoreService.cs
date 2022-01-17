@@ -9,11 +9,11 @@ namespace TOMI.Services.Interfaces
     {
         Task<StoreModelResponse> CreateStore(StoreModel user);
         Task<GetStoreListResponse> GetUserByCustomereAsync(string customerId);
-        Task<FileUplaodRespone> SalesData(SalesDataModel stockModel);
-        Task<FileUplaodRespone> MasterData(MasterDataModel masterData);
-        Task<FileUplaodRespone> StocksData(StocksDataModel stocksData);
-        Task<List<Sales>> GetSalesData(SalesModelRequest request);
-        Task<List<Master>> GetMasterData(MasterModelRequest request);
-        Task<List<Stocks>> GetStocksData(StocksModelRequest request);
+        Task<FileUplaodRespone> SalesData(FilterDataModel stockModel);
+        Task<FileUplaodRespone> MasterData(FilterDataModel masterData);
+        Task<FileUplaodRespone> StocksData(FilterDataModel stocksData);
+        Task<List<Sales>> GetSalesData(FilterDataRequest request);
+        Task<List<Master>> GetMasterData(FilterDataRequest request);
+        Task<List<Stocks>> GetStocksData(FilterDataRequest request);
     }
 }
