@@ -8,7 +8,7 @@ namespace TOMI.Data.Database.Entities
         [Key]
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public string Group { get; set; }
+        public string GroupId { get; set; }
         public string TagFrom { get; set; }
         public string TagTo { get; set; }
         public Guid? CustomerId { get; set; }

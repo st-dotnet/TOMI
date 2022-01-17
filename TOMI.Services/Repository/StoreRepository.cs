@@ -37,7 +37,7 @@ namespace TOMI.Services.Repository
                 {
                     var customers = _mapper.Map<Store>(store);
                     Store result = _context.Stores.Add(customers).Entity;
-                   await  _context.SaveChangesAsync();
+                    await _context.SaveChangesAsync();
                     return new StoreModelResponse
                     {
                         store = result,
@@ -96,7 +96,7 @@ namespace TOMI.Services.Repository
                     BadDataFound = null,
                     Delimiter = "|",
                 };
-              
+
                 using (var reader = new StreamReader(path))
                 using (var csv = new CsvReader(reader, config))
                 {
@@ -126,7 +126,7 @@ namespace TOMI.Services.Repository
                     // Make some adjustments.
                     // ...
                     // Try again.
-                   await _context.SaveChangesAsync();
+                    await _context.SaveChangesAsync();
                 }
                 isSaveSuccess = true;
             }
@@ -135,11 +135,11 @@ namespace TOMI.Services.Repository
                 //log error
             }
 
-             return new FileUplaodRespone
+            return new FileUplaodRespone
             {
-                 stockRecordCount = records.Count.ToString(),
+                stockRecordCount = records.Count.ToString(),
                 Success = isSaveSuccess
-             }; ;
+            }; ;
         }
         public async Task<FileUplaodRespone> MasterData(FilterDataModel masterData)
         {
@@ -150,7 +150,7 @@ namespace TOMI.Services.Repository
             {
                 var extension = "." + masterData.File.FileName.Split('.')[masterData.File.FileName.Split('.').Length - 1];
                 fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
-          
+
                 var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
 
                 if (!Directory.Exists(pathBuilt))
@@ -158,8 +158,8 @@ namespace TOMI.Services.Repository
                     Directory.CreateDirectory(pathBuilt);
                 }
 
-                  var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
-                   fileName);
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
+                 fileName);
 
 
                 using (var stream = new FileStream(path, FileMode.Create))
@@ -173,7 +173,7 @@ namespace TOMI.Services.Repository
                     Delimiter = "|",
                 };
                 var temp = File.ReadAllLines(path);
-               
+
 
                 string regex = "^0+(?!$)";
                 foreach (string line in temp)
@@ -181,27 +181,27 @@ namespace TOMI.Services.Repository
                     MasterDataResponse masterdata = new MasterDataResponse();
                     masterdata.SKU = Regex.Replace(line.Substring(0, 26), regex, "");
                     masterdata.Barcode = (line.Substring(27, 30).Trim());
-                    masterdata.RetailPrice = Regex.Replace(line.Substring(58, 11), regex, ""); 
+                    masterdata.RetailPrice = Regex.Replace(line.Substring(58, 11), regex, "");
                     masterdata.Description = (line.Substring(70, 40).Trim());
                     masterdata.Department = (line.Substring(110, 02).Trim());
-                    masterdata.Blank = (line.Substring(112,11).Trim());
+                    masterdata.Blank = (line.Substring(112, 11).Trim());
                     masterdata.OHQuantity = "0";
                     masterdata.Unity = (line.Substring(134, 3).Trim());
                     records.Add(masterdata);
                 }
-            
-                    var storedetails = _mapper.Map<List<Master>>(records);
-                    //Loop and insert records.  
-                    foreach (Master storedetail in storedetails)
-                    {
-                        storedetail.CustomerId = masterData.CustomerId;
-                        storedetail.StoreId = masterData.StoreId;
-                        storedetail.StockDate = masterData.StockDate;
+
+                var storedetails = _mapper.Map<List<Master>>(records);
+                //Loop and insert records.  
+                foreach (Master storedetail in storedetails)
+                {
+                    storedetail.CustomerId = masterData.CustomerId;
+                    storedetail.StoreId = masterData.StoreId;
+                    storedetail.StockDate = masterData.StockDate;
 
 
-                        _context.Master.Add(storedetail);
-                    }
-                
+                    _context.Master.Add(storedetail);
+                }
+
                 // Submit the change to the database.
                 try
                 {
@@ -223,7 +223,7 @@ namespace TOMI.Services.Repository
                 //log error
             }
 
-             return new FileUplaodRespone
+            return new FileUplaodRespone
             {
                 stockRecordCount = records.Count.ToString(),
                 Success = isSaveSuccess
@@ -265,7 +265,9 @@ namespace TOMI.Services.Repository
                 string regex = "^0+(?!$)";
                 foreach (string line in temp)
                 {
+
                     StocksDataResponse stockdata = new StocksDataResponse();
+
                     stockdata.SKU = Regex.Replace(line.Substring(0, 26), regex, "");
                     stockdata.Barcode = (line.Substring(27, 30).Trim());
                     stockdata.RetailPrice = Regex.Replace(line.Substring(58, 11), regex, "");
@@ -274,21 +276,28 @@ namespace TOMI.Services.Repository
                     stockdata.Blank = (line.Substring(112, 11).Trim());
                     stockdata.OHQuantity = (line.Substring(122, 11).Trim());
                     stockdata.Unity = (line.Substring(134, 3).Trim());
-
                     records.Add(stockdata);
+                    //var isMasterSkuExist = _context.Master.FirstOrDefault(x => x.SKU == stockdata.SKU);
+                    //if (isMasterSkuExist != null)
+                    //{
+                    //    isMasterSkuExist.OHQuantity = stockdata.OHQuantity;
+                    //    _context.Master.Update(isMasterSkuExist);
+                    //}
                 }
-               
+
+
+
                 var storedetails = _mapper.Map<List<Stocks>>(records);
-               //Loop and insert records.  
-               foreach (Stocks storedetail in storedetails)
+                //Loop and insert records.  
+                foreach (Stocks storedetail in storedetails)
                 {
                     storedetail.CustomerId = stocksData.CustomerId;
-                  storedetail.StoreId = stocksData.StoreId;
-                  storedetail.StockDate = stocksData.StockDate;
-
-
-                 _context.Stocks.Add(storedetail);
-               }
+                    storedetail.StoreId = stocksData.StoreId;
+                    storedetail.StockDate = stocksData.StockDate;
+                    
+                    _context.Stocks.Add(storedetail);
+                   
+                }
 
                 // Submit the change to the database.
                 try
@@ -299,7 +308,7 @@ namespace TOMI.Services.Repository
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
-                  
+
                     _context.SaveChanges();
                 }
                 isSaveSuccess = true;
