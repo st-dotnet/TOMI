@@ -10,7 +10,7 @@ using TOMI.Data.Database;
 namespace TOMI.Data.Migrations
 {
     [DbContext(typeof(TOMIDataContext))]
-    [Migration("20220117081546_MyFirstMigration")]
+    [Migration("20220117133447_MyFirstMigration")]
     partial class MyFirstMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -62,6 +62,41 @@ namespace TOMI.Data.Migrations
                             IsActive = false,
                             Name = "Test"
                         });
+                });
+
+            modelBuilder.Entity("TOMI.Data.Database.Entities.Group", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("Deletedby")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Group");
                 });
 
             modelBuilder.Entity("TOMI.Data.Database.Entities.Master", b =>
@@ -150,8 +185,8 @@ namespace TOMI.Data.Migrations
                     b.Property<Guid?>("Deletedby")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("Group")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("GroupId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -178,6 +213,8 @@ namespace TOMI.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
 
                     b.ToTable("Ranges");
                 });
@@ -443,10 +480,19 @@ namespace TOMI.Data.Migrations
                             FirstName = "Admin",
                             IsActive = false,
                             LastName = "Admin",
-                            Password = "AQAAAAEAACcQAAAAEOUsIQ/uDKyRif+3GnrWaMSZh93eVNDLxd5qJmNrmUo3LMOimZNapdXtpuyfCSOjtw==",
+                            Password = "AQAAAAEAACcQAAAAEAo6pc5LXr2zJmZ5yn6NQg39SYM8cmIYslp21vIk/SCmg9bRBuLPGVqtyPDJlcu55w==",
                             PhoneNumber = "1234567890",
                             Role = "SuperAdmin"
                         });
+                });
+
+            modelBuilder.Entity("TOMI.Data.Database.Entities.Ranges", b =>
+                {
+                    b.HasOne("TOMI.Data.Database.Entities.Group", "Group")
+                        .WithMany("Ranges")
+                        .HasForeignKey("GroupId");
+
+                    b.Navigation("Group");
                 });
 
             modelBuilder.Entity("TOMI.Data.Database.Entities.Store", b =>
@@ -483,6 +529,11 @@ namespace TOMI.Data.Migrations
                     b.Navigation("Stores");
 
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("TOMI.Data.Database.Entities.Group", b =>
+                {
+                    b.Navigation("Ranges");
                 });
 
             modelBuilder.Entity("TOMI.Data.Database.Entities.Store", b =>

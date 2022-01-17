@@ -23,4 +23,8 @@
     <ProjectReference Include="..\TOMI.Services\TOMI.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Upload\files\" />
+  </ItemGroup>
+
 </Project>

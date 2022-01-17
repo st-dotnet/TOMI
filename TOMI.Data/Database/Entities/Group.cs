@@ -12,5 +12,6 @@ namespace TOMI.Data.Database.Entities
         [Key]
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public virtual ICollection<Ranges> Ranges { get; set; }
     }
 }

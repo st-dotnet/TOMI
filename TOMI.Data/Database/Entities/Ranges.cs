@@ -8,12 +8,13 @@ namespace TOMI.Data.Database.Entities
         [Key]
         public Guid Id { get; set; }
         public string Name { get; set; }
-        public string GroupId { get; set; }
+        public Guid? GroupId { get; set; }
         public string TagFrom { get; set; }
         public string TagTo { get; set; }
         public Guid? CustomerId { get; set; }
         public Guid? StoreId { get; set; }
         public DateTimeOffset? StockDate { get; set; }
+        public virtual Group Group { get; set; }
 
     }
 }

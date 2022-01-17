@@ -32,6 +32,7 @@ namespace TOMI.Data.Database
                 else if (entity.State == EntityState.Deleted)
                 {
                     ((EntityBase)entity.Entity).DeletedAt = timestamp;
+                    ((EntityBase)entity.Entity).IsActive = true;
                     entity.State = EntityState.Modified;
                 }
             }

@@ -46,7 +46,7 @@ namespace TOMI.Web.Controllers
         /// Deleterange
         /// </summary>
         /// <returns></returns>
-        [HttpDelete("DeleteRange")]
+        [HttpDelete("DeleteRange/{rangeId}")]
         public async Task<IActionResult> DeleteRangeAsync(Guid rangeId)
         {
             try

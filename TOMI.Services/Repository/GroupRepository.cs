@@ -61,7 +61,7 @@ namespace TOMI.Services.Repository
 
         public async Task<List<Group>> GetGroupAsync()
         {
-            return await _context.Group.ToListAsync();
+            return await _context.Group.Where(x=>x.IsActive==false).ToListAsync();
         }
 
         public async Task<Group> UpdateGroup(GroupModel model)
@@ -71,10 +71,7 @@ namespace TOMI.Services.Repository
 
             if (result != null)
             {
-                result.Id = model.Id;
                 result.Name = model.Name;
-               
-
                 await _context.SaveChangesAsync();
 
                 return result;

@@ -135,7 +135,6 @@ namespace TOMI.Web.Controllers
                 throw;
             }
         }
-
         /// <summary>
         ///  this is used for get Stocks data by customerid, storeId and date
         /// </summary>
