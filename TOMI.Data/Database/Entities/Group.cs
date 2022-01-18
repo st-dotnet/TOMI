@@ -10,7 +10,7 @@ namespace TOMI.Data.Database.Entities
     public class Group:EntityBase
     {
         [Key]
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
         public string Name { get; set; }
     }
 }

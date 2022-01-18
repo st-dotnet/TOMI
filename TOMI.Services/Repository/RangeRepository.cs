@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
@@ -49,7 +50,16 @@ namespace TOMI.Services.Repository
             throw new ValidationException("Range not found!");
         }
 
+        public async Task<List<Ranges>> Search(string name)
+        {
+            
+            var res= await (from m in _context.Ranges
+                     where m.Name.Contains(name)
 
+                     select m).ToListAsync();
+            return res;
+
+        }
    
     }
 }

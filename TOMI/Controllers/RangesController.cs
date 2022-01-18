@@ -93,6 +93,25 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
+
+        /// <summary>
+        /// Search
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("Search")]
+        public async Task<IActionResult> Search(String name)
+        {
+            try
+            {
+               
+                var response = await _rangeService.Search(name);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
         #endregion
     }
 }

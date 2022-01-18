@@ -181,7 +181,7 @@ namespace TOMI.Services.Repository
                     MasterDataResponse masterdata = new MasterDataResponse();
                     masterdata.SKU = Regex.Replace(line.Substring(0, 26), regex, "");
                     masterdata.Barcode = (line.Substring(27, 30).Trim());
-                    masterdata.RetailPrice = Regex.Replace(line.Substring(58, 11), regex, "");
+                    masterdata.RetailPrice = (Regex.Replace(line.Substring(58, 11), regex, "")).Replace(",", ".");
                     masterdata.Description = (line.Substring(70, 40).Trim());
                     masterdata.Department = (line.Substring(110, 02).Trim());
                     masterdata.Blank = (line.Substring(112, 11).Trim());
@@ -265,43 +265,43 @@ namespace TOMI.Services.Repository
                 string regex = "^0+(?!$)";
                 foreach (string line in temp)
                 {
-
                     StocksDataResponse stockdata = new StocksDataResponse();
-
                     stockdata.SKU = Regex.Replace(line.Substring(0, 26), regex, "");
                     stockdata.Barcode = (line.Substring(27, 30).Trim());
-                    stockdata.RetailPrice = Regex.Replace(line.Substring(58, 11), regex, "");
+                    stockdata.RetailPrice = (Regex.Replace(line.Substring(58, 11), regex, "")).Replace(",", "."); 
                     stockdata.Description = (line.Substring(70, 40).Trim());
                     stockdata.Department = (line.Substring(110, 02).Trim());
                     stockdata.Blank = (line.Substring(112, 11).Trim());
-                    stockdata.OHQuantity = (line.Substring(122, 11).Trim());
+                    stockdata.OHQuantity = (Regex.Replace(line.Substring(122, 11), regex, "")).Trim();
                     stockdata.Unity = (line.Substring(134, 3).Trim());
+
                     records.Add(stockdata);
-                    //var isMasterSkuExist = _context.Master.FirstOrDefault(x => x.SKU == stockdata.SKU);
-                    //if (isMasterSkuExist != null)
-                    //{
-                    //    isMasterSkuExist.OHQuantity = stockdata.OHQuantity;
-                    //    _context.Master.Update(isMasterSkuExist);
-                    //}
+                    var isMasterSkuExist = _context.Master.FirstOrDefault(x => x.SKU == stockdata.SKU);
+                    if (isMasterSkuExist != null)
+                    {
+                        isMasterSkuExist.OHQuantity = stockdata.OHQuantity;
+                        _context.Master.Update(isMasterSkuExist);
+                        await _context.SaveChangesAsync();
+                    }
+
                 }
-
-
 
                 var storedetails = _mapper.Map<List<Stocks>>(records);
                 //Loop and insert records.  
                 foreach (Stocks storedetail in storedetails)
                 {
+                    
                     storedetail.CustomerId = stocksData.CustomerId;
                     storedetail.StoreId = stocksData.StoreId;
                     storedetail.StockDate = stocksData.StockDate;
-                    
+                   
                     _context.Stocks.Add(storedetail);
                    
                 }
 
                 // Submit the change to the database.
                 try
-                {
+                { 
                     await _context.SaveChangesAsync();
                     File.Delete(path);
                 }
