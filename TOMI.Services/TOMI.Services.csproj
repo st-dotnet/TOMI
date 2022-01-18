@@ -6,13 +6,15 @@
 
   <ItemGroup>
     <Compile Remove="bin\**" />
+    <Compile Remove="Services\**" />
     <EmbeddedResource Remove="bin\**" />
+    <EmbeddedResource Remove="Services\**" />
     <None Remove="bin\**" />
+    <None Remove="Services\**" />
   </ItemGroup>
 
   <ItemGroup>
     <Folder Include="obj\" />
-    <Folder Include="Services\" />
   </ItemGroup>
 
   <ItemGroup>

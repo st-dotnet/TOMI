@@ -26,7 +26,14 @@ namespace TOMI.Services.Repository
         }
         public async Task<Ranges> DeleteRange(Guid id)
         {
-            return await _context.Ranges.FirstOrDefaultAsync(x => x.Id == id);
+            var existingRanges= await _context.Ranges.FirstOrDefaultAsync(x => x.Id == id);
+            if (existingRanges != null)
+            {
+                Ranges result = _context.Ranges.Remove(existingRanges).Entity;
+                 _context.SaveChanges();
+                return result;
+            }
+            throw new ValidationException("Range not found!");
         }
         public async Task<Ranges> GetRange(Guid id)
         {
@@ -34,7 +41,7 @@ namespace TOMI.Services.Repository
         }
         public async Task<List<Ranges>> GetRangesAsync()
         {
-            return await _context.Ranges.ToListAsync(); 
+            return await _context.Ranges.Include(x=>x.Group).ToListAsync(); 
         }
         public async Task<Ranges> SaveRanges(RangesModel Range)
         {
@@ -44,7 +51,7 @@ namespace TOMI.Services.Repository
             if (existingRanges == null)
             {
                 Ranges result = _context.Ranges.Add(ranges).Entity;
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return result;
             }
             throw new ValidationException("Range not found!");

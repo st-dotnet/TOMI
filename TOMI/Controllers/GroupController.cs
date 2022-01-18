@@ -68,7 +68,7 @@ namespace TOMI.Web.Controllers
         /// DeleteGroup
         /// </summary>
         /// <returns></returns>
-        [HttpDelete("DeleteGroup")]
+        [HttpDelete("DeleteGroup/{id}")]
         public async Task<IActionResult> DeleteGroup(Guid id)
         {
             try

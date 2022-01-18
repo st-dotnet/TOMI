@@ -10,7 +10,7 @@ using TOMI.Data.Database;
 namespace TOMI.Data.Migrations
 {
     [DbContext(typeof(TOMIDataContext))]
-    [Migration("20220117115140_MyFirstMigration")]
+    [Migration("20220117133447_MyFirstMigration")]
     partial class MyFirstMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -185,8 +185,8 @@ namespace TOMI.Data.Migrations
                     b.Property<Guid?>("Deletedby")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("GroupId")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<Guid?>("GroupId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
@@ -213,6 +213,8 @@ namespace TOMI.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GroupId");
 
                     b.ToTable("Ranges");
                 });
@@ -478,10 +480,19 @@ namespace TOMI.Data.Migrations
                             FirstName = "Admin",
                             IsActive = false,
                             LastName = "Admin",
-                            Password = "AQAAAAEAACcQAAAAEJW+RandQ6PGa7x+0sYxRLCN9vDupxA7OhjPAl3l8UokLonEW6hswIkr0z4zBcqpAw==",
+                            Password = "AQAAAAEAACcQAAAAEAo6pc5LXr2zJmZ5yn6NQg39SYM8cmIYslp21vIk/SCmg9bRBuLPGVqtyPDJlcu55w==",
                             PhoneNumber = "1234567890",
                             Role = "SuperAdmin"
                         });
+                });
+
+            modelBuilder.Entity("TOMI.Data.Database.Entities.Ranges", b =>
+                {
+                    b.HasOne("TOMI.Data.Database.Entities.Group", "Group")
+                        .WithMany("Ranges")
+                        .HasForeignKey("GroupId");
+
+                    b.Navigation("Group");
                 });
 
             modelBuilder.Entity("TOMI.Data.Database.Entities.Store", b =>
@@ -518,6 +529,11 @@ namespace TOMI.Data.Migrations
                     b.Navigation("Stores");
 
                     b.Navigation("Users");
+                });
+
+            modelBuilder.Entity("TOMI.Data.Database.Entities.Group", b =>
+                {
+                    b.Navigation("Ranges");
                 });
 
             modelBuilder.Entity("TOMI.Data.Database.Entities.Store", b =>

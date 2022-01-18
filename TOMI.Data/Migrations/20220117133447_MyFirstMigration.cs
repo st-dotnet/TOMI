@@ -75,31 +75,6 @@ namespace TOMI.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Ranges",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    GroupId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TagFrom = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TagTo = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    StoreId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    StockDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    Deletedby = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Ranges", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Sales",
                 columns: table => new
                 {
@@ -191,6 +166,37 @@ namespace TOMI.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Ranges",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    GroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    TagFrom = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TagTo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    StoreId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    StockDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Deletedby = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Ranges", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Ranges_Group_GroupId",
+                        column: x => x.GroupId,
+                        principalTable: "Group",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -235,7 +241,12 @@ namespace TOMI.Data.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "CreatedAt", "CreatedBy", "CustomerId", "DeletedAt", "Deletedby", "Email", "FirstName", "IsActive", "LastName", "Password", "PhoneNumber", "Role", "StoreId", "UpdatedAt", "UpdatedBy" },
-                values: new object[] { new Guid("b74ddd14-6340-4840-95c2-db12554843e5"), null, null, new Guid("b74ddd14-6340-4840-95c2-db12554843e5"), null, null, "admin@gmail.com", "Admin", false, "Admin", "AQAAAAEAACcQAAAAEJW+RandQ6PGa7x+0sYxRLCN9vDupxA7OhjPAl3l8UokLonEW6hswIkr0z4zBcqpAw==", "1234567890", "SuperAdmin", null, null, null });
+                values: new object[] { new Guid("b74ddd14-6340-4840-95c2-db12554843e5"), null, null, new Guid("b74ddd14-6340-4840-95c2-db12554843e5"), null, null, "admin@gmail.com", "Admin", false, "Admin", "AQAAAAEAACcQAAAAEAo6pc5LXr2zJmZ5yn6NQg39SYM8cmIYslp21vIk/SCmg9bRBuLPGVqtyPDJlcu55w==", "1234567890", "SuperAdmin", null, null, null });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Ranges_GroupId",
+                table: "Ranges",
+                column: "GroupId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Stores_CustomerId",
@@ -258,9 +269,6 @@ namespace TOMI.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Group");
-
-            migrationBuilder.DropTable(
                 name: "Master");
 
             migrationBuilder.DropTable(
@@ -274,6 +282,9 @@ namespace TOMI.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Group");
 
             migrationBuilder.DropTable(
                 name: "Stores");
