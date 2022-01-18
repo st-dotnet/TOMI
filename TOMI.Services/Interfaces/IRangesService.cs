@@ -8,7 +8,7 @@ namespace TOMI.Services.Interfaces.RangesService
 {
     public interface IRangesService
     {
-        Task<Ranges> SaveRanges(RangesModel customer);
+        Task<RangesModel> SaveRanges(RangesModel customer);
         Task<Ranges> DeleteRange(Guid id);
         Task<Ranges> GetRange(Guid id);
         Task<List<Ranges>> GetRangesAsync();

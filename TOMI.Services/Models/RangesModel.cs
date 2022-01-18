@@ -6,6 +6,7 @@ namespace TOMI.Services.Models
 {
     public class RangesModel
     {
+        public Guid? Id { get; set; }
         public string Name { get; set; }
         public Guid? GroupId { get; set; }
         public string TagFrom { get; set; }

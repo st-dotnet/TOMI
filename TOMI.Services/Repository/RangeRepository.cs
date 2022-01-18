@@ -43,17 +43,20 @@ namespace TOMI.Services.Repository
         {
             return await _context.Ranges.Include(x=>x.Group).ToListAsync(); 
         }
-        public async Task<Ranges> SaveRanges(RangesModel Range)
+        public async Task<RangesModel> SaveRanges(RangesModel rangeModel)
         {
-            Ranges existingRanges = await _context.Ranges.FirstOrDefaultAsync(c => c.Name == Range.Name);
+           Ranges existingRanges = await _context.Ranges.FirstOrDefaultAsync(c => c.Id == rangeModel.Id);
+          
+            var ranges = _mapper.Map<Ranges>(rangeModel);
 
-            var ranges = _mapper.Map<Ranges>(Range);
-            if (existingRanges == null)
-            {
+            if (existingRanges == null) {
                 Ranges result = _context.Ranges.Add(ranges).Entity;
-                await _context.SaveChangesAsync();
-                return result;
             }
+            else
+                _context.Ranges.Update(ranges);               
+
+            await _context.SaveChangesAsync();
+            return rangeModel;
             throw new ValidationException("Range not found!");
         }
 
@@ -61,7 +64,7 @@ namespace TOMI.Services.Repository
         {
             
             var res= await (from m in _context.Ranges
-                     where m.Name.Contains(name)
+                     where m.Name.Contains(name) 
 
                      select m).ToListAsync();
             return res;

@@ -26,17 +26,23 @@ namespace TOMI.Services.Repository
             _mapper = mapper;
         }
 
-        public async Task<Group> AddGroup(GroupModel model)
+        public async Task<GroupModel> AddGroup(GroupModel model)
         {
-            Group existingRanges = await _context.Group.FirstOrDefaultAsync(c => c.Name == model.Name);
+            Group existingRanges = await _context.Group.FirstOrDefaultAsync(c => c.Id == model.Id);
 
             var group = _mapper.Map<Group>(model);
             if (existingRanges == null)
             {
                 Group result = _context.Group.Add(group).Entity;
-                _context.SaveChanges();
-                return result;
             }
+            else
+            {
+                existingRanges.Name = model.Name;
+                _context.Group.Update(existingRanges);
+            }
+            _context.SaveChanges();
+
+            return model;
             throw new ValidationException("Group not found!");
         }
 
