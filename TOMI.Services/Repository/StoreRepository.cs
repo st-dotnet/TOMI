@@ -276,7 +276,14 @@ namespace TOMI.Services.Repository
                     stockdata.Unity = (line.Substring(134, 3).Trim());
 
                     records.Add(stockdata);
-                   
+                    var isMasterSkuExist = _context.Master.FirstOrDefault(x => x.SKU == stockdata.SKU);
+                    if (isMasterSkuExist != null)
+                    {
+                        isMasterSkuExist.OHQuantity = stockdata.OHQuantity;
+                        _context.Master.Update(isMasterSkuExist);
+                        //await _context.SaveChangesAsync();
+                    }
+
                 }
 
                 var storedetails = _mapper.Map<List<Stocks>>(records);
@@ -327,7 +334,7 @@ namespace TOMI.Services.Repository
         }
         public async Task<List<Master>> GetMasterData(FilterDataRequest request)
         {
-            var response = await _context.Master.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate == request.StockDate).Take(500).ToListAsync();
+            var response = await _context.Master.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate == request.StockDate).ToListAsync();
             return response;
         }
 
