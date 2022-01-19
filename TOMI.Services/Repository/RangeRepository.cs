@@ -67,18 +67,5 @@ namespace TOMI.Services.Repository
             throw new ValidationException("Range not found!");
         }
 
-        public async Task<List<Ranges>> Search(string searchText)
-        {
-            
-            //var res= await (from m in _context.Ranges
-            //         where m.Name.Contains(name) 
-
-            //         select m).ToListAsync();
-
-            var response = await _context.Ranges.Where(c => searchText.Contains(c.Name) || searchText.Contains(c.TagFrom) || searchText.Contains(c.TagTo)).ToListAsync();
-            return response;
-
-        }
-   
     }
 }

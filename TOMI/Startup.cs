@@ -63,6 +63,7 @@ namespace TOMI
             services.AddTransient<IStoreService, StoreRepository>();
             services.AddTransient<IRangesService, RangeRepository>();
             services.AddTransient<IGroupService, GroupRepository>();
+            services.AddTransient<IStockAdjustmentService, StockAdjustmentRepository>();
 
             // add Swagger 
             services.AddSwaggerGen(setup =>

@@ -276,14 +276,7 @@ namespace TOMI.Services.Repository
                     stockdata.Unity = (line.Substring(134, 3).Trim());
 
                     records.Add(stockdata);
-                    var isMasterSkuExist = _context.Master.FirstOrDefault(x => x.SKU == stockdata.SKU);
-                    if (isMasterSkuExist != null)
-                    {
-                        isMasterSkuExist.OHQuantity = stockdata.OHQuantity;
-                        _context.Master.Update(isMasterSkuExist);
-                        await _context.SaveChangesAsync();
-                    }
-
+                   
                 }
 
                 var storedetails = _mapper.Map<List<Stocks>>(records);

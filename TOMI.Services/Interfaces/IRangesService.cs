@@ -12,6 +12,6 @@ namespace TOMI.Services.Interfaces.RangesService
         Task<Ranges> DeleteRange(Guid id);
         Task<Ranges> GetRange(Guid id);
         Task<List<Ranges>> GetRangesAsync();
-        Task<List<Ranges>> Search(string name);
+      
     }
 }
