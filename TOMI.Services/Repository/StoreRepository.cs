@@ -281,7 +281,7 @@ namespace TOMI.Services.Repository
                     {
                         isMasterSkuExist.OHQuantity = stockdata.OHQuantity;
                         _context.Master.Update(isMasterSkuExist);
-                        await _context.SaveChangesAsync();
+                        //await _context.SaveChangesAsync();
                     }
 
                 }
@@ -334,7 +334,7 @@ namespace TOMI.Services.Repository
         }
         public async Task<List<Master>> GetMasterData(FilterDataRequest request)
         {
-            var response = await _context.Master.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate == request.StockDate).Take(500).ToListAsync();
+            var response = await _context.Master.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate == request.StockDate).ToListAsync();
             return response;
         }
 
