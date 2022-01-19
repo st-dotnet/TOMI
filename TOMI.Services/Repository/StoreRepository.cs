@@ -329,19 +329,18 @@ namespace TOMI.Services.Repository
 
         public async Task<List<Sales>> GetSalesData(FilterDataRequest request)
         {
-            var response = await _context.Sales.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate == request.StockDate).ToListAsync();
-            return response;
+            return await _context.Sales.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate.Value.Date == request.StockDate.Value.Date).ToListAsync();
+          
         }
         public async Task<List<Master>> GetMasterData(FilterDataRequest request)
         {
-            var response = await _context.Master.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate == request.StockDate).ToListAsync();
-            return response;
+            return await _context.Master.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate.Value.Date == request.StockDate.Value.Date).Take(500).ToListAsync();
+            
         }
 
         public async Task<List<Stocks>> GetStocksData(FilterDataRequest request)
         {
-            var response = await _context.Stocks.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate == request.StockDate).Take(500).ToListAsync();
-            return response;
+            return await _context.Stocks.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate.Value.Date == request.StockDate.Value.Date).Take(500).ToListAsync();
         }
     }
 }
