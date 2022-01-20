@@ -329,7 +329,7 @@ namespace TOMI.Services.Repository
 
         public async Task<List<Sales>> GetSalesData(FilterDataRequest request)
         {
-            return await _context.Sales.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate.Value.Date == request.StockDate.Value.Date).ToListAsync();
+            return await _context.Sales.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate.Value.Date == request.StockDate.Value.Date).Take(500).ToListAsync();
           
         }
         public async Task<List<Master>> GetMasterData(FilterDataRequest request)
