@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -145,7 +146,13 @@ namespace TOMI.Services.Repository
         {
             bool isSaveSuccess = false;
             string fileName;
-            List<MasterDataResponse> records = new List<MasterDataResponse>();
+
+            List<Master> masterList = new();
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            double timeElapsed = 0;
+
             try
             {
                 var extension = "." + masterData.File.FileName.Split('.')[masterData.File.FileName.Split('.').Length - 1];
@@ -166,55 +173,41 @@ namespace TOMI.Services.Repository
                 {
                     await masterData.File.CopyToAsync(stream);
                 }
-                var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-                {
-                    HasHeaderRecord = false,
-                    BadDataFound = null,
-                    Delimiter = "|",
-                };
-                var temp = File.ReadAllLines(path);
-
+                var masterFile = File.ReadAllLines(path);
 
                 string regex = "^0+(?!$)";
-                foreach (string line in temp)
+
+                masterList = masterFile.SelectMany(x => new List<Master>
                 {
-                    MasterDataResponse masterdata = new MasterDataResponse();
-                    masterdata.SKU = Regex.Replace(line.Substring(0, 26), regex, "");
-                    masterdata.Barcode = (line.Substring(27, 30).Trim());
-                    masterdata.RetailPrice = (Regex.Replace(line.Substring(58, 11), regex, "")).Replace(",", ".");
-                    masterdata.Description = (line.Substring(70, 40).Trim());
-                    masterdata.Department = (line.Substring(110, 02).Trim());
-                    masterdata.Blank = (line.Substring(112, 11).Trim());
-                    masterdata.OHQuantity = "0";
-                    masterdata.Unity = (line.Substring(134, 3).Trim());
-                    records.Add(masterdata);
-                }
-
-                var storedetails = _mapper.Map<List<Master>>(records);
-                //Loop and insert records.  
-                foreach (Master storedetail in storedetails)
-                {
-                    storedetail.CustomerId = masterData.CustomerId;
-                    storedetail.StoreId = masterData.StoreId;
-                    storedetail.StockDate = masterData.StockDate;
-
-
-                    _context.Master.Add(storedetail);
-                }
+                   new()
+                    {
+                        SKU = Regex.Replace(x.Substring(0, 26), regex, ""),
+                        Barcode = (x.Substring(27, 30).Trim()),
+                        RetailPrice = (Regex.Replace(x.Substring(58, 11), regex, "")).Replace(",", "."),
+                        Description = (x.Substring(70, 40).Trim()),
+                        Department = (x.Substring(110, 02).Trim()),
+                        Blank = (x.Substring(112, 11).Trim()),
+                        OHQuantity = "0",
+                        Unity = (x.Substring(134, 3).Trim()),
+                        CustomerId = masterData.CustomerId,
+                        StoreId = masterData.StoreId,
+                        StockDate = masterData.StockDate,
+                    }
+                 }).ToList();
 
                 // Submit the change to the database.
                 try
                 {
-                    await _context.SaveChangesAsync();
+                    await _context.BulkInsertAsync(masterList);
+                    stopwatch.Stop();
+                    timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
+
                     File.Delete(path);
                 }
                 catch (Exception e)
                 {
                     Console.WriteLine(e);
-                    // Make some adjustments.
-                    // ...
-                    // Try again.
-                    _context.SaveChanges();
+
                 }
                 isSaveSuccess = true;
             }
@@ -225,7 +218,8 @@ namespace TOMI.Services.Repository
 
             return new FileUplaodRespone
             {
-                stockRecordCount = records.Count.ToString(),
+                stockRecordCount = masterList.Count.ToString(),
+                TimeElapsed = timeElapsed,
                 Success = isSaveSuccess
             }; ; ;
         }
@@ -234,7 +228,7 @@ namespace TOMI.Services.Repository
         {
             bool isSaveSuccess = false;
             string fileName;
-            List<StocksDataResponse> records = new List<StocksDataResponse>();
+            List<Stocks> records = new();
             try
             {
                 var extension = "." + stocksData.File.FileName.Split('.')[stocksData.File.FileName.Split('.').Length - 1];
@@ -255,53 +249,57 @@ namespace TOMI.Services.Repository
                 {
                     await stocksData.File.CopyToAsync(stream);
                 }
-                var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-                {
-                    HasHeaderRecord = false,
-                    BadDataFound = null,
-                    Delimiter = "|",
-                };
+             
                 var temp = File.ReadAllLines(path);
                 string regex = "^0+(?!$)";
                 foreach (string line in temp)
                 {
-                    StocksDataResponse stockdata = new StocksDataResponse();
-                    stockdata.SKU = Regex.Replace(line.Substring(0, 26), regex, "");
-                    stockdata.Barcode = (line.Substring(27, 30).Trim());
-                    stockdata.RetailPrice = (Regex.Replace(line.Substring(58, 11), regex, "")).Replace(",", "."); 
-                    stockdata.Description = (line.Substring(70, 40).Trim());
-                    stockdata.Department = (line.Substring(110, 02).Trim());
-                    stockdata.Blank = (line.Substring(112, 11).Trim());
-                    stockdata.OHQuantity = (Regex.Replace(line.Substring(122, 11), regex, "")).Trim();
-                    stockdata.Unity = (line.Substring(134, 3).Trim());
+                    Stocks stockdata = new()
+                    {
+                        SKU = Regex.Replace(line.Substring(0, 26), regex, ""),
+                        Barcode = line.Substring(27, 30).Trim(),
+                        RetailPrice = (Regex.Replace(line.Substring(58, 11), regex, "")).Replace(",", "."),
+                        Description = line.Substring(70, 40).Trim(),
+                        Department = line.Substring(110, 02).Trim(),
+                        Blank = line.Substring(112, 11).Trim(),
+                        OHQuantity = Regex.Replace(line.Substring(122, 11), regex, "").Trim(),
+                        Unity = line.Substring(134, 3).Trim(),
+                        CustomerId = stocksData.CustomerId,
+                        StoreId = stocksData.StoreId,
+                        StockDate = stocksData.StockDate
+                    };
 
-                    records.Add(stockdata);
+                    _context.Stocks.Add(stockdata);
                     var isMasterSkuExist = _context.Master.FirstOrDefault(x => x.SKU == stockdata.SKU);
                     if (isMasterSkuExist != null)
                     {
                         isMasterSkuExist.OHQuantity = stockdata.OHQuantity;
                         _context.Master.Update(isMasterSkuExist);
-                        //await _context.SaveChangesAsync();
+
                     }
-
                 }
 
-                var storedetails = _mapper.Map<List<Stocks>>(records);
-                //Loop and insert records.  
-                foreach (Stocks storedetail in storedetails)
-                {
-                    
-                    storedetail.CustomerId = stocksData.CustomerId;
-                    storedetail.StoreId = stocksData.StoreId;
-                    storedetail.StockDate = stocksData.StockDate;
-                   
-                    _context.Stocks.Add(storedetail);
-                   
-                }
+                 
+                 
 
-                // Submit the change to the database.
+           
+
+                //var storedetails = _mapper.Map<List<Stocks>>(records);
+                ////Loop and insert records.  
+                //foreach (Stocks storedetail in storedetails)
+                //{
+
+                //    storedetail.CustomerId = stocksData.CustomerId;
+                //    storedetail.StoreId = stocksData.StoreId;
+                //    storedetail.StockDate = stocksData.StockDate;
+
+                //    _context.Stocks.Add(storedetail);
+
+                //}
+
+            
                 try
-                { 
+                {
                     await _context.SaveChangesAsync();
                     File.Delete(path);
                 }
@@ -315,7 +313,7 @@ namespace TOMI.Services.Repository
             }
             catch (Exception e)
             {
-                //log error
+               
             }
 
             return new FileUplaodRespone
@@ -330,12 +328,12 @@ namespace TOMI.Services.Repository
         public async Task<List<Sales>> GetSalesData(FilterDataRequest request)
         {
             return await _context.Sales.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate.Value.Date == request.StockDate.Value.Date).Take(500).ToListAsync();
-          
+
         }
         public async Task<List<Master>> GetMasterData(FilterDataRequest request)
         {
             return await _context.Master.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate.Value.Date == request.StockDate.Value.Date).Take(500).ToListAsync();
-            
+
         }
 
         public async Task<List<Stocks>> GetStocksData(FilterDataRequest request)

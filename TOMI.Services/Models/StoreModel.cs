@@ -22,5 +22,6 @@ namespace TOMI.Services.Models
     public class FileUplaodRespone : BaseResponse
     {
         public string stockRecordCount { get; set; }
+        public double TimeElapsed { get; set; }
     }
 }
