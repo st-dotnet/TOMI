@@ -94,7 +94,43 @@ namespace TOMI.Web.Controllers
             }
         }
 
-       
+        /// <summary>
+        /// GetLastRange
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetLastRange/{id}")]
+        public async Task<IActionResult> GetLastRange(Guid id)
+        {
+            try
+            {
+                var response = await _rangeService.GetLastRange(id);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        /// <summary>
+        ///  GetMinMaxRange
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet(" GetMinMaxRange/{id}")]
+        public async Task<IActionResult> GetMinMaxRange(Guid id)
+        {
+            try
+            {
+                var response = await _rangeService.GetMinMaxRange(id);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+
         #endregion
     }
 }

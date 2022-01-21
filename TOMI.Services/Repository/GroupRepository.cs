@@ -28,7 +28,14 @@ namespace TOMI.Services.Repository
 
         public async Task<GroupModel> AddGroup(GroupModel model)
         {
+            Group existingRange = await _context.Group.FirstOrDefaultAsync(c => c.Name == model.Name);
+            if(existingRange!=null)
+            {
+                return null;
+            }
+
             Group existingRanges = await _context.Group.FirstOrDefaultAsync(c => c.Id == model.Id);
+
 
             var group = _mapper.Map<Group>(model);
             if (existingRanges == null)
@@ -46,18 +53,29 @@ namespace TOMI.Services.Repository
             throw new ValidationException("Group not found!");
         }
 
-       
         public async Task<Group> DeleteGroup(Guid id)
         {
             var result= await _context.Group
                 .FirstOrDefaultAsync(e => e.Id == id);
-            if (result != null)
+
+            var res =  _context.Ranges.SingleOrDefaultAsync(s => s.GroupId == id);
+            if(res.Result!=null)
             {
-                _context.Group.Remove(result);
+                throw new Exception("Group name is used by ranges");
+            }
+           else if (result.IsDeleted == false)
+            {
+                result.IsDeleted = true;
                 await _context.SaveChangesAsync();
                 return result;
             }
-            return null;
+            else
+            {
+                throw new ValidationException("Group not found!");
+            }
+           
+
+
         }
 
         public async Task<Group> GetGroup(Guid id)

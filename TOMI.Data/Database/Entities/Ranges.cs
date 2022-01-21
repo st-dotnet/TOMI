@@ -5,6 +5,10 @@ namespace TOMI.Data.Database.Entities
 {
     public class Ranges : EntityBase
     {
+        public Ranges()
+        {
+            IsDeleted = false;
+        }
         [Key]
         public Guid Id { get; set; }
         public string Name { get; set; }
@@ -15,6 +19,7 @@ namespace TOMI.Data.Database.Entities
         public Guid? StoreId { get; set; }
         public DateTimeOffset? StockDate { get; set; }
         public virtual Group Group { get; set; }
+        public bool IsDeleted { get; set; }
 
     }
 }

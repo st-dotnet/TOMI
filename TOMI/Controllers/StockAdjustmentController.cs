@@ -97,7 +97,60 @@ namespace TOMI.Web.Controllers
             }
         }
 
-       
+        /// <summary>
+        /// GoToRecord
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GoToRecord/{id}")]
+        public async Task<IActionResult> GoToRecord(Guid id)
+        {
+            try
+            {
+                var response = await _stockAdjustmentService.GoToRecord(id);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        /// <summary>
+        /// GetDeletedRecord
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetDeletedRecord")]
+        public async Task<IActionResult> GetDeletedRecord(Guid recid)
+        {
+            try
+            {
+                var response = await _stockAdjustmentService.GetDeletedRecord(recid);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        /// <summary>
+        /// ChangeDeletedRecStatus
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("ChangeDeletedRecStatus")]
+        public async Task<IActionResult> ChangeDeletedRecStatus(Guid recid)
+        {
+            try
+            {
+                var response = await _stockAdjustmentService.ChangeDeletedRecStatus(recid);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
         #endregion
     }
 }

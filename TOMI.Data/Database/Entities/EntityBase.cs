@@ -10,7 +10,8 @@ namespace TOMI.Data.Database.Entities
         public Guid? CreatedBy { get; set; }
         public Guid? UpdatedBy { get; set; }
         public Guid? Deletedby { get; set; }
-        public bool IsActive { get; set; }  
+        public bool IsActive { get; set; }
+
 
     }
 }

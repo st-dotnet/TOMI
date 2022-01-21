@@ -50,13 +50,13 @@ namespace TOMI.Services.Repository
         public async Task<StockAdjustment> DeleteStockAdjustment(Guid id)
         {
             var existingRanges = await _context.StockAdjustment.FirstOrDefaultAsync(x => x.Id == id);
-            if (existingRanges != null)
+            if (existingRanges.Isdeleted == false)
             {
-                StockAdjustment result = _context.StockAdjustment.Remove(existingRanges).Entity;
+                existingRanges.Isdeleted = true;
+
                 _context.SaveChanges();
-                return result;
             }
-            throw new ValidationException("ID not found!");
+            return existingRanges;
         }
 
         public async Task<StockAdjustment> GetStockAdjustmentAsync(Guid id)
@@ -67,6 +67,33 @@ namespace TOMI.Services.Repository
         public async Task<List<StockAdjustment>> GetStockAdjustmentListAsync()
         {
             return await _context.StockAdjustment.ToListAsync();
+        }
+
+        public async Task<List<StockAdjustment>> GoToRecord(Guid id)
+        {
+            StockAdjustment recid = await _context.StockAdjustment.FirstOrDefaultAsync(x =>x.Rec==id);
+            if (recid != null)
+            {
+                return await _context.StockAdjustment.ToListAsync();
+            }
+
+            return null;
+        }
+
+        public async Task<List<StockAdjustment>> GetDeletedRecord(Guid recid)
+        {
+            return await _context.StockAdjustment.Where(x => x.Rec == recid && x.Isdeleted == true).ToListAsync();
+        }
+
+        public async Task<List<StockAdjustment>> ChangeDeletedRecStatus(Guid recid)
+        {
+            var toBeDeleted = await _context.StockAdjustment.Where(x => x.Rec == recid && x.Isdeleted == true).ToListAsync();
+
+            toBeDeleted.ForEach(a => { a.Isdeleted = false; });
+
+            await _context.SaveChangesAsync();
+
+            return toBeDeleted;
         }
     }
 }
