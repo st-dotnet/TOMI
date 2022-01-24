@@ -25,25 +25,23 @@ namespace TOMI.Services.Repository
             _context = context;
             _mapper = mapper;
         }
-        public async Task<StockAdjustmentModel> SaveStockAdjustment(StockAdjustmentModel model)
+        public async Task<StockAdjustmentResponse> SaveStockAdjustment(StockAdjustmentModel model)
         {
             StockAdjustment stockAdjustment = await _context.StockAdjustment.FirstOrDefaultAsync(c => c.Id == model.Id);
-
             var stockadjustment = _mapper.Map<StockAdjustment>(model);
-
             if (stockAdjustment == null)
             {
                 StockAdjustment result = _context.StockAdjustment.Add(stockadjustment).Entity;
+                await _context.SaveChangesAsync();
+                return new StockAdjustmentResponse { Adjustment = result, Success = true };
             }
             else
             {
                 var res = _mapper.Map<StockAdjustment>(model);
                 _context.StockAdjustment.Update(res);
+                await _context.SaveChangesAsync();
+                return new StockAdjustmentResponse { Adjustment = res, Success = true };
             }
-
-
-            await _context.SaveChangesAsync();
-            return model;
             throw new ValidationException("Data not found!");
         }
 

@@ -41,12 +41,9 @@ namespace TOMI.Services.Repository
                 if (user != null)
                 {
                     // for verify the hash password
-                    //var passwordHasher = new PasswordHasher<User>();
-                    //var userPassword = passwordHasher.HashPassword(user, password);
-                    //var result = passwordHasher.VerifyHashedPassword(user, user.Password, password);
-                    var userPassword = BCrypt.Net.BCrypt.HashPassword(password);
-                    bool verified = BCrypt.Net.BCrypt.Verify(password, user.Password);
-                    if (verified)
+                    var passwordHasher = new PasswordHasher<User>();
+                    var result = passwordHasher.VerifyHashedPassword(user, user.Password, password);
+                    if (result == PasswordVerificationResult.Success)
                     {
                         var token = GenerateJwtToken(user, user.Email);
                         return new UserModelResponse
@@ -57,14 +54,48 @@ namespace TOMI.Services.Repository
                         };
                     }
                 }
-                return new UserModelResponse { Error = "Invalid UserName and Password a" };
+                return new UserModelResponse { Error = "Invalid UserName and Password " };
             }
             catch (Exception ex)
             {
-                return new UserModelResponse { Error = "Invalid UserName and Password b" };
+                return new UserModelResponse { Error = "Invalid UserName and Password " };
             }
 
+
+
         }
+        //public UserModelResponse Authenticate(string email, string password)
+        //{
+        //    try
+        //    {
+        //        User user = _context.Users.FirstOrDefault(x => x.Email == email);
+        //        if (user != null)
+        //        {
+        //            // for verify the hash password
+        //            //var passwordHasher = new PasswordHasher<User>();
+        //            //var userPassword = passwordHasher.HashPassword(user, password);
+        //            //var result = passwordHasher.VerifyHashedPassword(user, user.Password, password);
+        //            var userPassword = BCrypt.Net.BCrypt.HashPassword(password);
+        //            bool verified = BCrypt.Net.BCrypt.Verify(password, user.Password);
+        //            if (verified)
+        //            {
+        //                var token = GenerateJwtToken(user, user.Email);
+        //                return new UserModelResponse
+        //                {
+        //                    User = user,
+        //                    Token = token,
+        //                    Success = true
+        //                };
+        //            }
+        //        }
+        //        return new UserModelResponse { Error = "Invalid UserName and Password a" };
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return new UserModelResponse { Error = "Invalid UserName and Password b" };
+        //    }
+
+        //}
 
         //Generate JWT token
         private string GenerateJwtToken(User user, string email)

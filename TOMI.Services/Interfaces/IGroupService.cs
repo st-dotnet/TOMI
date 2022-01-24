@@ -11,9 +11,9 @@ namespace TOMI.Services.Interfaces
    public interface IGroupService
     {
         Task<GroupResponse> AddGroup(GroupModel model);
-        Task<Group> DeleteGroup(Guid id);
+        Task<GroupResponse> DeleteGroup(Guid id);
         Task<Group> GetGroup(Guid id);
         Task<List<Group>> GetGroupAsync();
-        Task<Group> UpdateGroup(GroupModel model);
+       // Task<Group> UpdateGroup(GroupModel model);
     }
 }

@@ -10,7 +10,7 @@ namespace TOMI.Services.Interfaces
 {
     public interface IStockAdjustmentService
     {
-        Task<StockAdjustmentModel> SaveStockAdjustment(StockAdjustmentModel model);
+        Task<StockAdjustmentResponse> SaveStockAdjustment(StockAdjustmentModel model);
         Task<StockAdjustment> DeleteStockAdjustment(Guid id);
         Task<StockAdjustment> GetStockAdjustmentAsync(Guid id);
         Task<List<StockAdjustment>> GetStockAdjustmentListAsync();

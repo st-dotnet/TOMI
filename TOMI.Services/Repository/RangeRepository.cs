@@ -51,10 +51,11 @@ namespace TOMI.Services.Repository
 
             if (existingRanges == null)
             {
-                Ranges result = _context.Ranges.Add(ranges).Entity;
+                Ranges result = _context.Ranges.Add(existingRanges).Entity;
             }
             else
             {
+                //var res= _mapper.Map<Ranges>(rangeModel);
                 existingRanges.Name = rangeModel.Name;
                 existingRanges.TagFrom = rangeModel.TagFrom;
                 existingRanges.TagTo = rangeModel.TagTo;

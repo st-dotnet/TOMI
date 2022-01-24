@@ -51,19 +51,19 @@ namespace TOMI.Web.Controllers
         /// UpdateGroup
         /// </summary>
         /// <returns></returns>
-        [HttpPost]
-        [Route("UpdateGroup")]
-        public async Task<IActionResult> UpdateGroup(GroupModel model)
-        {
-            try
-            {
-                return Ok(await _groupService.UpdateGroup(model));
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.ToString());
-            }
-        }
+        //[HttpPost]
+        //[Route("UpdateGroup")]
+        //public async Task<IActionResult> UpdateGroup(GroupModel model)
+        //{
+        //    try
+        //    {
+        //        return Ok(await _groupService.UpdateGroup(model));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception(ex.ToString());
+        //    }
+        //}
         /// <summary>
         /// DeleteGroup
         /// </summary>
