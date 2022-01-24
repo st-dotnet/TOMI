@@ -13,7 +13,7 @@ namespace TOMI.Services.Interfaces.RangesService
         Task<Ranges> GetRange(Guid id);
         Task<List<Ranges>> GetRangesAsync();
         Task<Ranges> GetLastRange(Guid id);
-         Task<int> GetMinMaxRange(Guid id);
+        Task<int> GetMinMaxRange();
 
 
 

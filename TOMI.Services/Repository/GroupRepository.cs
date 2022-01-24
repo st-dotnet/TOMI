@@ -26,57 +26,46 @@ namespace TOMI.Services.Repository
             _mapper = mapper;
         }
 
-        public async Task<GroupModel> AddGroup(GroupModel model)
+        public async Task<GroupResponse> AddGroup(GroupModel model)
         {
-            Group existingRange = await _context.Group.FirstOrDefaultAsync(c => c.Name == model.Name);
-            if(existingRange!=null)
-            {
-                return null;
-            }
-
             Group existingRanges = await _context.Group.FirstOrDefaultAsync(c => c.Id == model.Id);
-
-
-            var group = _mapper.Map<Group>(model);
-            if (existingRanges == null)
+            if (existingRanges != null)
             {
-                Group result = _context.Group.Add(group).Entity;
-            }
-            else
-            {
+                var isNameExist = _context.Group.FirstOrDefaultAsync(c => c.Name == model.Name);
+
+                if (isNameExist != null)
+                    return new GroupResponse { Error = "Group name already exist ", Success = false };
+
                 existingRanges.Name = model.Name;
                 _context.Group.Update(existingRanges);
+                _context.SaveChanges();
+                return new GroupResponse { group = existingRanges, Success = true };
             }
-            _context.SaveChanges();
+    
+            if (existingRanges == null)
+            {
+                var group = _mapper.Map<Group>(model);
+                Group result = _context.Group.Add(group).Entity;
+                _context.SaveChanges();
+                return new GroupResponse { group = result, Success = true };
+            }
+      
 
-            return model;
             throw new ValidationException("Group not found!");
         }
 
         public async Task<Group> DeleteGroup(Guid id)
         {
-            var result= await _context.Group
-                .FirstOrDefaultAsync(e => e.Id == id);
-
-            var res =  _context.Ranges.SingleOrDefaultAsync(s => s.GroupId == id);
-            if(res.Result!=null)
+            var existingRanges = await _context.Group.FirstOrDefaultAsync(x => x.Id == id);
+            if (existingRanges.IsDeleted == false)
             {
-                throw new Exception("Group name is used by ranges");
-            }
-           else if (result.IsDeleted == false)
-            {
-                result.IsDeleted = true;
+                existingRanges.IsDeleted = true;
                 await _context.SaveChangesAsync();
-                return result;
+                return existingRanges;
             }
-            else
-            {
-                throw new ValidationException("Group not found!");
-            }
-           
-
-
+            throw new ValidationException("GroupId not found!");
         }
+       
 
         public async Task<Group> GetGroup(Guid id)
         {

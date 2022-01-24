@@ -26,7 +26,7 @@ namespace TOMI.Services.Repository
         }
         public async Task<Ranges> DeleteRange(Guid id)
         {
-            var existingRanges= await _context.Ranges.FirstOrDefaultAsync(x => x.Id == id);
+            var existingRanges = await _context.Ranges.FirstOrDefaultAsync(x => x.Id == id);
             if (existingRanges.IsDeleted == false)
             {
                 existingRanges.IsDeleted = true;
@@ -41,15 +41,16 @@ namespace TOMI.Services.Repository
         }
         public async Task<List<Ranges>> GetRangesAsync()
         {
-            return await _context.Ranges.Include(x=>x.Group).ToListAsync(); 
+            return await _context.Ranges.Include(x => x.Group).ToListAsync();
         }
         public async Task<RangesModel> SaveRanges(RangesModel rangeModel)
         {
-           Ranges existingRanges = await _context.Ranges.FirstOrDefaultAsync(c => c.Id == rangeModel.Id);
-          
+            Ranges existingRanges = await _context.Ranges.FirstOrDefaultAsync(c => c.Id == rangeModel.Id);
+
             var ranges = _mapper.Map<Ranges>(rangeModel);
 
-            if (existingRanges == null) {
+            if (existingRanges == null)
+            {
                 Ranges result = _context.Ranges.Add(ranges).Entity;
             }
             else
@@ -60,7 +61,7 @@ namespace TOMI.Services.Repository
                 existingRanges.GroupId = rangeModel.GroupId;
                 _context.Ranges.Update(existingRanges);
             }
-                               
+
 
             await _context.SaveChangesAsync();
             return rangeModel;
@@ -74,11 +75,24 @@ namespace TOMI.Services.Repository
             .OrderByDescending(m => m.Id).FirstOrDefaultAsync();
         }
 
-        public async Task<int> GetMinMaxRange(Guid id)
-        {
-            int MaxRangeValue = await _context.Ranges.MaxAsync(s =>Convert.ToInt32( s.TagTo)) ;
+        //public  int GetMinMaxRange()
+        //{
+        //    int MaxRangeValue = _context.Ranges.MaxAsync(s =>Convert.ToInt32(s.TagTo));
 
-            return MaxRangeValue;
+        //    return MaxRangeValue;
+        //}
+        public async Task<int> GetMinMaxRange()
+        {
+            var maxRange = await _context.Ranges.MaxAsync(x => Convert.ToInt32(x.TagTo));
+            if (maxRange != null)
+            {
+                return Convert.ToInt32(maxRange);
+            }
+            else
+            {
+                return 0;
+            }
         }
     }
 }
+

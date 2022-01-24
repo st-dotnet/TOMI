@@ -116,12 +116,12 @@ namespace TOMI.Web.Controllers
         ///  GetMinMaxRange
         /// </summary>
         /// <returns></returns>
-        [HttpGet(" GetMinMaxRange/{id}")]
-        public async Task<IActionResult> GetMinMaxRange(Guid id)
+        [HttpGet("GetMinMaxRange")]
+        public async Task<IActionResult> GetMinMaxRange()
         {
             try
             {
-                var response = await _rangeService.GetMinMaxRange(id);
+                var response = await _rangeService.GetMinMaxRange();
                 return Ok(response);
             }
             catch (Exception ex)

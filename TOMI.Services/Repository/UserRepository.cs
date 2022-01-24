@@ -41,9 +41,12 @@ namespace TOMI.Services.Repository
                 if (user != null)
                 {
                     // for verify the hash password
-                    var passwordHasher = new PasswordHasher<User>();
-                    var result = passwordHasher.VerifyHashedPassword(user, user.Password, password);
-                    if (result == PasswordVerificationResult.Success)
+                    //var passwordHasher = new PasswordHasher<User>();
+                    //var userPassword = passwordHasher.HashPassword(user, password);
+                    //var result = passwordHasher.VerifyHashedPassword(user, user.Password, password);
+                    var userPassword = BCrypt.Net.BCrypt.HashPassword(password);
+                    bool verified = BCrypt.Net.BCrypt.Verify(password, user.Password);
+                    if (verified)
                     {
                         var token = GenerateJwtToken(user, user.Email);
                         return new UserModelResponse
@@ -54,11 +57,11 @@ namespace TOMI.Services.Repository
                         };
                     }
                 }
-                return new UserModelResponse { Error = "Invalid UserName and Password " };
+                return new UserModelResponse { Error = "Invalid UserName and Password a" };
             }
             catch (Exception ex)
             {
-                return new UserModelResponse { Error = "Invalid UserName and Password " };
+                return new UserModelResponse { Error = "Invalid UserName and Password b" };
             }
 
         }
@@ -106,8 +109,9 @@ namespace TOMI.Services.Repository
 
                 if (existingUser == null)
                 {
-                    PasswordHasher<User> passwordHasher = new PasswordHasher<User>();
-                    user.Password = passwordHasher.HashPassword(user, user.Password);
+                    //PasswordHasher<User> passwordHasher = new PasswordHasher<User>();
+                    //user.Password = passwordHasher.HashPassword(user, user.Password);
+                    user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
                     User result = _context.Users.Add(user).Entity;
                     _context.SaveChanges();
                     var token = GenerateJwtToken(user, user.Email);
@@ -143,8 +147,9 @@ namespace TOMI.Services.Repository
                     var customers = _mapper.Map<Store>(user.Store);
                     var storeResult = _context.Stores.Add(customers).Entity;
                     _context.SaveChanges();
-                    PasswordHasher<User> passwordHasher = new PasswordHasher<User>();
-                    user.Password = passwordHasher.HashPassword(user, user.Password);
+                    //PasswordHasher<User> passwordHasher = new PasswordHasher<User>();
+                    //user.Password = passwordHasher.HashPassword(user, user.Password);
+                    user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
                     user.StoreId = storeResult.Id;
                     var userResult = _context.Users.Add(user).Entity;
                     _context.SaveChanges();
