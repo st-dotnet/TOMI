@@ -97,9 +97,9 @@ namespace TOMI.Services.Repository
            
         }
 
-        public async Task<List<Master>> MasterData(string sku)
+        public async Task<Master> MasterDataBySku(string sku)
         {
-            return await _context.Master.Where(x => x.SKU == sku).ToListAsync();
+            return await _context.Master.FirstOrDefaultAsync(x => x.SKU == sku);
         }
     }
 }

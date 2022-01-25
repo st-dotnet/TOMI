@@ -156,12 +156,12 @@ namespace TOMI.Web.Controllers
         /// </summary>
         /// <param name="sku"></param>
         /// <returns></returns>
-        [HttpPost("MasterData/{sku}")]
+        [HttpGet("MasterDataBySku/{sku}")]
         public async Task<IActionResult> MasterData(string sku)
         {
             try
             {
-                var response = await _stockAdjustmentService.MasterData(sku);
+                var response = await _stockAdjustmentService.MasterDataBySku(sku);
                 return Ok(response);
             }
             catch (Exception ex)
