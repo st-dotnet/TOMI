@@ -16,13 +16,13 @@ namespace TOMI.Data.Database.Entities
 
         [Key]
         public Guid Id { get; set; }
-        public Guid? Rec { get; set; }
+        public int? Rec { get; set; }
         public string Term { get; set; }
         public int? Dload { get; set; }
         public int? Tag { get; set; }
         public int? Shelf { get; set; }
         public string Barcode { get; set; }
-        public string SKU { get; set; }
+        public Guid SKU { get; set; }
         public byte NOF { get; set; }
         public int? Department { get; set; }
         public int? Quantity { get; set; }

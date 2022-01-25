@@ -47,23 +47,7 @@ namespace TOMI.Web.Controllers
             }
         }
 
-        /// <summary>
-        /// UpdateGroup
-        /// </summary>
-        /// <returns></returns>
-        //[HttpPost]
-        //[Route("UpdateGroup")]
-        //public async Task<IActionResult> UpdateGroup(GroupModel model)
-        //{
-        //    try
-        //    {
-        //        return Ok(await _groupService.UpdateGroup(model));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception(ex.ToString());
-        //    }
-        //}
+
         /// <summary>
         /// DeleteGroup
         /// </summary>
@@ -79,42 +63,42 @@ namespace TOMI.Web.Controllers
             {
                 throw new Exception(ex.ToString());
             }
+            }
+            /// <summary>
+            /// GetGroupList
+            /// </summary>
+            /// <returns></returns>
+            [HttpGet("GetGroupList")]
+            public async Task<IActionResult> GetGroupListAsync()
+            {
+                try
+                {
+                    var response = await _groupService.GetGroupAsync();
+                    return Ok(response);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.ToString());
+                }
+            }
+            /// <summary>
+            /// GetGroup
+            /// </summary>
+            /// <returns></returns>
+            [HttpGet("GetGroup/{id}")]
+            public async Task<IActionResult> GetGroup(Guid id)
+            {
+                try
+                {
+                    // var groupRequest = _mapper.Map<Group>(id);
+                    var response = await _groupService.GetGroup(id);
+                    return Ok(response);
+                }
+                catch (Exception ex)
+                {
+                    throw new Exception(ex.ToString());
+                }
+            }
+            #endregion
         }
-        /// <summary>
-        /// GetGroupList
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("GetGroupList")]
-        public async Task<IActionResult> GetGroupListAsync()
-        {
-            try
-            {
-                var response = await _groupService.GetGroupAsync();
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.ToString());
-            }
-        }
-        /// <summary>
-        /// GetGroup
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet("GetGroup/{id}")]
-        public async Task<IActionResult> GetGroup(Guid id)
-        {
-            try
-            {
-               // var groupRequest = _mapper.Map<Group>(id);
-                var response = await _groupService.GetGroup(id);
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.ToString());
-            }
-        }
-        #endregion
     }
-}

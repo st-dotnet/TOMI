@@ -67,9 +67,9 @@ namespace TOMI.Services.Repository
             return await _context.StockAdjustment.ToListAsync();
         }
 
-        public async Task<List<StockAdjustment>> GoToRecord(Guid id)
+        public async Task<List<StockAdjustment>> GoToRecord(int recId)
         {
-            StockAdjustment recid = await _context.StockAdjustment.FirstOrDefaultAsync(x =>x.Rec==id);
+            StockAdjustment recid = await _context.StockAdjustment.FirstOrDefaultAsync(x =>x.Rec== recId);
             if (recid != null)
             {
                 return await _context.StockAdjustment.ToListAsync();
@@ -78,12 +78,12 @@ namespace TOMI.Services.Repository
             return null;
         }
 
-        public async Task<List<StockAdjustment>> GetDeletedRecord(Guid recid)
+        public async Task<List<StockAdjustment>> GetDeletedRecord(int recid)
         {
             return await _context.StockAdjustment.Where(x => x.Rec == recid && x.Isdeleted == true).ToListAsync();
         }
 
-        public async Task<List<StockAdjustment>> ChangeDeletedRecStatus(Guid recid)
+        public async Task<List<StockAdjustment>> ChangeDeletedRecStatus(int recid)
         {
             
                 var toBeDeleted = await _context.StockAdjustment.Where(x => x.Rec == recid && x.Isdeleted == true).ToListAsync();
@@ -95,6 +95,11 @@ namespace TOMI.Services.Repository
                 return toBeDeleted;
             
            
+        }
+
+        public async Task<List<Master>> MasterData(string sku)
+        {
+            return await _context.Master.Where(x => x.SKU == sku).ToListAsync();
         }
     }
 }

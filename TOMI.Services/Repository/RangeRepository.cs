@@ -24,17 +24,20 @@ namespace TOMI.Services.Repository
             _context = context;
             _mapper = mapper;
         }
+       
         public async Task<Ranges> DeleteRange(Guid id)
         {
             var existingRanges = await _context.Ranges.FirstOrDefaultAsync(x => x.Id == id);
-            if (existingRanges.IsDeleted == false)
+            if (existingRanges != null)
             {
-                existingRanges.IsDeleted = true;
+                _context.Ranges.Remove(existingRanges);
                 await _context.SaveChangesAsync();
                 return existingRanges;
             }
             throw new ValidationException("Range not found!");
         }
+
+
         public async Task<Ranges> GetRange(Guid id)
         {
             return await _context.Ranges.FirstOrDefaultAsync(x => x.Id == id);
@@ -43,6 +46,7 @@ namespace TOMI.Services.Repository
         {
             return await _context.Ranges.Include(x => x.Group).ToListAsync();
         }
+
         public async Task<RangesModel> SaveRanges(RangesModel rangeModel)
         {
             Ranges existingRanges = await _context.Ranges.FirstOrDefaultAsync(c => c.Id == rangeModel.Id);
@@ -51,7 +55,7 @@ namespace TOMI.Services.Repository
 
             if (existingRanges == null)
             {
-                Ranges result = _context.Ranges.Add(existingRanges).Entity;
+                Ranges result = _context.Ranges.Add(ranges).Entity;
             }
             else
             {

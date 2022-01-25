@@ -42,22 +42,22 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
-        /// <summary>
-        /// Deleterange
-        /// </summary>
-        /// <returns></returns>
-        [HttpDelete("DeleteRange/{rangeId}")]
-        public async Task<IActionResult> DeleteRangeAsync(Guid rangeId)
-        {
-            try
-            {
-                return Ok(await _rangeService.DeleteRange(rangeId));
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.ToString());
-            }
-        }
+        ///// <summary>
+        ///// Deleterange
+        ///// </summary>
+        ///// <returns></returns>
+        //[HttpDelete("DeleteRange/{rangeId}")]
+        //public async Task<IActionResult> DeleteRangeAsync(Guid rangeId)
+        //{
+        //    try
+        //    {
+        //        return Ok(await _rangeService.DeleteRange(rangeId));
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception(ex.ToString());
+        //    }
+        //}
         /// <summary>
         /// GetrangeList
         /// </summary>

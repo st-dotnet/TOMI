@@ -9,15 +9,9 @@ namespace TOMI.Data.Database.Entities
 {
     public class Group:EntityBase
     {
-        public Group()
-        {
-            IsDeleted = false;
-        }
-
         [Key]
         public Guid? Id { get; set; }
         public string Name { get; set; }
-        public bool IsDeleted { get; set; }
         public virtual ICollection<Ranges> Ranges { get; set; }
 
        

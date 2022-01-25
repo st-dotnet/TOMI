@@ -102,11 +102,11 @@ namespace TOMI.Web.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("GoToRecord/{id}")]
-        public async Task<IActionResult> GoToRecord(Guid id)
+        public async Task<IActionResult> GoToRecord(int recId)
         {
             try
             {
-                var response = await _stockAdjustmentService.GoToRecord(id);
+                var response = await _stockAdjustmentService.GoToRecord(recId);
                 return Ok(response);
             }
             catch (Exception ex)
@@ -118,9 +118,9 @@ namespace TOMI.Web.Controllers
         /// <summary>
         /// GetDeletedRecord
         /// </summary>
-        /// <returns></returns>
+        /// <returns></returns> 
         [HttpGet("GetDeletedRecord")]
-        public async Task<IActionResult> GetDeletedRecord(Guid recid)
+        public async Task<IActionResult> GetDeletedRecord(int recid)
         {
             try
             {
@@ -138,11 +138,30 @@ namespace TOMI.Web.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost("ChangeDeletedRecStatus")]
-        public async Task<IActionResult> ChangeDeletedRecStatus(Guid recid)
+        public async Task<IActionResult> ChangeDeletedRecStatus(int recid)
         {
             try
             {
                 var response = await _stockAdjustmentService.ChangeDeletedRecStatus(recid);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        /// <summary>
+        /// MasterData
+        /// </summary>
+        /// <param name="sku"></param>
+        /// <returns></returns>
+        [HttpPost("MasterData/{sku}")]
+        public async Task<IActionResult> MasterData(string sku)
+        {
+            try
+            {
+                var response = await _stockAdjustmentService.MasterData(sku);
                 return Ok(response);
             }
             catch (Exception ex)
