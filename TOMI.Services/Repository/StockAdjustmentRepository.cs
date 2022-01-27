@@ -64,7 +64,7 @@ namespace TOMI.Services.Repository
 
         public async Task<List<StockAdjustment>> GetStockAdjustmentListAsync()
         {
-            return await _context.StockAdjustment.ToListAsync();
+            return await _context.StockAdjustment.Include(x=>x.Master).ToListAsync();
         }
 
         public async Task<List<StockAdjustment>> GoToRecord(int recId)

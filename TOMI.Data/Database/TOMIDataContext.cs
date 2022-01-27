@@ -40,6 +40,11 @@ namespace TOMI.Data.Database
                   .WithOne(c=>c.Group)
                    .HasForeignKey(x => x.GroupId);
 
+            modelBuilder.Entity<Master>()
+              .HasMany(c => c.StockAdjustment)
+              .WithOne(c => c.Master)
+               .HasForeignKey(x => x.SKU);
+
             modelBuilder.Entity<Store>()
                 .HasOne(c => c.User)
                 .WithOne(s => s.Store)

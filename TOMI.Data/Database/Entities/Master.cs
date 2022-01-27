@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace TOMI.Data.Database.Entities
@@ -18,5 +19,7 @@ namespace TOMI.Data.Database.Entities
         public Guid? CustomerId { get; set; }
         public Guid? StoreId { get; set; }
         public DateTimeOffset? StockDate { get; set; }
+
+        public virtual ICollection<StockAdjustment> StockAdjustment { get; set; }
     }
 }

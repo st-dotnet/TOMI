@@ -27,5 +27,7 @@ namespace TOMI.Data.Database.Entities
         public int? Department { get; set; }
         public int? Quantity { get; set; }
         public bool Isdeleted { get; set; }
+
+        public virtual Master Master { get; set; }
     }
 }
