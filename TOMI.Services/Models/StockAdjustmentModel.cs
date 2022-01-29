@@ -28,4 +28,21 @@ namespace TOMI.Services.Models
     {
         public StockAdjustment Adjustment { get; set; }
     }
+
+    public class StockAdjustmentFilterModel
+    {
+ 
+        public string Term { get; set; }
+        public int? Dload { get; set; }
+        public int? Tag { get; set; }
+        public int? Shelf { get; set; }
+        public string Barcode { get; set; }
+        public byte NOF { get; set; }
+        public int? Department { get; set; }
+        public int? Quantity { get; set; }
+        public string SKU { get; set; }
+        public string RetailPrice { get; set; }
+        public string Description { get; set; }
+        public string searchtext { get; set; }
+    }
 }

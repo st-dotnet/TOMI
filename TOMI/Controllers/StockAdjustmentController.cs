@@ -170,6 +170,19 @@ namespace TOMI.Web.Controllers
             }
         }
 
+        [HttpPost]
+        [Route("SearchStockAdjustment")]
+        public async Task<IActionResult> SearchStockAdjustment(StockAdjustmentFilterModel model)
+        {
+            try
+            {
+                return Ok(await _stockAdjustmentService.FilterStock(model));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
         #endregion
     }
 }
