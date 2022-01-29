@@ -101,7 +101,7 @@ namespace TOMI.Web.Controllers
         /// GoToRecord
         /// </summary>
         /// <returns></returns>
-        [HttpGet("GoToRecord/{id}")]
+        [HttpGet("GoToRecord/{recId}")]
         public async Task<IActionResult> GoToRecord(int recId)
         {
             try
@@ -120,11 +120,11 @@ namespace TOMI.Web.Controllers
         /// </summary>
         /// <returns></returns> 
         [HttpGet("GetDeletedRecord")]
-        public async Task<IActionResult> GetDeletedRecord(int recid)
+        public async Task<IActionResult> GetDeletedRecord()
         {
             try
             {
-                var response = await _stockAdjustmentService.GetDeletedRecord(recid);
+                var response = await _stockAdjustmentService.GetDeletedRecord();
                 return Ok(response);
             }
             catch (Exception ex)

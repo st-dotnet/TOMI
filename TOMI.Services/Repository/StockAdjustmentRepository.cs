@@ -28,9 +28,10 @@ namespace TOMI.Services.Repository
         public async Task<StockAdjustmentResponse> SaveStockAdjustment(StockAdjustmentModel model)
         {
             StockAdjustment stockAdjustment = await _context.StockAdjustment.FirstOrDefaultAsync(c => c.Id == model.Id);
-            var stockadjustment = _mapper.Map<StockAdjustment>(model);
+          
             if (stockAdjustment == null)
             {
+                var stockadjustment = _mapper.Map<StockAdjustment>(model);
                 StockAdjustment result = _context.StockAdjustment.Add(stockadjustment).Entity;
                 await _context.SaveChangesAsync();
                 return new StockAdjustmentResponse { Adjustment = result, Success = true };
@@ -38,7 +39,18 @@ namespace TOMI.Services.Repository
             else
             {
                 var res = _mapper.Map<StockAdjustment>(model);
-                _context.StockAdjustment.Update(res);
+                stockAdjustment.Rec = model.Rec;
+               
+                stockAdjustment.Term = model.Term;
+                stockAdjustment.Dload = model.Dload;
+                stockAdjustment.Tag = model.Tag;
+                stockAdjustment.Shelf = model.Shelf;
+                stockAdjustment.Barcode = model.Barcode;
+                stockAdjustment.SKU = model.SKU;
+       
+
+
+        _context.StockAdjustment.Update(stockAdjustment);
                 await _context.SaveChangesAsync();
                 return new StockAdjustmentResponse { Adjustment = res, Success = true };
             }
@@ -64,23 +76,23 @@ namespace TOMI.Services.Repository
 
         public async Task<List<StockAdjustment>> GetStockAdjustmentListAsync()
         {
-            return await _context.StockAdjustment.Include(x=>x.Master).ToListAsync();
+            return await _context.StockAdjustment.Include(x=>x.Master).Where(x=>!x.Isdeleted).ToListAsync();
         }
 
         public async Task<List<StockAdjustment>> GoToRecord(int recId)
         {
-            StockAdjustment recid = await _context.StockAdjustment.FirstOrDefaultAsync(x =>x.Rec== recId);
+            List<StockAdjustment> records = new();
+            StockAdjustment recid = await _context.StockAdjustment.Include(x => x.Master).FirstOrDefaultAsync(x => x.Rec == recId);
             if (recid != null)
             {
-                return await _context.StockAdjustment.ToListAsync();
+                  records.Add(recid);
             }
-
-            return null;
+            return records;
         }
 
-        public async Task<List<StockAdjustment>> GetDeletedRecord(int recid)
+        public async Task<List<StockAdjustment>> GetDeletedRecord()
         {
-            return await _context.StockAdjustment.Where(x => x.Rec == recid && x.Isdeleted == true).ToListAsync();
+            return await _context.StockAdjustment.Include(x=>x.Master).Where(x => x.Isdeleted).ToListAsync();
         }
 
         public async Task<List<StockAdjustment>> ChangeDeletedRecStatus(int recid)

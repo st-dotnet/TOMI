@@ -17,7 +17,7 @@ namespace TOMI.Services.Models
         public int? Tag { get; set; }
         public int? Shelf { get; set; }
         public string Barcode { get; set; }
-        public string SKU { get; set; }
+        public Guid SKU { get; set; }
         public byte NOF { get; set; }
         public int? Department { get; set; }
         public int? Quantity { get; set; }
