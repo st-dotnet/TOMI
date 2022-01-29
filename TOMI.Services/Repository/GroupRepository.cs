@@ -38,8 +38,8 @@ namespace TOMI.Services.Repository
             
             if (existingRanges != null)
             {
-                var group = _mapper.Map<Group>(model);
-               // existingRanges.Name = model.Name;
+                
+                existingRanges.Name = model.Name;
                 _context.Group.Update(existingRanges);
                 _context.SaveChanges();
                 return new GroupResponse { group = existingRanges, Success = true };
