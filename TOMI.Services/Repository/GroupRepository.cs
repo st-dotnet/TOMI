@@ -67,7 +67,7 @@ namespace TOMI.Services.Repository
                 if (recordexist != null)
                     return new GroupResponse { Error = "Mentioned group name is in used ", Success = false };
                 _context.Group.Remove(existingGroup);
-                await _context.SaveChangesAsync();
+                 _context.SaveChanges();
                 return new GroupResponse { group = existingGroup, Success = true };
             }
             return new GroupResponse { Error = "GroupId not found! ", Success = false };
