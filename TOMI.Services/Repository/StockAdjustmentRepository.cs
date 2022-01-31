@@ -120,6 +120,9 @@ namespace TOMI.Services.Repository
             if (model.Dload != null)
                 stockAdjustmentData = stockAdjustmentData.Where(s => s.Dload == model.Dload).ToList();
 
+            if (model.Empno != null)
+                stockAdjustmentData = stockAdjustmentData.Where(s => s.Empno == model.Empno).ToList();
+
             if (!string.IsNullOrEmpty(model.Barcode))
                 stockAdjustmentData = stockAdjustmentData.Where(s => s.Barcode == model.Barcode).ToList();
 
@@ -130,25 +133,34 @@ namespace TOMI.Services.Repository
                 stockAdjustmentData = stockAdjustmentData.Where(s => s.Master.Description == model.Description).ToList();
 
             if (!string.IsNullOrEmpty(model.Term))
-                stockAdjustmentData = stockAdjustmentData.Where(s => s.Term== model.Term).ToList();
+                stockAdjustmentData = stockAdjustmentData.Where(s => s.Term == model.Term).ToList();
 
-            if (model.Shelf!=null)
+            if (model.Shelf != null)
                 stockAdjustmentData = stockAdjustmentData.Where(s => s.Shelf == model.Shelf).ToList();
 
             if (model.Tag != null)
                 stockAdjustmentData = stockAdjustmentData.Where(s => s.Tag == model.Tag).ToList();
 
-            if (model.Shelf != null)
-                stockAdjustmentData = stockAdjustmentData.Where(s => s.Shelf == model.Shelf).ToList();
-
             if (!string.IsNullOrEmpty(model.RetailPrice))
                 stockAdjustmentData = stockAdjustmentData.Where(s => s.Master.RetailPrice == model.RetailPrice).ToList();
 
             if (model.Quantity != null)
-                stockAdjustmentData = stockAdjustmentData.Where(s => s.Quantity == model.Quantity).ToList();
+                stockAdjustmentData = stockAdjustmentData.Where(s => s.Quantity.ToString().Contains(model.Quantity.ToString())).ToList();
 
-            //if(string.IsNullOrEmpty(model.searchtext))
-            //    stockAdjustmentData = stockAdjustmentData.Where(s => s.Quantity.ToString().Contains(model.Quantity.ToString())).ToList();
+
+            if (string.IsNullOrEmpty(model.searchtext))
+                stockAdjustmentData = stockAdjustmentData.Where(s => s.Quantity.ToString().Contains(model.Quantity.ToString())
+                || s.Shelf.ToString().Contains(model.Shelf.ToString())
+                || s.Tag.ToString().Contains(model.Tag.ToString())
+                || s.Term.ToString().Contains(model.Term.ToString())
+                || s.Master.Description.ToString().Contains(model.Description.ToString())
+                || s.Master.RetailPrice.ToString().Contains(model.RetailPrice.ToString())
+                || s.SKU.ToString().Contains(model.SKU.ToString())
+                || s.Department.ToString().Contains(model.Department.ToString())
+                || s.Dload.ToString().Contains(model.Dload.ToString())
+                || s.Empno.ToString().Contains(model.Empno.ToString())
+                || s.Barcode.ToString().Contains(model.Barcode.ToString())
+                ).ToList();
             return stockAdjustmentData;
         }
     }
