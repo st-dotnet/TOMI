@@ -153,7 +153,18 @@ namespace TOMI.Services.Repository
                         Success = true
                     };
                 }
-                return new UserModelResponse { Error = " UserName already Exist" };
+                else
+                {
+                    //var res = _mapper.Map<User>(user);
+                    _context.Users.Update(user);
+                    await _context.SaveChangesAsync();
+                    return new UserModelResponse
+                    {
+                        User = user,
+                        Success = true
+                    };
+                }
+                //return new UserModelResponse { Error = " UserName already Exist" };
             }
             catch (Exception ex)
             {
