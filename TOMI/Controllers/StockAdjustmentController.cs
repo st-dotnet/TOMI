@@ -183,6 +183,20 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
-        #endregion
+
+        [HttpGet]
+        [Route("GetMasterByCustomerId/{custid}")]
+        public async Task<IActionResult> GetMasterByCustomerId(Guid custid)
+        {
+            try
+            {
+                return Ok(await _stockAdjustmentService.GetMasterDataByCustomerId(custid));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+            #endregion
+        }
     }
 }

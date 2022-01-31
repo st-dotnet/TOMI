@@ -105,9 +105,17 @@ namespace TOMI.Services.Repository
 
         }
 
-        public async Task<Master> MasterDataBySku(string sku)
+        public async Task<MasterResponse> MasterDataBySku(string sku)
         {
-            return await _context.Master.FirstOrDefaultAsync(x => x.SKU == sku);
+            var stock = await _context.Master.FirstOrDefaultAsync(x => x.SKU == sku);
+            if (stock == null)
+            {
+                return new MasterResponse { Error = "Sku id doesn't exist", Success = false };
+            }
+            else
+            {
+                return new MasterResponse { master = stock, Success = true };
+            }
         }
 
         public async Task<List<StockAdjustment>> FilterStock(StockAdjustmentFilterModel model)
@@ -162,6 +170,11 @@ namespace TOMI.Services.Repository
                 || s.Barcode.ToString().Contains(model.Barcode.ToString())
                 ).ToList();
             return stockAdjustmentData;
+        }
+
+        public async Task<List<Master>> GetMasterDataByCustomerId(Guid custid)
+        {
+            return await _context.Master.Where(x => x.CustomerId == custid).ToListAsync();
         }
     }
 }
