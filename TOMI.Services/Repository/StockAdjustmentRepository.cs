@@ -148,18 +148,18 @@ namespace TOMI.Services.Repository
                 stockAdjustmentData = stockAdjustmentData.Where(s => s.Quantity.ToString().Contains(model.Quantity.ToString())).ToList();
 
 
-            if (string.IsNullOrEmpty(model.searchtext))
-                stockAdjustmentData = stockAdjustmentData.Where(s => s.Quantity.ToString().Contains(model.Quantity.ToString())
-                || s.Shelf.ToString().Contains(model.Shelf.ToString())
-                || s.Tag.ToString().Contains(model.Tag.ToString())
-                || s.Term.ToString().Contains(model.Term.ToString())
-                || s.Master.Description.ToString().Contains(model.Description.ToString())
-                || s.Master.RetailPrice.ToString().Contains(model.RetailPrice.ToString())
-                || s.SKU.ToString().Contains(model.SKU.ToString())
-                || s.Department.ToString().Contains(model.Department.ToString())
-                || s.Dload.ToString().Contains(model.Dload.ToString())
-                || s.Empno.ToString().Contains(model.Empno.ToString())
-                || s.Barcode.ToString().Contains(model.Barcode.ToString())
+            if (!string.IsNullOrEmpty(model.searchtext))
+                stockAdjustmentData = stockAdjustmentData.Where(s => s.Quantity.ToString().Contains(model.searchtext.ToString())
+                || s.Shelf.ToString().Contains(model.searchtext.ToString())
+                || s.Tag.ToString().Contains(model.searchtext.ToString())
+                || s.Term.ToString().Contains(model.searchtext.ToString())
+                || s.Master.Description.ToString().Contains(model.searchtext.ToString())
+                || s.Master.RetailPrice.ToString().Contains(model.searchtext.ToString())
+                || s.SKU.ToString().Contains(model.searchtext.ToString())
+                || s.Department.ToString().Contains(model.searchtext.ToString())
+                || s.Dload.ToString().Contains(model.searchtext.ToString())
+                || s.Empno.ToString().Contains(model.searchtext.ToString())
+                || s.Barcode.ToString().Contains(model.searchtext.ToString())
                 ).ToList();
             return stockAdjustmentData;
         }
