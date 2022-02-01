@@ -91,10 +91,10 @@ namespace TOMI.Services.Repository
             return await _context.StockAdjustment.Include(x => x.Master).Where(x => x.Isdeleted).ToListAsync();
         }
 
-        public async Task<List<StockAdjustment>> ChangeDeletedRecStatus(int recid)
+        public async Task<List<StockAdjustment>> ChangeDeletedRecStatus(Guid recid)
         {
 
-            var toBeDeleted = await _context.StockAdjustment.Where(x => x.Rec == recid && x.Isdeleted == true).ToListAsync();
+            var toBeDeleted = await _context.StockAdjustment.Where(x => x.Id == recid && x.Isdeleted == true).ToListAsync();
 
             toBeDeleted.ForEach(a => { a.Isdeleted = false; });
 

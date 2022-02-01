@@ -137,8 +137,8 @@ namespace TOMI.Web.Controllers
         /// ChangeDeletedRecStatus
         /// </summary>
         /// <returns></returns>
-        [HttpPost("ChangeDeletedRecStatus")]
-        public async Task<IActionResult> ChangeDeletedRecStatus(int recid)
+        [HttpGet("ChangeDeletedRecStatus/{recid}")]
+        public async Task<IActionResult> ChangeDeletedRecStatus(Guid recid)
         {
             try
             {
