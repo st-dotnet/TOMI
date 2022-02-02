@@ -18,6 +18,11 @@ namespace TOMI.Data.Database
         public DbSet<StockAdjustment> StockAdjustment { get; set; }
         public DbSet<InfoLoad> InfoLoad { get; set; }
         public DbSet<DwnErrors> DwnErrors { get; set; }
+        public DbSet<Departments> Departments { get; set; }
+        public DbSet<Reserved> Reserved { get; set; }
+        public DbSet<Stock> Stock { get; set; }
+        public DbSet<Categories> Categories { get; set; }
+        public DbSet<ParametersByDepartment> ParametersByDepartment { get; set; }
 
         public TOMIDataContext(DbContextOptions<TOMIDataContext> options)
             : base(options)

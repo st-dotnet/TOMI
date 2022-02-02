@@ -17,4 +17,6 @@ namespace TOMI.Services.Models
         public Guid? StoreId { get; set; }
         public DateTime? StockDate { get; set; }
     }
+
+   
 }

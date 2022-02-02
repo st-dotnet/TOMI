@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using CsvHelper;
+using CsvHelper.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using TOMI.Data.Database;
@@ -35,7 +40,7 @@ namespace TOMI.Services.Repository
                 await _context.SaveChangesAsync();
                 return infoLoad;
             }
-            throw new ValidationException("Id not found!");
+            throw new System.ComponentModel.DataAnnotations.ValidationException("Id not found!");
         }
 
         public async Task<InfoLoad> GetInfoLoadAsync(int id)
@@ -65,7 +70,81 @@ namespace TOMI.Services.Repository
                 await _context.SaveChangesAsync();
                 return new InfoLoadResponse { InfoLoad = res, Success = true };
             }
-            throw new ValidationException("Id not found!");
+            throw new System.ComponentModel.DataAnnotations.ValidationException("Id not found!");
+        }
+
+        public async Task<FileInfoDataResponse> InfoData(FilterInfoDataModel infodata)
+        {
+            bool isSaveSuccess = false;
+            string fileName;
+            List<InfoDataResponse> records = new List<InfoDataResponse>();
+
+            try
+            {
+                var extension = "." + infodata.File.FileName.Split('.')[infodata.File.FileName.Split('.').Length - 1];
+                fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
+
+                var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
+
+                if (!Directory.Exists(pathBuilt))
+                {
+                    Directory.CreateDirectory(pathBuilt);
+                }
+
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
+                   fileName);
+
+
+                using (var stream = new FileStream(path, FileMode.Create))
+                {
+                    await infodata.File.CopyToAsync(stream);
+                }
+                var config = new CsvConfiguration(CultureInfo.InvariantCulture)
+                {
+                    HasHeaderRecord = false,
+                    BadDataFound = null,
+                    Delimiter = ",",
+                };
+
+                using (var reader = new StreamReader(path)) 
+                using (var csv = new CsvReader(reader, config))
+                {
+
+                    records = csv.GetRecords<InfoDataResponse>().ToList();
+
+                    var infodetails = _mapper.Map<List<InfoLoad>>(records);
+
+                    foreach (var item in infodetails)
+                    {
+                        _context.InfoLoad.Add(item);
+                    }
+                }
+                // Submit the change to the database.
+                try
+                {
+                    await _context.SaveChangesAsync();
+                    File.Delete(path);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    // Make some adjustments.
+                    // ...
+                    // Try again.
+                    await _context.SaveChangesAsync();
+                }
+                isSaveSuccess = true;
+            }
+            catch (Exception e)
+            {
+                //log error
+            }
+
+            return new FileInfoDataResponse
+            {
+                InfoDataRecordCount = records.Count.ToString(),
+                Success = isSaveSuccess
+            }; ;
         }
     }
 }

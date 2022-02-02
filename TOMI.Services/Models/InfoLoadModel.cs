@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using TOMI.Data.Database.Entities;
 
 namespace TOMI.Services.Models
@@ -28,5 +29,17 @@ namespace TOMI.Services.Models
     public class InfoLoadResponse : BaseResponse
     {
         public InfoLoad InfoLoad { get; set; }
+    }
+
+    public class FilterInfoDataModel
+    {
+        public IFormFile File { get; set; }
+      
+    }
+
+    public class FileInfoDataResponse : BaseResponse
+    {
+        public string InfoDataRecordCount { get; set; }
+        public double TimeElapsed { get; set; }
     }
 }

@@ -96,6 +96,23 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
+
+        [HttpPost("ImportInfoFile")]
+        public async Task<IActionResult> ImportInfoFile([FromForm] FilterInfoDataModel infodata)
+        {
+            try
+            {
+                if (infodata != null)
+                    return Ok(await _infoLoadService.InfoData(infodata));
+                else
+                    return BadRequest(new { message = "please at least upload one file " });
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "Invalid file extension" });
+                throw;
+            }
+        }
         #endregion
     }
 }

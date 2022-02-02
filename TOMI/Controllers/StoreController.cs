@@ -97,6 +97,91 @@ namespace TOMI.Web.Controllers
             }
         }
 
+        [HttpPost("ImportDepartmentFile")]
+        public async Task<IActionResult> DepartmentFile([FromForm] FilterDataModel model)
+        {
+            try
+            {
+                if (model != null)
+                    return Ok(await _storeService.DepartmentsData(model));
+                else
+                    return BadRequest(new { message = "please at least upload one file " });
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "Invalid file extension" });
+                throw;
+            }
+        }
+
+        [HttpPost("ImportNewStockFile")]
+        public async Task<IActionResult> NewStockFile([FromForm] FilterDataModel model)
+        {
+            try
+            {
+                if (model != null)
+                    return Ok(await _storeService.StockData(model));
+                else
+                    return BadRequest(new { message = "please at least upload one file " });
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "Invalid file extension" });
+                throw;
+            }
+        }
+
+        [HttpPost("ImportReservedFile")]
+        public async Task<IActionResult> ReservedFile([FromForm] FilterDataModel model)
+        {
+            try
+            {
+                if (model != null)
+                    return Ok(await _storeService.ReservedData(model));
+                else
+                    return BadRequest(new { message = "please at least upload one file " });
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "Invalid file extension" });
+                throw;
+            }
+        }
+
+
+        [HttpPost("ImportCategoriesFile")]
+        public async Task<IActionResult> CategoriesFile([FromForm] FilterDataModel model)
+        {
+            try
+            {
+                if (model != null)
+                    return Ok(await _storeService.CatergoriesData(model));
+                else
+                    return BadRequest(new { message = "please at least upload one file " });
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "Invalid file extension" });
+                throw;
+            }
+        }
+
+        [HttpPost("ImportParametersByDepartmentFile")]
+        public async Task<IActionResult> ParametersByDepartmentFile([FromForm] FilterDataModel model)
+        {
+            try
+            {
+                if (model != null)
+                    return Ok(await _storeService.ParametersByDepartmentData(model));
+                else
+                    return BadRequest(new { message = "please at least upload one file " });
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "Invalid file extension" });
+                throw;
+            }
+        }
 
         /// <summary>
         ///  this is used for get Sales data by customerid, storeId and date
@@ -146,6 +231,76 @@ namespace TOMI.Web.Controllers
             try
             {
                 return Ok(await _storeService.GetStocksData(request));
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "Invalid Id" });
+                throw;
+            }
+        }
+
+        [HttpPost("GetNewStockData")]
+        public async Task<IActionResult> GetNewStockData(FilterDataRequest request)
+        {
+            try
+            {
+                return Ok(await _storeService.GetNewStockData(request));
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "Invalid Id" });
+                throw;
+            }
+        }
+
+        [HttpPost("GetReservedData")]
+        public async Task<IActionResult> GetReservedData(FilterDataRequest request)
+        {
+            try
+            {
+                return Ok(await _storeService.GetReservedData(request));
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "Invalid Id" });
+                throw;
+            }
+        }
+
+        [HttpPost("GetDepartmentsData")]
+        public async Task<IActionResult> GetDepartmentsData(FilterDataRequest request)
+        {
+            try
+            {
+                return Ok(await _storeService.GetDepartmentsData(request));
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "Invalid Id" });
+                throw;
+            }
+        }
+
+        [HttpPost("GetCategoriesData")]
+        public async Task<IActionResult> GetCategoriesData(FilterDataRequest request)
+        {
+            try
+            {
+                return Ok(await _storeService.GetCategoriesData(request));
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "Invalid Id" });
+                throw;
+            }
+        }
+
+        [HttpPost("GetParametersByDepartmentData")]
+        public async Task<IActionResult> GetParametersByDepartmentData(FilterDataRequest request)
+        {
+            try
+            {
+                return Ok(await _storeService.GetParametersByDepartmentData(request));
             }
             catch (Exception)
             {
