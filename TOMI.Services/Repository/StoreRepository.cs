@@ -347,7 +347,7 @@ namespace TOMI.Services.Repository
                         PrecVtaNorm=(x.Substring(52,8)),
                         PrecVtaNorm_SImpto=(x.Substring(60,8)),
                         SOH=(x.Substring(68,12)),
-                        Category=(x.Substring(81,6)),
+                        Category=x.Length  ==87 ?x.Substring(81,6):null,
                         CustomerId = model.CustomerId,
                         StoreId = model.StoreId,
                         StockDate = model.StockDate,
@@ -575,7 +575,6 @@ namespace TOMI.Services.Repository
                 {
                    new()
                     {
-
                         Department=(x.Substring(0,4)),
                         Quantity=(x.Substring(4,4)),
                         Pesos=(x.Substring(8,6)),
