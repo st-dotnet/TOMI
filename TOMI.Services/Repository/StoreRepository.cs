@@ -575,7 +575,7 @@ namespace TOMI.Services.Repository
                 {
                    new()
                     {
-                          
+
                         Department=(x.Substring(0,4)),
                         Quantity=(x.Substring(4,4)),
                         Pesos=(x.Substring(8,6)),
@@ -610,6 +610,89 @@ namespace TOMI.Services.Repository
             return new FileUplaodRespone
             {
                 stockRecordCount = parametersbydepartmentList.Count.ToString(),
+                TimeElapsed = timeElapsed,
+                Success = isSaveSuccess
+            }; ; ;
+        }
+
+        public async Task<FileUplaodRespone> OrderJobData(FilterDataModel model)
+        {
+            bool isSaveSuccess = false;
+            string fileName;
+
+            List<OrderJob> orderJobList = new();
+
+            var stopwatch = new Stopwatch();
+            stopwatch.Start();
+            double timeElapsed = 0;
+
+            try
+            {
+                var extension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
+                fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
+
+                var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
+
+                if (!Directory.Exists(pathBuilt))
+                {
+                    Directory.CreateDirectory(pathBuilt);
+                }
+
+                var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
+                 fileName);
+
+
+                using (var stream = new FileStream(path, FileMode.Create))
+                {
+                    await model.File.CopyToAsync(stream);
+                }
+                var orderJobFile = File.ReadAllLines(path);
+               
+                string regex = "^0+(?!$)";
+                orderJobList = orderJobFile.Skip(1).SelectMany(x => new List<OrderJob>
+                {
+                   new()
+                    {
+                     
+                        Store = Regex.Replace(x.Substring(0,3),regex, ""),
+                        Code= Regex.Replace(x.Substring(3,14),regex, ""),
+                        Department=Regex.Replace(x.Substring(18,4),regex, ""),
+                        Description =Regex.Replace(x.Substring(22,30),regex, ""),
+                        SalePrice= Regex.Replace(x.Substring(52,8),regex, ""),
+                        PriceWithoutTaxes= Regex.Replace(x.Substring(60,8),regex, ""),
+                        SKU = Regex.Replace(x.Substring(68, 12), regex, ""),
+                        Category=x.Length  ==88 ?x.Substring(82,6):null,
+                        CustomerId = model.CustomerId,
+                        StoreId = model.StoreId,
+                        StockDate = model.StockDate,
+
+                    }
+                 }).ToList();
+
+                // Submit the change to the database.
+                try
+                {
+                    await _context.BulkInsertAsync(orderJobList);
+                    stopwatch.Stop();
+                    timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
+
+                    File.Delete(path);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+
+                }
+                isSaveSuccess = true;
+            }
+            catch (Exception e)
+            {
+                //log error
+            }
+
+            return new FileUplaodRespone
+            {
+                stockRecordCount = orderJobList.Count.ToString(),
                 TimeElapsed = timeElapsed,
                 Success = isSaveSuccess
             }; ; ;
@@ -765,6 +848,10 @@ namespace TOMI.Services.Repository
 
         }
 
+        public async Task<List<OrderJob>> GetOrderJob(FilterDataRequest request)
+        {
+            return await _context.OrderJob.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate.Value.Date == request.StockDate.Value.Date).Take(500).ToListAsync();
 
+        }
     }
 }

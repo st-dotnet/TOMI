@@ -1,13 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace TOMI.Data.Database.Entities
 {
-   public class StockAdjustment:EntityBase
+    public class StockAdjustment:EntityBase
     {
         public StockAdjustment()
         {
@@ -29,5 +25,6 @@ namespace TOMI.Data.Database.Entities
         public int? Quantity { get; set; }
         public bool Isdeleted { get; set; }
         public virtual Master Master { get; set; }
+        public virtual OrderJob OrderJob { get; set; }
     }
 }

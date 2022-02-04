@@ -18,6 +18,7 @@ namespace TOMI.Data.Database
         public DbSet<StockAdjustment> StockAdjustment { get; set; }
         public DbSet<InfoLoad> InfoLoad { get; set; }
         public DbSet<DwnErrors> DwnErrors { get; set; }
+        public DbSet<OrderJob> OrderJob { get; set; }
         public DbSet<Departments> Departments { get; set; }
         public DbSet<Reserved> Reserved { get; set; }
         public DbSet<Stock> Stock { get; set; }
@@ -51,7 +52,10 @@ namespace TOMI.Data.Database
               .HasMany(c => c.StockAdjustment)
               .WithOne(c => c.Master)
                .HasForeignKey(x => x.SKU);
-
+            modelBuilder.Entity<OrderJob>()
+       .HasMany(c => c.StockAdjustment)
+       .WithOne(c => c.OrderJob)
+        .HasForeignKey(x => x.SKU);
             modelBuilder.Entity<Store>()
                 .HasOne(c => c.User)
                 .WithOne(s => s.Store)
