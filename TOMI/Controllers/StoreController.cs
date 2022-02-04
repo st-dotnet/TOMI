@@ -166,6 +166,23 @@ namespace TOMI.Web.Controllers
             }
         }
 
+        [HttpPost("ImportOrderJobFile")]
+        public async Task<IActionResult> OrderJobFile([FromForm] FilterDataModel model)
+        {
+            try
+            {
+                if (model != null)
+                    return Ok(await _storeService.OrderJobData(model));
+                else
+                    return BadRequest(new { message = "please at least upload one file " });
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "Invalid file extension" });
+                throw;
+            }
+        }
+
         [HttpPost("ImportParametersByDepartmentFile")]
         public async Task<IActionResult> ParametersByDepartmentFile([FromForm] FilterDataModel model)
         {
@@ -245,6 +262,20 @@ namespace TOMI.Web.Controllers
             try
             {
                 return Ok(await _storeService.GetNewStockData(request));
+            }
+            catch (Exception)
+            {
+                return BadRequest(new { message = "Invalid Id" });
+                throw;
+            }
+        }
+
+        [HttpPost("GetOrderJob")]
+        public async Task<IActionResult> GetOrderJob(FilterDataRequest request)
+        {
+            try
+            {
+                return Ok(await _storeService.GetOrderJob(request));
             }
             catch (Exception)
             {
