@@ -263,7 +263,7 @@ namespace TOMI.Web.Controllers
             {
                 return Ok(await _storeService.GetNewStockData(request));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return BadRequest(new { message = "Invalid Id" });
                 throw;
