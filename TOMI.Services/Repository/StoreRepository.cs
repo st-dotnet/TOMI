@@ -258,15 +258,15 @@ namespace TOMI.Services.Repository
                     await model.File.CopyToAsync(stream);
                 }
                 var departmentFile = File.ReadAllLines(path);
-
-                departmentsList = departmentFile.SelectMany(x => new List<Departments>
+                string regex = "^0+(?!$)";
+                departmentsList = departmentFile.Skip(1).SelectMany(x => new List<Departments>
                 {
                    new()
                     {
-                       Division=(x.Substring(0,2)),
-                       DivisionName=(x.Substring(2,30)),
-                       Department=(x.Substring(32,4)),
-                       DepartmentName=(x.Substring(36,30)),
+                       Division=Regex.Replace(x.Substring(0,2),regex, ""),
+                       DivisionName=Regex.Replace(x.Substring(2,30),regex, ""),
+                       Department=Regex.Replace(x.Substring(32,4),regex, ""),
+                       DepartmentName=Regex.Replace(x.Substring(36,30),regex, ""),
                         CustomerId = model.CustomerId,
                         StoreId = model.StoreId,
                         StockDate = model.StockDate,
@@ -398,33 +398,25 @@ namespace TOMI.Services.Repository
                 var extension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
                 fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
 
-                var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
-
-                if (!Directory.Exists(pathBuilt))
-                {
-                    Directory.CreateDirectory(pathBuilt);
-                }
-
+               
                 var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
                  fileName);
 
-
+                string regex = "^0+(?!$)";
                 using (var stream = new FileStream(path, FileMode.Create))
                 {
                     await model.File.CopyToAsync(stream);
                 }
                 var reservedFile = File.ReadAllLines(path);
 
-
-
-                reservedList = reservedFile.SelectMany(x => new List<Reserved>
+                reservedList = reservedFile.Skip(1).SelectMany(x => new List<Reserved>
                 {
                    new()
                     {
-                        Store=(x.Substring(0,4)),
-                        Code=(x.Substring(4,14)),
-                        Quantity=(x.Substring(18,9)),
-                        Filler=(x.Substring(27,1)),
+                        Store=Regex.Replace(x.Substring(0,4),regex,""),
+                        Code=Regex.Replace(x.Substring(4,14),regex,""),
+                        Quantity=Regex.Replace(x.Substring(18,9),regex,""),
+                        Filler=Regex.Replace(x.Substring(27,1),regex,""),
                         CustomerId = model.CustomerId,
                         StoreId = model.StoreId,
                         StockDate = model.StockDate,
@@ -492,17 +484,15 @@ namespace TOMI.Services.Repository
                     await model.File.CopyToAsync(stream);
                 }
                 var catergoriesFile = File.ReadAllLines(path);
-
-
-
-                catergoriesList = catergoriesFile.SelectMany(x => new List<Categories>
+                string regex = "^0+(?!$)";
+                catergoriesList = catergoriesFile.Skip(1).SelectMany(x => new List<Categories>
                 {
                    new()
                     {
-                        Division=(x.Substring(0,2)),
-                        DivisionName=(x.Substring(2,30)),
-                        Category=(x.Substring(32,6)),
-                        CategoryName=(x.Substring(38,40)),
+                        Division=Regex.Replace(x.Substring(0,2),regex,""),
+                        DivisionName=Regex.Replace(x.Substring(2,30),regex,""),
+                        Category=Regex.Replace(x.Substring(32,6),regex,""),
+                        CategoryName=Regex.Replace(x.Substring(38,40),regex,""),
                         CustomerId = model.CustomerId,
                         StoreId = model.StoreId,
                         StockDate = model.StockDate,
