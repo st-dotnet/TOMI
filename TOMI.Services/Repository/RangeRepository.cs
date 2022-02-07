@@ -88,10 +88,10 @@ namespace TOMI.Services.Repository
         //}
         public async Task<int> GetMinMaxRange()
         {
-            var maxRange = await _context.Ranges.MaxAsync(x => Convert.ToInt32(x.TagTo));
+            var maxRange = await _context.Ranges.MaxAsync(x => x.TagTo);
             if (maxRange.ToString() !=null)
             {
-                return Convert.ToInt32(maxRange);
+                return Convert.ToInt32(maxRange)+1;
             }
             else
             {
