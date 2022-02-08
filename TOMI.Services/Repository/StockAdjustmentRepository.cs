@@ -195,18 +195,31 @@ namespace TOMI.Services.Repository
             return await _context.Master.Where(x => x.CustomerId == custid).ToListAsync();
         }
 
-        public async Task<bool> VoidTag(int[] tag)
+        public async Task<StockAdjustmentResponse> VoidTag(int[] tag)
         {
-           
-            foreach (var item in tag)
+            try
             {
-                var tagdata = await _context.StockAdjustment.FirstOrDefaultAsync(x => x.Tag == item);
-                tagdata.Isdeleted = true;
-                _context.Add(tagdata);
-            }
+                List<StockAdjustment> records = new();
+                foreach (var item in tag)
+                {
+                    var tagdata = await _context.StockAdjustment.FirstOrDefaultAsync(x => x.Tag == item);
+                    if(tagdata!=null)
+                    {
+                        tagdata.Isdeleted = true;
+                        records.Add(tagdata);
+                    }
+                }
+                await _context.BulkUpdateAsync(records);
 
-            return true;
+                return new StockAdjustmentResponse { Success = true };
+            }
+            catch (Exception ex)
+            {
+
+                return new StockAdjustmentResponse { Success = false , Error="Tag is not Valid"};
+            }
            
+
         }
 
     }

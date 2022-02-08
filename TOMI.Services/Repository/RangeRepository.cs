@@ -101,14 +101,14 @@ namespace TOMI.Services.Repository
 
         public async Task<bool> GetTag(int tag)
         {
-            var findtag = await _context.Ranges.FirstOrDefaultAsync(x => Convert.ToInt32(x.TagFrom) <= tag && Convert.ToInt32(x.TagTo) >= tag);
+            var findtag = await _context.Ranges.FirstOrDefaultAsync(x =>x.TagFrom <= tag && x.TagTo >= tag);
             if (findtag != null)
             {
-                return true;
+                return false;
             }
             else
             {
-                return false;
+                return true;
             }
         }
     }

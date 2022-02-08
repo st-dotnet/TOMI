@@ -100,7 +100,7 @@ namespace TOMI.Web.Controllers
         /// VoidTag
         /// </summary>
         /// <returns></returns>
-        [HttpPost("VoidTag/{tag}")]
+        [HttpPost("VoidTag")]
         public async Task<IActionResult> VoidTag(int[] tag)
         {
             try
