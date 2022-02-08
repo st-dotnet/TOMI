@@ -18,7 +18,7 @@ namespace TOMI.Services.Interfaces
         Task<List<StockAdjustment>> GetDeletedRecord();
         Task<List<StockAdjustment>> ChangeDeletedRecStatus(Guid recid);
         Task<MasterResponse> MasterDataBySku(string sku);
-
+        Task<OrderjobResponse> MasterDataByBarCode(string barcode);
         Task<List<StockAdjustment>> FilterStock(StockAdjustmentFilterModel model);
         Task<List<Master>> GetMasterDataByCustomerId(Guid id);
     }

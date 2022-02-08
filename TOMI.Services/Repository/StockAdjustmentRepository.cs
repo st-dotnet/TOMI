@@ -28,9 +28,15 @@ namespace TOMI.Services.Repository
         public async Task<StockAdjustmentResponse> SaveStockAdjustment(StockAdjustmentModel model)
         {
             StockAdjustment stockAdjustment = await _context.StockAdjustment.FirstOrDefaultAsync(c => c.Id == model.Id);
-
+            int record = 1;
             if (stockAdjustment == null)
             {
+                var maxRange = await _context.StockAdjustment.MaxAsync(x => x.Rec);
+                if (maxRange.ToString() != null)
+                {
+                    record = Convert.ToInt32(maxRange) + 1;
+                }
+                model.Rec = record;
                 var stockadjustment = _mapper.Map<StockAdjustment>(model);
                 StockAdjustment result = _context.StockAdjustment.Add(stockadjustment).Entity;
                 await _context.SaveChangesAsync();
@@ -39,7 +45,6 @@ namespace TOMI.Services.Repository
             else
             {
                 var res = _mapper.Map<StockAdjustment>(model);
-                stockAdjustment.Rec = model.Rec;
                 stockAdjustment.Term = model.Term;
                 stockAdjustment.Dload = model.Dload;
                 stockAdjustment.Tag = model.Tag;
@@ -72,13 +77,13 @@ namespace TOMI.Services.Repository
 
         public async Task<List<StockAdjustment>> GetStockAdjustmentListAsync()
         {
-            return await _context.StockAdjustment.Include(x => x.Master).Where(x => !x.Isdeleted).ToListAsync();
+            return await _context.StockAdjustment.Include(x => x.OrderJob).Where(x => !x.Isdeleted).ToListAsync();
         }
 
         public async Task<List<StockAdjustment>> GoToRecord(int recId)
         {
             List<StockAdjustment> records = new();
-            StockAdjustment recid = await _context.StockAdjustment.Include(x => x.Master).FirstOrDefaultAsync(x => x.Rec == recId);
+            StockAdjustment recid = await _context.StockAdjustment.Include(x => x.OrderJob).FirstOrDefaultAsync(x => x.Rec == recId);
             if (recid != null)
             {
                 records.Add(recid);
@@ -88,7 +93,7 @@ namespace TOMI.Services.Repository
 
         public async Task<List<StockAdjustment>> GetDeletedRecord()
         {
-            return await _context.StockAdjustment.Include(x => x.Master).Where(x => x.Isdeleted).ToListAsync();
+            return await _context.StockAdjustment.Include(x => x.OrderJob).Where(x => x.Isdeleted).ToListAsync();
         }
 
         public async Task<List<StockAdjustment>> ChangeDeletedRecStatus(Guid recid)
@@ -118,9 +123,22 @@ namespace TOMI.Services.Repository
             }
         }
 
+        public async Task<OrderjobResponse> MasterDataByBarCode(string barcode)
+        {
+            var stock = await _context.OrderJob.FirstOrDefaultAsync(x => x.Code == barcode);
+            if (stock == null)
+            {
+                return new OrderjobResponse { Error = "Barcode id doesn't exist", Success = false };
+            }
+            else
+            {
+                return new OrderjobResponse { orderJob = stock, Success = true };
+            }
+        }
+
         public async Task<List<StockAdjustment>> FilterStock(StockAdjustmentFilterModel model)
         {
-            var stockAdjustmentData = await _context.StockAdjustment.Include(x => x.Master).ToListAsync();
+            var stockAdjustmentData = await _context.StockAdjustment.Include(x => x.OrderJob).ToListAsync();
 
             if (!string.IsNullOrEmpty(model.Department.ToString()))
                 stockAdjustmentData = stockAdjustmentData.Where(s => s.Department == model.Department).ToList();
@@ -135,10 +153,10 @@ namespace TOMI.Services.Repository
                 stockAdjustmentData = stockAdjustmentData.Where(s => s.Barcode == model.Barcode).ToList();
 
             if (!string.IsNullOrEmpty(model.SKU))
-                stockAdjustmentData = stockAdjustmentData.Where(s => s.Master.SKU == model.SKU).ToList();
+                stockAdjustmentData = stockAdjustmentData.Where(s => s.OrderJob.SKU == model.SKU).ToList();
 
             if (!string.IsNullOrEmpty(model.Description))
-                stockAdjustmentData = stockAdjustmentData.Where(s => s.Master.Description == model.Description).ToList();
+                stockAdjustmentData = stockAdjustmentData.Where(s => s.OrderJob.Description == model.Description).ToList();
 
             if (!string.IsNullOrEmpty(model.Term))
                 stockAdjustmentData = stockAdjustmentData.Where(s => s.Term == model.Term).ToList();
@@ -150,7 +168,7 @@ namespace TOMI.Services.Repository
                 stockAdjustmentData = stockAdjustmentData.Where(s => s.Tag == model.Tag).ToList();
 
             if (!string.IsNullOrEmpty(model.RetailPrice))
-                stockAdjustmentData = stockAdjustmentData.Where(s => s.Master.RetailPrice == model.RetailPrice).ToList();
+                stockAdjustmentData = stockAdjustmentData.Where(s => s.OrderJob.SalePrice == model.RetailPrice).ToList();
 
             if (model.Quantity != null)
                 stockAdjustmentData = stockAdjustmentData.Where(s => s.Quantity.ToString().Contains(model.Quantity.ToString())).ToList();
@@ -161,8 +179,8 @@ namespace TOMI.Services.Repository
                 || s.Shelf.ToString().Contains(model.searchtext.ToString())
                 || s.Tag.ToString().Contains(model.searchtext.ToString())
                 || s.Term.ToString().Contains(model.searchtext.ToString())
-                || s.Master.Description.ToString().Contains(model.searchtext.ToString())
-                || s.Master.RetailPrice.ToString().Contains(model.searchtext.ToString())
+                || s.OrderJob.Description.ToString().Contains(model.searchtext.ToString())
+                || s.OrderJob.SalePrice.ToString().Contains(model.searchtext.ToString())
                 || s.SKU.ToString().Contains(model.searchtext.ToString())
                 || s.Department.ToString().Contains(model.searchtext.ToString())
                 || s.Dload.ToString().Contains(model.searchtext.ToString())
