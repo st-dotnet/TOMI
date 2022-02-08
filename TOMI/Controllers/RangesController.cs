@@ -130,6 +130,24 @@ namespace TOMI.Web.Controllers
             }
         }
 
+        /// <summary>
+        ///  GetTagValue
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetTagValue/{tag}")]
+        public async Task<IActionResult> GetTagValue(int tag)
+        {
+            try
+            {
+                var response = await _rangeService.GetTag(tag);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
 
         #endregion
     }
