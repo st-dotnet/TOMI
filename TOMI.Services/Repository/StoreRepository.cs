@@ -344,7 +344,7 @@ namespace TOMI.Services.Repository
 
 
 
-                stockList = stockFile.SelectMany(x => new List<Stock>
+                stockList = stockFile.Skip(1).SelectMany(x => new List<Stock>
                 {
                    new()
                     {
@@ -734,12 +734,12 @@ namespace TOMI.Services.Repository
             return await _context.ParametersByDepartment.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate.Value.Date == request.StockDate.Value.Date).Take(500).ToListAsync();
 
         }
-
         public async Task<List<OrderJob>> GetOrderJob(FilterDataRequest request)
         {
             return await _context.OrderJob.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate.Value.Date == request.StockDate.Value.Date).Take(500).ToListAsync();
 
         }
+
 
         public async Task<FileUplaodRespone> OrderJobData(FilterDataModel model)
         {
@@ -823,5 +823,6 @@ namespace TOMI.Services.Repository
                 Success = isSaveSuccess
             }; ; ;
         }
+
     }
 }
