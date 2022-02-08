@@ -315,6 +315,151 @@ namespace TOMI.Data.Migrations
                     b.ToTable("InfoLoad");
                 });
 
+            modelBuilder.Entity("TOMI.Data.Database.Entities.MF1", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CustomerId1")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("Deletedby")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Department")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Employee_Number")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("Inventory_Date")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("Sale_Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("StoreId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Terminal")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("count_time")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("count_type")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("counted_status")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("creation_time")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("inventory_key")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("nof")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("operation")
+                        .HasColumnType("int");
+
+                    b.Property<int>("shelf")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("sync_back_from_terminal_status")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("sync_back_from_terminal_time")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("sync_to_terminal_status")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("sync_to_terminal_time")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("tag")
+                        .HasColumnType("int");
+
+                    b.Property<int>("total_counted")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("CustomerId1");
+
+                    b.HasIndex("StoreId");
+
+                    b.ToTable("MF1");
+                });
+
+            modelBuilder.Entity("TOMI.Data.Database.Entities.MF2", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("Deletedby")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Department")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("creation_time")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("MF2");
+                });
+
             modelBuilder.Entity("TOMI.Data.Database.Entities.Master", b =>
                 {
                     b.Property<Guid>("Id")
@@ -380,12 +525,76 @@ namespace TOMI.Data.Migrations
                     b.ToTable("Master");
                 });
 
+            modelBuilder.Entity("TOMI.Data.Database.Entities.OrderJob", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Category")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("Deletedby")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Department")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("PriceWithoutTaxes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SKU")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SalePrice")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("StockDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Store")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid?>("StoreId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("OrderJob");
+                });
+
             modelBuilder.Entity("TOMI.Data.Database.Entities.ParametersByDepartment", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTimeOffset?>("CreatedAt")
                         .HasColumnType("datetimeoffset");
@@ -473,11 +682,11 @@ namespace TOMI.Data.Migrations
                     b.Property<Guid?>("StoreId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("TagFrom")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("TagFrom")
+                        .HasColumnType("int");
 
-                    b.Property<string>("TagTo")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int?>("TagTo")
+                        .HasColumnType("int");
 
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("datetimeoffset");
@@ -941,10 +1150,35 @@ namespace TOMI.Data.Migrations
                             FirstName = "Admin",
                             IsActive = false,
                             LastName = "Admin",
-                            Password = "AQAAAAEAACcQAAAAEGlun3dOeJVCivN/of5vRhe1NdYgWRodTdCpyIolxmrJuXmnujsMPQVBHiQIEaRtcQ==",
+                            Password = "AQAAAAEAACcQAAAAENN1Gpr6WXcSbMRfgNSH9Fi+owtYDa0C9SIagNoyOdw/c48yL0XeGLysS7xWyNmXhg==",
                             PhoneNumber = "1234567890",
                             Role = "SuperAdmin"
                         });
+                });
+
+            modelBuilder.Entity("TOMI.Data.Database.Entities.MF1", b =>
+                {
+                    b.HasOne("TOMI.Data.Database.Entities.OrderJob", "OrderJob")
+                        .WithMany("MF1")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TOMI.Data.Database.Entities.Customer", null)
+                        .WithMany("MF1")
+                        .HasForeignKey("CustomerId1")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("TOMI.Data.Database.Entities.Store", "Store")
+                        .WithMany("MF1")
+                        .HasForeignKey("StoreId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("OrderJob");
+
+                    b.Navigation("Store");
                 });
 
             modelBuilder.Entity("TOMI.Data.Database.Entities.Ranges", b =>
@@ -958,13 +1192,13 @@ namespace TOMI.Data.Migrations
 
             modelBuilder.Entity("TOMI.Data.Database.Entities.StockAdjustment", b =>
                 {
-                    b.HasOne("TOMI.Data.Database.Entities.Master", "Master")
+                    b.HasOne("TOMI.Data.Database.Entities.OrderJob", "OrderJob")
                         .WithMany("StockAdjustment")
                         .HasForeignKey("SKU")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Master");
+                    b.Navigation("OrderJob");
                 });
 
             modelBuilder.Entity("TOMI.Data.Database.Entities.Store", b =>
@@ -998,6 +1232,8 @@ namespace TOMI.Data.Migrations
 
             modelBuilder.Entity("TOMI.Data.Database.Entities.Customer", b =>
                 {
+                    b.Navigation("MF1");
+
                     b.Navigation("Stores");
 
                     b.Navigation("Users");
@@ -1008,13 +1244,17 @@ namespace TOMI.Data.Migrations
                     b.Navigation("Ranges");
                 });
 
-            modelBuilder.Entity("TOMI.Data.Database.Entities.Master", b =>
+            modelBuilder.Entity("TOMI.Data.Database.Entities.OrderJob", b =>
                 {
+                    b.Navigation("MF1");
+
                     b.Navigation("StockAdjustment");
                 });
 
             modelBuilder.Entity("TOMI.Data.Database.Entities.Store", b =>
                 {
+                    b.Navigation("MF1");
+
                     b.Navigation("User");
                 });
 #pragma warning restore 612, 618

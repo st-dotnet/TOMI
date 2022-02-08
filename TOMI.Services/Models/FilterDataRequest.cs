@@ -17,6 +17,13 @@ namespace TOMI.Services.Models
         public Guid? StoreId { get; set; }
         public DateTime? StockDate { get; set; }
     }
+    public class TerminalModel
+    {
+        public Guid? CustomerId { get; set; }
+        public Guid? StoreId { get; set; }
+        public DateTime? Date { get; set; }
+        public int CountType { get; set; }
+        public string InventaryKey { get; set; }
+    }
 
-   
 }

@@ -24,6 +24,8 @@ namespace TOMI.Data.Database
         public DbSet<Stock> Stock { get; set; }
         public DbSet<Categories> Categories { get; set; }
         public DbSet<ParametersByDepartment> ParametersByDepartment { get; set; }
+        public DbSet<MF1> MF1 { get; set; }
+        public DbSet<MF2> MF2 { get; set; }
 
         public TOMIDataContext(DbContextOptions<TOMIDataContext> options)
             : base(options)
@@ -54,10 +56,40 @@ namespace TOMI.Data.Database
           .HasForeignKey(x => x.SKU);
 
             modelBuilder.Entity<Store>()
-                .HasOne(c => c.User)
-                .WithOne(s => s.Store)
-                .HasForeignKey<User>(x => x.StoreId)
-                .OnDelete(DeleteBehavior.NoAction);
+ .HasOne(c => c.User)
+ .WithOne(s => s.Store)
+ .HasForeignKey<User>(x => x.StoreId)
+ .OnDelete(DeleteBehavior.NoAction);
+
+
+
+
+            //modelBuilder.Entity<MF2>()
+            // .HasMany(c => c.MF1)
+            // .WithOne(c => c.MF2)
+            // .HasForeignKey(x => x.Department);
+
+
+
+
+            modelBuilder.Entity<OrderJob>()
+            .HasMany(c => c.MF1)
+            .WithOne(c => c.OrderJob)
+            .HasForeignKey(x => x.CustomerId);
+
+
+
+            modelBuilder.Entity<Store>()
+            .HasMany(c => c.MF1)
+            .WithOne(c => c.Store)
+            .HasForeignKey(x => x.StoreId)
+            .OnDelete(DeleteBehavior.NoAction);
+            //modelBuilder.Entity<OrderJob>()
+            // .HasMany(c => c.MF1)
+            // .WithOne(c => c.OrderJob)
+            // .HasForeignKey(x => x.Inventory_Date);
+
+
 
             this.SeedUsers(modelBuilder);
         }
