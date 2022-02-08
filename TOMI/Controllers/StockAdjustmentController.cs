@@ -96,6 +96,23 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
+        /// <summary>
+        /// VoidTag
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("VoidTag/{tag}")]
+        public async Task<IActionResult> VoidTag(int[] tag)
+        {
+            try
+            {
+                var response = await _stockAdjustmentService.VoidTag(tag);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
 
         /// <summary>
         /// GoToRecord

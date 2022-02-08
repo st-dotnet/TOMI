@@ -194,5 +194,20 @@ namespace TOMI.Services.Repository
         {
             return await _context.Master.Where(x => x.CustomerId == custid).ToListAsync();
         }
+
+        public async Task<bool> VoidTag(int[] tag)
+        {
+           
+            foreach (var item in tag)
+            {
+                var tagdata = await _context.StockAdjustment.FirstOrDefaultAsync(x => x.Tag == item);
+                tagdata.Isdeleted = true;
+                _context.Add(tagdata);
+            }
+
+            return true;
+           
+        }
+
     }
 }

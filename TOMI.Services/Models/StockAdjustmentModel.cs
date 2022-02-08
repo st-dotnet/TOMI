@@ -22,7 +22,7 @@ namespace TOMI.Services.Models
         public byte NOF { get; set; }
         public int? Department { get; set; }
         public int? Quantity { get; set; }
-        public bool? Isdeleted { get; set; }
+      
     }
 
     public class StockAdjustmentResponse:BaseResponse
