@@ -24,15 +24,17 @@ namespace TOMI.Services.Repository
             _mapper = mapper;
         }
 
-        public async Task<MF1> GenerateMasterFiles(TerminalModel model)
+        public async Task<TerminalResponse> GenerateMF1(TerminalModel model)
         {
-            List<MF1> MasterData = new();
+            List<MF1> mf1 = new();
+            List<MF2> mf2 = new();
             var masterdata = _context.OrderJob.Where(x => x.CustomerId == model.CustomerId && x.StoreId == model.StoreId && x.StockDate == model.Date).ToList();
             foreach (var item in masterdata)
             {
+                MF2 data2 = new MF2();
                 MF1 data = new MF1();
                 data.Code = item.Code;
-                data.CustomerId = (Guid)item.CustomerId;
+                data.CustomerId = (Guid)model.CustomerId;
                 data.Department = item.Department;
                 data.inventory_key = model.InventaryKey;
                 data.counted_status = true;
@@ -40,7 +42,6 @@ namespace TOMI.Services.Repository
                 data.count_time = DateTime.Now;
                 data.Terminal = "ds";
                 data.StoreId = (Guid)model.StoreId;
-                data.Employee_Number = "";
                 data.Inventory_Date = DateTime.Now;
                 data.Sale_Price = 0;
                 data.tag = 1;
@@ -57,12 +58,19 @@ namespace TOMI.Services.Repository
                 data.count_time = DateTime.Now;
                 data.nof = false;
                 data.counted_status = false;
-                MasterData.Add(data);
+                //insert data in MF2
+                data2.Department = item.Department;
+                data2.creation_time = (DateTimeOffset)item.StockDate;
+
+                mf1.Add(data);
+                mf2.Add(data2);
+
             }
-            var result = _context.BulkInsertAsync(MasterData);
-            //var result = _context.MF1.Add(data).Entity;
-            await _context.SaveChangesAsync();
-            return new MF1 { };
+            await _context.BulkInsertAsync(mf1);
+            await _context.BulkInsertAsync(mf2);
+            return new TerminalResponse { Success = true };
         }
+
+       
     }
 }

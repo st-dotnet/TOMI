@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.AspNetCore.Http;
+using TOMI.Data.Database.Entities;
 
 namespace TOMI.Services.Models
 {
@@ -24,6 +25,11 @@ namespace TOMI.Services.Models
         public DateTime? Date { get; set; }
         public int CountType { get; set; }
         public string InventaryKey { get; set; }
+    }
+
+    public class TerminalResponse : BaseResponse
+    {
+        public MF1 MF1 { get; set; }
     }
 
 }

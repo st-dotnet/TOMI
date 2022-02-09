@@ -12,7 +12,9 @@ namespace TOMI.Data.Database.Entities
         [Key]
         public Guid Id { get; set; }
         public string Department { get; set; }
-        public DateTime creation_time { get; set; }
+        public DateTimeOffset creation_time { get; set; }
+
+       // public virtual OrderJob OrderJob { get; set; }
 
     }
 

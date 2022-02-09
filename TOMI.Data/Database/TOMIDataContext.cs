@@ -72,18 +72,31 @@ namespace TOMI.Data.Database
 
 
 
-            modelBuilder.Entity<OrderJob>()
-            .HasMany(c => c.MF1)
-            .WithOne(c => c.OrderJob)
-            .HasForeignKey(x => x.CustomerId);
+            //modelBuilder.Entity<OrderJob>()
+            //.HasMany(c => c.MF1)
+            //.WithOne(c => c.OrderJob)
+            //.HasForeignKey(x => x.CustomerId);
 
 
 
             modelBuilder.Entity<Store>()
-            .HasMany(c => c.MF1)
+            .HasMany(c=> c.MF1)
             .WithOne(c => c.Store)
             .HasForeignKey(x => x.StoreId)
             .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<Customer>()
+           .HasMany(c => c.MF1)
+           .WithOne(c => c.customer)
+           .HasForeignKey(x => x.CustomerId)
+           .OnDelete(DeleteBehavior.NoAction);
+
+           // modelBuilder.Entity<OrderJob>()
+           //.HasMany(c => c.MF2)
+           //.WithOne(c => c.OrderJob)
+           //.HasForeignKey(x => x.Id)
+           //.OnDelete(DeleteBehavior.NoAction);
+
             //modelBuilder.Entity<OrderJob>()
             // .HasMany(c => c.MF1)
             // .WithOne(c => c.OrderJob)

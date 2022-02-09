@@ -21,7 +21,7 @@ namespace TOMI.Data.Database.Entities
         public Guid? StoreId { get; set; }
         public DateTimeOffset? StockDate { get; set; }
         public virtual ICollection<StockAdjustment> StockAdjustment { get; set; }
-        public virtual ICollection<MF1> MF1 { get; set; }
+       // public virtual ICollection<MF2> MF2 { get; set; }
     }
 }
 

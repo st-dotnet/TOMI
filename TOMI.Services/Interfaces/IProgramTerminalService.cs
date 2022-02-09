@@ -10,6 +10,6 @@ namespace TOMI.Services.Interfaces
 {
    public interface IProgramTerminalService
     {
-        Task<MF1> GenerateMasterFiles(TerminalModel model);
+        Task<TerminalResponse> GenerateMF1(TerminalModel model);
     }
 }

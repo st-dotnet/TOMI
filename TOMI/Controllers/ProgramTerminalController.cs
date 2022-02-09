@@ -32,12 +32,12 @@ namespace TOMI.Web.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpPost]
-        [Route("GenerateMasterFiles")]
-        public async Task<IActionResult> GenerateMasterFiles(TerminalModel model)
+        [Route("GenerateMF1")]
+        public async Task<IActionResult> GenerateMF1(TerminalModel model)
         {
             try
             {
-                return Ok(await _programTerminalService.GenerateMasterFiles(model));
+                return Ok(await _programTerminalService.GenerateMF1(model));
             }
             catch (Exception ex)
             {
