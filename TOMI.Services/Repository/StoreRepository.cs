@@ -165,29 +165,32 @@ namespace TOMI.Services.Repository
 
             try
             {
-                var extension = "." + masterData.File.FileName.Split('.')[masterData.File.FileName.Split('.').Length - 1];
-                fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
-
-                var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
-
-                if (!Directory.Exists(pathBuilt))
+                string existingFile = masterData.File.FileName.ToString();
+                if (existingFile.Contains("MAST"))
                 {
-                    Directory.CreateDirectory(pathBuilt);
-                }
+                    var extension = "." + masterData.File.FileName.Split('.')[masterData.File.FileName.Split('.').Length - 1];
+                    fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
 
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
-                 fileName);
+                    var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
+
+                    if (!Directory.Exists(pathBuilt))
+                    {
+                        Directory.CreateDirectory(pathBuilt);
+                    }
+
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
+                     fileName);
 
 
-                using (var stream = new FileStream(path, FileMode.Create))
-                {
-                    await masterData.File.CopyToAsync(stream);
-                }
-                var masterFile = File.ReadAllLines(path);
+                    using (var stream = new FileStream(path, FileMode.Create))
+                    {
+                        await masterData.File.CopyToAsync(stream);
+                    }
+                    var masterFile = File.ReadAllLines(path);
 
-                string regex = "^0+(?!$)";
+                    string regex = "^0+(?!$)";
 
-                masterList = masterFile.SelectMany(x => new List<Master>
+                    masterList = masterFile.SelectMany(x => new List<Master>
                 {
                    new()
                     {
@@ -205,21 +208,27 @@ namespace TOMI.Services.Repository
                     }
                  }).ToList();
 
-                // Submit the change to the database.
-                try
-                {
-                    await _context.BulkInsertAsync(masterList);
-                    stopwatch.Stop();
-                    timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
+                    // Submit the change to the database.
+                    try
+                    {
+                        await _context.BulkInsertAsync(masterList);
+                        stopwatch.Stop();
+                        timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
 
-                    File.Delete(path);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
+                        File.Delete(path);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
 
+                    }
+                    isSaveSuccess = true;
                 }
-                isSaveSuccess = true;
+                else
+                {
+                    return new FileUplaodRespone { Success = false, Error = "Invalid File" };
+                }
+
             }
             catch (Exception e)
             {
@@ -247,27 +256,30 @@ namespace TOMI.Services.Repository
 
             try
             {
-                var extension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
-                fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
-
-                var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
-
-                if (!Directory.Exists(pathBuilt))
+                string existingFile = model.File.FileName.ToString();
+                if (existingFile.Contains("DPTO"))
                 {
-                    Directory.CreateDirectory(pathBuilt);
-                }
+                    var extension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
+                    fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
 
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
-                 fileName);
+                    var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
+
+                    if (!Directory.Exists(pathBuilt))
+                    {
+                        Directory.CreateDirectory(pathBuilt);
+                    }
+
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
+                     fileName);
 
 
-                using (var stream = new FileStream(path, FileMode.Create))
-                {
-                    await model.File.CopyToAsync(stream);
-                }
-                var departmentFile = File.ReadAllLines(path);
-                string regex = "^0+(?!$)";
-                departmentsList = departmentFile.Skip(1).SelectMany(x => new List<Departments>
+                    using (var stream = new FileStream(path, FileMode.Create))
+                    {
+                        await model.File.CopyToAsync(stream);
+                    }
+                    var departmentFile = File.ReadAllLines(path);
+                    string regex = "^0+(?!$)";
+                    departmentsList = departmentFile.Skip(1).SelectMany(x => new List<Departments>
                 {
                    new()
                     {
@@ -281,21 +293,27 @@ namespace TOMI.Services.Repository
                     }
                  }).ToList();
 
-                // Submit the change to the database.
-                try
-                {
-                    await _context.BulkInsertAsync(departmentsList);
-                    stopwatch.Stop();
-                    timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
+                    // Submit the change to the database.
+                    try
+                    {
+                        await _context.BulkInsertAsync(departmentsList);
+                        stopwatch.Stop();
+                        timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
 
-                    File.Delete(path);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
+                        File.Delete(path);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
 
+                    }
+                    isSaveSuccess = true;
                 }
-                isSaveSuccess = true;
+                else
+                {
+                    return new FileUplaodRespone { Success = false, Error = "Invalid File" };
+                }
+
             }
             catch (Exception e)
             {
@@ -322,61 +340,71 @@ namespace TOMI.Services.Repository
 
             try
             {
-                var extension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
-                fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
-
-                var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
-
-                if (!Directory.Exists(pathBuilt))
+                string existingFile = model.File.FileName.ToString();
+                if (existingFile.Contains("EXIS"))
                 {
-                    Directory.CreateDirectory(pathBuilt);
-                }
+                    var extension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
+                    fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
 
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
-                 fileName);
+                    var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
+
+                    if (!Directory.Exists(pathBuilt))
+                    {
+                        Directory.CreateDirectory(pathBuilt);
+                    }
+
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
+                     fileName);
 
 
-                using (var stream = new FileStream(path, FileMode.Create))
-                {
-                    await model.File.CopyToAsync(stream);
-                }
-                var stockFile = File.ReadAllLines(path);
+                    using (var stream = new FileStream(path, FileMode.Create))
+                    {
+                        await model.File.CopyToAsync(stream);
+                    }
+                    var stockFile = File.ReadAllLines(path);
+                    string regex = "^0+(?!$)";
 
 
-
-                stockList = stockFile.Skip(1).SelectMany(x => new List<Stock>
+                    stockList = stockFile.Skip(1).SelectMany(x => new List<Stock>
                 {
                    new()
                     {
-                        Store=(x.Substring(0,4)),
-                        SKU=(x.Substring(4,14)),
-                        Departament=(x.Substring(18,4)),
-                        Description=(x.Substring(22,30)),
-                        PrecVtaNorm=(x.Substring(52,8)),
-                        PrecVtaNorm_SImpto=(x.Substring(60,8)),
-                        SOH=(x.Substring(68,12)),
-                        Category=x.Length  ==87 ?x.Substring(81,6):null,
+                        Store=Regex.Replace(x.Substring(0,4), regex, ""),
+                        SKU = Regex.Replace(x.Substring(4,14), regex, ""),
+                        Departament = Regex.Replace(x.Substring(18,4), regex, ""),
+                        Description = (x.Substring(22,30).Trim()),
+                        PrecVtaNorm= Regex.Replace(x.Substring(52,8), regex, ""),
+                        PrecVtaNorm_SImpto= Regex.Replace(x.Substring(60,8), regex, ""),
+                        SOH= Regex.Replace(x.Substring(68,12), regex, ""),
+                        Category=x.Length ==87 ?x.Substring(81,6):null,
                         CustomerId = model.CustomerId,
                         StoreId = model.StoreId,
                         StockDate = model.StockDate,
                     }
+                 
                  }).ToList();
 
-                // Submit the change to the database.
-                try
-                {
-                    await _context.BulkInsertAsync(stockList);
-                    stopwatch.Stop();
-                    timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
+                    // Submit the change to the database.
+                    try
+                    {
+                        await _context.BulkInsertAsync(stockList);
+                        stopwatch.Stop();
+                        timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
 
-                    File.Delete(path);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
+                        File.Delete(path);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
 
+                    }
+                    isSaveSuccess = true;
                 }
-                isSaveSuccess = true;
+                else
+                {
+                    return new FileUplaodRespone { Success = false, Error = "Invalid File" };
+                }
+
             }
             catch (Exception e)
             {
@@ -403,21 +431,24 @@ namespace TOMI.Services.Repository
 
             try
             {
-                var extension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
-                fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
-
-               
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
-                 fileName);
-
-                string regex = "^0+(?!$)";
-                using (var stream = new FileStream(path, FileMode.Create))
+                string existingFile = model.File.FileName.ToString();
+                if (existingFile.Contains("APAR"))
                 {
-                    await model.File.CopyToAsync(stream);
-                }
-                var reservedFile = File.ReadAllLines(path);
+                    var extension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
+                    fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
 
-                reservedList = reservedFile.Skip(1).SelectMany(x => new List<Reserved>
+
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
+                     fileName);
+
+                    string regex = "^0+(?!$)";
+                    using (var stream = new FileStream(path, FileMode.Create))
+                    {
+                        await model.File.CopyToAsync(stream);
+                    }
+                    var reservedFile = File.ReadAllLines(path);
+
+                    reservedList = reservedFile.Skip(1).SelectMany(x => new List<Reserved>
                 {
                    new()
                     {
@@ -431,21 +462,27 @@ namespace TOMI.Services.Repository
                     }
                  }).ToList();
 
-                // Submit the change to the database.
-                try
-                {
-                    await _context.BulkInsertAsync(reservedList);
-                    stopwatch.Stop();
-                    timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
+                    // Submit the change to the database.
+                    try
+                    {
+                        await _context.BulkInsertAsync(reservedList);
+                        stopwatch.Stop();
+                        timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
 
-                    File.Delete(path);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
+                        File.Delete(path);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
 
+                    }
+                    isSaveSuccess = true;
                 }
-                isSaveSuccess = true;
+                else
+                {
+                    return new FileUplaodRespone { Success = false, Error = "Invalid File" };
+                }
+
             }
             catch (Exception e)
             {
@@ -473,27 +510,30 @@ namespace TOMI.Services.Repository
 
             try
             {
-                var extension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
-                fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
-
-                var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
-
-                if (!Directory.Exists(pathBuilt))
+                string existingFile = model.File.FileName.ToString();
+                if (existingFile.Contains("CATE"))
                 {
-                    Directory.CreateDirectory(pathBuilt);
-                }
+                    var extension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
+                    fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
 
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
-                 fileName);
+                    var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
+
+                    if (!Directory.Exists(pathBuilt))
+                    {
+                        Directory.CreateDirectory(pathBuilt);
+                    }
+
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
+                     fileName);
 
 
-                using (var stream = new FileStream(path, FileMode.Create))
-                {
-                    await model.File.CopyToAsync(stream);
-                }
-                var catergoriesFile = File.ReadAllLines(path);
-                string regex = "^0+(?!$)";
-                catergoriesList = catergoriesFile.Skip(1).SelectMany(x => new List<Categories>
+                    using (var stream = new FileStream(path, FileMode.Create))
+                    {
+                        await model.File.CopyToAsync(stream);
+                    }
+                    var catergoriesFile = File.ReadAllLines(path);
+                    string regex = "^0+(?!$)";
+                    catergoriesList = catergoriesFile.Skip(1).SelectMany(x => new List<Categories>
                 {
                    new()
                     {
@@ -507,21 +547,26 @@ namespace TOMI.Services.Repository
                     }
                  }).ToList();
 
-                // Submit the change to the database.
-                try
-                {
-                    await _context.BulkInsertAsync(catergoriesList);
-                    stopwatch.Stop();
-                    timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
+                    // Submit the change to the database.
+                    try
+                    {
+                        await _context.BulkInsertAsync(catergoriesList);
+                        stopwatch.Stop();
+                        timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
 
-                    File.Delete(path);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
+                        File.Delete(path);
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
 
+                    }
+                    isSaveSuccess = true;
                 }
-                isSaveSuccess = true;
+                else
+                {
+                    return new FileUplaodRespone { Success = false, Error = "Invalid File" };
+                }
             }
             catch (Exception e)
             {
@@ -561,9 +606,9 @@ namespace TOMI.Services.Repository
                                 Quantity = worksheet.Cells[row, 2].Value.ToString().Trim(),
                                 Pesos = worksheet.Cells[row, 3].Value.ToString().Trim(),
                                 PercentageInPieces = worksheet.Cells[row, 4].Value.ToString().Trim(),
-                                CustomerId=model.CustomerId,
-                                StoreId=model.StoreId,
-                                StockDate=model.StockDate
+                                CustomerId = model.CustomerId,
+                                StoreId = model.StoreId,
+                                StockDate = model.StockDate
                             });
                         }
                     }
@@ -687,8 +732,6 @@ namespace TOMI.Services.Repository
                 Success = isSaveSuccess
             }; ; ;
         }
-
-
 
         public async Task<List<Sales>> GetSalesData(FilterDataRequest request)
         {
