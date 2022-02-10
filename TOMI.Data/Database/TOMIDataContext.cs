@@ -10,9 +10,6 @@ namespace TOMI.Data.Database
         public DbSet<Customer> Customers { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Store> Stores { get; set; }
-        public DbSet<Sales> Sales { get; set; }
-        public DbSet<Stocks> Stocks { get; set; }
-        public DbSet<Master> Master { get; set; }
         public DbSet<Ranges> Ranges { get; set; }
         public DbSet<Group> Group { get; set; }
         public DbSet<StockAdjustment> StockAdjustment { get; set; }

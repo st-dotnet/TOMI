@@ -24,60 +24,96 @@ namespace TOMI.Services.Repository
             _context = context;
             _mapper = mapper;
         }
-       
+
         public async Task<Ranges> DeleteRange(Guid id)
         {
-            var existingRanges = await _context.Ranges.FirstOrDefaultAsync(x => x.Id == id);
-            if (existingRanges != null)
+            try
             {
-                _context.Ranges.Remove(existingRanges);
-                await _context.SaveChangesAsync();
-                return existingRanges;
+                var existingRanges = await _context.Ranges.FirstOrDefaultAsync(x => x.Id == id);
+                if (existingRanges != null)
+                {
+                    _context.Ranges.Remove(existingRanges);
+                    await _context.SaveChangesAsync();
+                    return existingRanges;
+                }
+                throw new ValidationException("Range not found!");
             }
-            throw new ValidationException("Range not found!");
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
 
 
         public async Task<Ranges> GetRange(Guid id)
         {
-            return await _context.Ranges.FirstOrDefaultAsync(x => x.Id == id);
+            try
+            {
+                return await _context.Ranges.FirstOrDefaultAsync(x => x.Id == id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
         public async Task<List<Ranges>> GetRangesAsync()
         {
-            return await _context.Ranges.Include(x => x.Group).ToListAsync();
+            try
+            {
+                return await _context.Ranges.Include(x => x.Group).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
 
         public async Task<RangesModel> SaveRanges(RangesModel rangeModel)
         {
-            Ranges existingRanges = await _context.Ranges.FirstOrDefaultAsync(c => c.Id == rangeModel.Id);
-
-            var ranges = _mapper.Map<Ranges>(rangeModel);
-
-            if (existingRanges == null)
+            try
             {
-                Ranges result = _context.Ranges.Add(ranges).Entity;
+                Ranges existingRanges = await _context.Ranges.FirstOrDefaultAsync(c => c.Id == rangeModel.Id);
+
+                var ranges = _mapper.Map<Ranges>(rangeModel);
+
+                if (existingRanges == null)
+                {
+                    Ranges result = _context.Ranges.Add(ranges).Entity;
+                }
+                else
+                {
+                    //var res= _mapper.Map<Ranges>(rangeModel);
+                    existingRanges.Name = rangeModel.Name;
+                    existingRanges.TagFrom = rangeModel.TagFrom;
+                    existingRanges.TagTo = rangeModel.TagTo;
+                    existingRanges.GroupId = rangeModel.GroupId;
+                    _context.Ranges.Update(existingRanges);
+                }
+
+
+                await _context.SaveChangesAsync();
+                return rangeModel;
+                throw new ValidationException("Range not found!");
             }
-            else
+            catch (Exception ex)
             {
-                //var res= _mapper.Map<Ranges>(rangeModel);
-                existingRanges.Name = rangeModel.Name;
-                existingRanges.TagFrom = rangeModel.TagFrom;
-                existingRanges.TagTo = rangeModel.TagTo;
-                existingRanges.GroupId = rangeModel.GroupId;
-                _context.Ranges.Update(existingRanges);
+                throw new Exception(ex.ToString());
             }
-
-
-            await _context.SaveChangesAsync();
-            return rangeModel;
-            throw new ValidationException("Range not found!");
         }
+
 
         public async Task<Ranges> GetLastRange(Guid id)
         {
-            return await _context.Ranges
+            try
+            {
+                return await _context.Ranges
             .Where(m => m.GroupId.Equals(id))
             .OrderByDescending(m => m.Id).FirstOrDefaultAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
 
         //public  int GetMinMaxRange()
@@ -88,27 +124,41 @@ namespace TOMI.Services.Repository
         //}
         public async Task<int> GetMinMaxRange()
         {
-            var maxRange = await _context.Ranges.MaxAsync(x => x.TagTo);
-            if (maxRange.ToString() !=null)
+            try
             {
-                return Convert.ToInt32(maxRange)+1;
+                var maxRange = await _context.Ranges.MaxAsync(x => x.TagTo);
+                if (maxRange.ToString() != null)
+                {
+                    return Convert.ToInt32(maxRange) + 1;
+                }
+                else
+                {
+                    return 0;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return 0;
+                throw new Exception(ex.ToString());
             }
         }
 
         public async Task<bool> GetTag(int tag)
         {
-            var findtag = await _context.Ranges.FirstOrDefaultAsync(x =>x.TagFrom <= tag && x.TagTo >= tag);
-            if (findtag != null)
+            try
             {
-                return false;
+                var findtag = await _context.Ranges.FirstOrDefaultAsync(x => x.TagFrom <= tag && x.TagTo >= tag);
+                if (findtag != null)
+                {
+                    return false;
+                }
+                else
+                {
+                    return true;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return true;
+                throw new Exception(ex.ToString());
             }
         }
     }

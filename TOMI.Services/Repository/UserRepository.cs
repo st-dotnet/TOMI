@@ -58,11 +58,8 @@ namespace TOMI.Services.Repository
             }
             catch (Exception ex)
             {
-                return new UserModelResponse { Error = "Invalid UserName and Password " };
+                throw new Exception(ex.ToString());
             }
-
-
-
         }
         //public UserModelResponse Authenticate(string email, string password)
         //{
@@ -168,7 +165,7 @@ namespace TOMI.Services.Repository
             }
             catch (Exception ex)
             {
-                return new UserModelResponse { Error = ex.Message };
+                throw new Exception(ex.ToString());
             }
 
         }
@@ -207,7 +204,7 @@ namespace TOMI.Services.Repository
             }
             catch (Exception ex)
             {
-                return new UserModelResponse { Error = ex.Message };
+                throw new Exception(ex.ToString());
             }
 
         }

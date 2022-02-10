@@ -17,10 +17,10 @@ namespace TOMI.Services.Interfaces
         Task<List<StockAdjustment>> GoToRecord(int recid);
         Task<List<StockAdjustment>> GetDeletedRecord();
         Task<List<StockAdjustment>> ChangeDeletedRecStatus(Guid recid);
-        Task<MasterResponse> MasterDataBySku(string sku);
+        Task<OrderjobResponse> MasterDataBySku(string sku);
         Task<OrderjobResponse> MasterDataByBarCode(string barcode);
         Task<List<StockAdjustment>> FilterStock(StockAdjustmentFilterModel model);
-        Task<List<Master>> GetMasterDataByCustomerId(Guid id);
+        Task<List<OrderJob>> GetMasterDataByCustomerId(Guid id);
         Task<StockAdjustmentResponse> VoidTag(int[] tag);
     }
 }

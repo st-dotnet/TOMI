@@ -32,7 +32,6 @@ namespace TOMI.Web.Controllers
             }
         }
 
-
         [HttpGet("GetStore/{customerId}")]
         public async Task<IActionResult> GetUsersByIdAsync(string customerId)
         {
@@ -46,57 +45,6 @@ namespace TOMI.Web.Controllers
             }
         }
 
-        [HttpPost("ImportSalesFile")]
-        public async Task<IActionResult> UploadFile([FromForm] FilterDataModel stockModel )
-        {
-            try
-            {
-                if (stockModel != null)
-                    return Ok(await _storeService.SalesData(stockModel));
-                else
-                    return BadRequest(new { message = "please at least upload one file " });
-            }
-            catch (Exception)
-            {
-                return BadRequest(new { message = "Invalid file extension" });
-                throw;
-            }  
-        }
-
-        [HttpPost("ImportMasterFile")]
-        public async Task<IActionResult> MasterFile([FromForm] FilterDataModel masterData)
-        {
-            try
-            {
-                if (masterData != null)
-                    return Ok(await _storeService.MasterData(masterData));
-                else
-                    return BadRequest(new { message = "please at least upload one file " });
-            }
-            catch (Exception)
-            {
-                return BadRequest(new { message = "Invalid file extension" });
-                throw;
-            }
-        }
-
-        [HttpPost("ImportStockFile")]
-        public async Task<IActionResult> StockFile([FromForm] FilterDataModel stockData)
-        {
-            try
-            {
-                if (stockData != null)
-                    return Ok(await _storeService.StocksData(stockData));
-                else
-                    return BadRequest(new { message = "please at least upload one file " });
-            }
-            catch (Exception)
-            {
-                return BadRequest(new { message = "Invalid file extension" });
-                throw;
-            }
-        }
-
         [HttpPost("ImportDepartmentFile")]
         public async Task<IActionResult> DepartmentFile([FromForm] FilterDataModel model)
         {
@@ -107,10 +55,9 @@ namespace TOMI.Web.Controllers
                 else
                     return BadRequest(new { message = "please at least upload one file " });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest(new { message = "Invalid file extension" });
-                throw;
+                throw new Exception(ex.ToString());
             }
         }
 
@@ -124,10 +71,9 @@ namespace TOMI.Web.Controllers
                 else
                     return BadRequest(new { message = "please at least upload one file " });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest(new { message = "Invalid file extension" });
-                throw;
+                throw new Exception(ex.ToString());
             }
         }
 
@@ -141,10 +87,9 @@ namespace TOMI.Web.Controllers
                 else
                     return BadRequest(new { message = "please at least upload one file " });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest(new { message = "Invalid file extension" });
-                throw;
+                throw new Exception(ex.ToString());
             }
         }
 
@@ -159,10 +104,9 @@ namespace TOMI.Web.Controllers
                 else
                     return BadRequest(new { message = "please at least upload one file " });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest(new { message = "Invalid file extension" });
-                throw;
+                throw new Exception(ex.ToString());
             }
         }
 
@@ -176,10 +120,9 @@ namespace TOMI.Web.Controllers
                 else
                     return BadRequest(new { message = "please at least upload one file " });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest(new { message = "Invalid file extension" });
-                throw;
+                throw new Exception(ex.ToString());
             }
         }
 
@@ -193,66 +136,9 @@ namespace TOMI.Web.Controllers
                 else
                     return BadRequest(new { message = "please at least upload one file " });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest(new { message = "Invalid file extension" });
-                throw;
-            }
-        }
-
-        /// <summary>
-        ///  this is used for get Sales data by customerid, storeId and date
-        /// </summary>
-        /// <param name="request">SalesModelRequest</param>
-        /// <returns></returns>
-        [HttpPost("GetSalesData")]
-        public async Task<IActionResult> GetSalesData(FilterDataRequest request)
-        {
-            try
-            {
-                return Ok(await _storeService.GetSalesData(request));
-            }
-            catch (Exception)
-            {
-                return BadRequest(new { message = "Invalid Id" });
-                throw;
-            }
-        }
-
-        /// <summary>
-        ///  this is used for get Master data by customerid, storeId and date
-        /// </summary>
-        /// <param name="request">MasterModelRequest</param>
-        /// <returns></returns>
-        [HttpPost("GetMasterData")]
-        public async Task<IActionResult> GetMasterData(FilterDataRequest request)
-        {
-            try
-            {
-                return Ok(await _storeService.GetMasterData(request));
-            }
-            catch (Exception)
-            {
-                return BadRequest(new { message = "Invalid Id" });
-                throw;
-            }
-        }
-        /// <summary>
-        ///  this is used for get Stocks data by customerid, storeId and date
-        /// </summary>
-        /// <param name="request">StocksModelRequest</param>
-        /// <returns></returns>
-        [HttpPost("GetStocksData")]
-        public async Task<IActionResult> GetStocksData(FilterDataRequest request)
-        {
-            try
-            {
-                return Ok(await _storeService.GetStocksData(request));
-            }
-            catch (Exception)
-            {
-                return BadRequest(new { message = "Invalid Id" });
-                throw;
+                throw new Exception(ex.ToString());
             }
         }
 
@@ -265,8 +151,7 @@ namespace TOMI.Web.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = "Invalid Id" });
-                throw;
+                throw new Exception(ex.ToString());
             }
         }
 
@@ -277,10 +162,9 @@ namespace TOMI.Web.Controllers
             {
                 return Ok(await _storeService.GetOrderJob(request));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest(new { message = "Invalid Id" });
-                throw;
+                throw new Exception(ex.ToString());
             }
         }
 
@@ -291,10 +175,9 @@ namespace TOMI.Web.Controllers
             {
                 return Ok(await _storeService.GetReservedData(request));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest(new { message = "Invalid Id" });
-                throw;
+                throw new Exception(ex.ToString());
             }
         }
 
@@ -305,10 +188,9 @@ namespace TOMI.Web.Controllers
             {
                 return Ok(await _storeService.GetDepartmentsData(request));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest(new { message = "Invalid Id" });
-                throw;
+                throw new Exception(ex.ToString());
             }
         }
 
@@ -319,10 +201,9 @@ namespace TOMI.Web.Controllers
             {
                 return Ok(await _storeService.GetCategoriesData(request));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest(new { message = "Invalid Id" });
-                throw;
+                throw new Exception(ex.ToString());
             }
         }
 
@@ -333,13 +214,10 @@ namespace TOMI.Web.Controllers
             {
                 return Ok(await _storeService.GetParametersByDepartmentData(request));
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest(new { message = "Invalid Id" });
-                throw;
+                throw new Exception(ex.ToString());
             }
         }
-
-
     }
 }

@@ -25,36 +25,63 @@ namespace TOMI.Services.Repository
         }
         public async Task<Customer> DeleteCustomer(Guid id)
         {
-            return await _context.Customers.FirstOrDefaultAsync(x => x.Id == id);
+            try
+            {
+                return await _context.Customers.FirstOrDefaultAsync(x => x.Id == id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
         public async Task<Customer> GetCustomer(Guid id)
         {
-            return await _context.Customers.FirstOrDefaultAsync(x => x.Id == id);
+            try
+            {
+                return await _context.Customers.FirstOrDefaultAsync(x => x.Id == id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
         public async Task<List<Customer>> GetCustomersAsync()
         {
-            var courses = _context.Customers.Include(c => c.Users).Include(c=>c.Stores);
+            var courses = _context.Customers.Include(c => c.Users).Include(c => c.Stores);
 
-            return await courses.ToListAsync(); 
+            return await courses.ToListAsync();
         }
         public async Task<Customer> SaveCustomer(CustomerModel customer)
         {
-            Customer exsitingCustomer = await _context.Customers.FirstOrDefaultAsync(c => c.Name == customer.Name);
-
-            var customers = _mapper.Map<Customer>(customer);
-            if (exsitingCustomer == null)
+            try
             {
-                Customer result = _context.Customers.Add(customers).Entity;
-                _context.SaveChanges();
-                return result;
+                Customer exsitingCustomer = await _context.Customers.FirstOrDefaultAsync(c => c.Name == customer.Name);
+                var customers = _mapper.Map<Customer>(customer);
+                if (exsitingCustomer == null)
+                {
+                    Customer result = _context.Customers.Add(customers).Entity;
+                    _context.SaveChanges();
+                    return result;
+                }
+                throw new ValidationException("Customer not found");
             }
-            throw new ValidationException("Customer not found!");
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
 
 
         public async Task<Customer> GetUserByCustomereAsync(string customerId)
         {
-            return await _context.Customers.Include(c => c.Users).FirstOrDefaultAsync(x => x.Id.ToString() == customerId) ;
+            try
+            {
+                return await _context.Customers.Include(c => c.Users).FirstOrDefaultAsync(x => x.Id.ToString() == customerId);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
     }
 }

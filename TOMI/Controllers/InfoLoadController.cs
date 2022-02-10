@@ -104,10 +104,9 @@ namespace TOMI.Web.Controllers
                 else
                     return BadRequest(new { message = "please at least upload one file " });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest(new { message = "Invalid file extension" });
-                throw;
+                throw new Exception(ex.ToString());
             }
         }
         #endregion

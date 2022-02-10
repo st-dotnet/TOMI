@@ -134,12 +134,15 @@ namespace TOMI
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();                
+                app.UseDeveloperExceptionPage();
             }
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "TOMI v1"));
 
             app.UseHttpsRedirection();
+
+            app.UseExceptionHandler("/error"); // Add this
+            //app.UseEndpoints(endpoints => endpoints.MapControllers());
 
             app.UseRouting();
             app.UseCors("foo"); // second
@@ -147,6 +150,7 @@ namespace TOMI
 
             app.UseAuthorization();
             app.UseMiddleware<AuthMiddleware>();
+            app.UseMiddleware<ErrorHandlerMiddleware>();
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();

@@ -58,7 +58,7 @@ namespace TOMI.Services.Repository
             }
             catch (Exception ex)
             {
-                return new StoreModelResponse { Error = ex.Message };
+                throw new Exception(ex.ToString());
             }
 
         }
@@ -74,175 +74,6 @@ namespace TOMI.Services.Repository
 
             }
         }
-        public async Task<FileUplaodRespone> SalesData(FilterDataModel stockModel)
-        {
-            bool isSaveSuccess = false;
-            string fileName;
-            List<SalesDetailResponse> records = new List<SalesDetailResponse>();
-
-
-            try
-            {
-                var extension = "." + stockModel.File.FileName.Split('.')[stockModel.File.FileName.Split('.').Length - 1];
-                fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
-
-                var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
-
-                if (!Directory.Exists(pathBuilt))
-                {
-                    Directory.CreateDirectory(pathBuilt);
-                }
-
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
-                   fileName);
-
-
-                using (var stream = new FileStream(path, FileMode.Create))
-                {
-                    await stockModel.File.CopyToAsync(stream);
-                }
-                var config = new CsvConfiguration(CultureInfo.InvariantCulture)
-                {
-                    HasHeaderRecord = false,
-                    BadDataFound = null,
-                    Delimiter = "|",
-                };
-
-                using (var reader = new StreamReader(path))
-                using (var csv = new CsvReader(reader, config))
-                {
-                    records = csv.GetRecords<SalesDetailResponse>().ToList();
-
-                    var storedetails = _mapper.Map<List<Sales>>(records);
-                    //Loop and insert records.  
-                    foreach (Sales storedetail in storedetails)
-                    {
-                        storedetail.CustomerId = stockModel.CustomerId;
-                        storedetail.StoreId = stockModel.StoreId;
-                        storedetail.StockDate = stockModel.StockDate;
-
-
-                        _context.Sales.Add(storedetail);
-                    }
-                }
-                // Submit the change to the database.
-                try
-                {
-                    await _context.SaveChangesAsync();
-                    File.Delete(path);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-                    // Make some adjustments.
-                    // ...
-                    // Try again.
-                    await _context.SaveChangesAsync();
-                }
-                isSaveSuccess = true;
-            }
-            catch (Exception e)
-            {
-                //log error
-            }
-
-            return new FileUplaodRespone
-            {
-                stockRecordCount = records.Count.ToString(),
-                Success = isSaveSuccess
-            }; ;
-        }
-        public async Task<FileUplaodRespone> MasterData(FilterDataModel masterData)
-        {
-            bool isSaveSuccess = false;
-            string fileName;
-
-            List<Master> masterList = new();
-
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-            double timeElapsed = 0;
-
-            try
-            {
-                string existingFile = masterData.File.FileName.ToString();
-                if (existingFile.Contains("MAST"))
-                {
-                    var extension = "." + masterData.File.FileName.Split('.')[masterData.File.FileName.Split('.').Length - 1];
-                    fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
-
-                    var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
-
-                    if (!Directory.Exists(pathBuilt))
-                    {
-                        Directory.CreateDirectory(pathBuilt);
-                    }
-
-                    var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
-                     fileName);
-
-
-                    using (var stream = new FileStream(path, FileMode.Create))
-                    {
-                        await masterData.File.CopyToAsync(stream);
-                    }
-                    var masterFile = File.ReadAllLines(path);
-
-                    string regex = "^0+(?!$)";
-
-                    masterList = masterFile.SelectMany(x => new List<Master>
-                {
-                   new()
-                    {
-                        SKU = Regex.Replace(x.Substring(0, 26), regex, ""),
-                        Barcode = (x.Substring(27, 30).Trim()),
-                        RetailPrice = (Regex.Replace(x.Substring(58, 11), regex, "")).Replace(",", "."),
-                        Description = (x.Substring(70, 40).Trim()),
-                        Department = (x.Substring(110, 02).Trim()),
-                        Blank = (x.Substring(112, 11).Trim()),
-                        OHQuantity = "0",
-                        Unity = (x.Substring(134, 3).Trim()),
-                        CustomerId = masterData.CustomerId,
-                        StoreId = masterData.StoreId,
-                        StockDate = masterData.StockDate,
-                    }
-                 }).ToList();
-
-                    // Submit the change to the database.
-                    try
-                    {
-                        await _context.BulkInsertAsync(masterList);
-                        stopwatch.Stop();
-                        timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
-
-                        File.Delete(path);
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-
-                    }
-                    isSaveSuccess = true;
-                }
-                else
-                {
-                    return new FileUplaodRespone { Success = false, Error = "Invalid File" };
-                }
-
-            }
-            catch (Exception e)
-            {
-                //log error
-            }
-
-            return new FileUplaodRespone
-            {
-                stockRecordCount = masterList.Count.ToString(),
-                TimeElapsed = timeElapsed,
-                Success = isSaveSuccess
-            }; ; ;
-        }
-
         public async Task<FileUplaodRespone> DepartmentsData(FilterDataModel model)
         {
             bool isSaveSuccess = false;
@@ -302,9 +133,9 @@ namespace TOMI.Services.Repository
 
                         File.Delete(path);
                     }
-                    catch (Exception e)
+                    catch (Exception ex)
                     {
-                        Console.WriteLine(e);
+                        throw new Exception(ex.ToString());
 
                     }
                     isSaveSuccess = true;
@@ -315,9 +146,9 @@ namespace TOMI.Services.Repository
                 }
 
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                //log error
+                throw new Exception(ex.ToString());
             }
 
             return new FileUplaodRespone
@@ -381,7 +212,7 @@ namespace TOMI.Services.Repository
                         StoreId = model.StoreId,
                         StockDate = model.StockDate,
                     }
-                 
+
                  }).ToList();
 
                     // Submit the change to the database.
@@ -406,9 +237,9 @@ namespace TOMI.Services.Repository
                 }
 
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                //log error
+                throw new Exception(ex.ToString());
             }
 
             return new FileUplaodRespone
@@ -471,10 +302,9 @@ namespace TOMI.Services.Repository
 
                         File.Delete(path);
                     }
-                    catch (Exception e)
+                    catch (Exception ex)
                     {
-                        Console.WriteLine(e);
-
+                        throw new Exception(ex.ToString());
                     }
                     isSaveSuccess = true;
                 }
@@ -496,7 +326,6 @@ namespace TOMI.Services.Repository
                 Success = isSaveSuccess
             }; ; ;
         }
-
         public async Task<FileUplaodRespone> CatergoriesData(FilterDataModel model)
         {
             bool isSaveSuccess = false;
@@ -580,7 +409,6 @@ namespace TOMI.Services.Repository
                 Success = isSaveSuccess
             }; ; ;
         }
-
         public async Task<FileUplaodRespone> ParametersByDepartmentData(FilterDataModel model)
         {
             bool isSaveSuccess = false;
@@ -629,161 +457,74 @@ namespace TOMI.Services.Repository
                 Success = isSaveSuccess
             };
         }
-        public async Task<FileUplaodRespone> StocksData(FilterDataModel stocksData)
-        {
-            bool isSaveSuccess = false;
-            string fileName;
-            List<Stocks> stockList = new();
-
-            var stopwatch = new Stopwatch();
-            stopwatch.Start();
-            double timeElapsed = 0;
-
-            try
-            {
-                var extension = "." + stocksData.File.FileName.Split('.')[stocksData.File.FileName.Split('.').Length - 1];
-                fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
-
-                var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
-
-                if (!Directory.Exists(pathBuilt))
-                {
-                    Directory.CreateDirectory(pathBuilt);
-                }
-
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
-                 fileName);
-
-
-                using (var stream = new FileStream(path, FileMode.Create))
-                {
-                    await stocksData.File.CopyToAsync(stream);
-                }
-
-                var stockfile = File.ReadAllLines(path);
-                string regex = "^0+(?!$)";
-
-                stockList = stockfile.SelectMany(x => new List<Stocks>
-                {
-                   new()
-                    {
-                        SKU = Regex.Replace(x.Substring(0, 26), regex, ""),
-                        Barcode = (x.Substring(27, 30).Trim()),
-                        RetailPrice = (Regex.Replace(x.Substring(58, 11), regex, "")).Replace(",", "."),
-                        Description = (x.Substring(70, 40).Trim()),
-                        Department = (x.Substring(110, 02).Trim()),
-                        Blank = (x.Substring(112, 11).Trim()),
-                        OHQuantity = Regex.Replace(x.Substring(122, 11), regex, "").Trim(),
-                        Unity = (x.Substring(134, 3).Trim()),
-                        CustomerId = stocksData.CustomerId,
-                        StoreId = stocksData.StoreId,
-                        StockDate = stocksData.StockDate,
-                    }
-                 }).ToList();
-
-
-                //var isMasterSkuExist = _context.Master.FirstOrDefault(x => x.SKU == stockList[0].SKU);
-                //if (isMasterSkuExist != null)
-                //{
-                //    isMasterSkuExist.OHQuantity = stockList[0].OHQuantity;
-                //    _context.Master.Update(isMasterSkuExist);
-
-                //}
-
-
-                //var storedetails = _mapper.Map<List<Stocks>>(records);
-                ////Loop and insert records.  
-                //foreach (Stocks storedetail in storedetails)
-                //{
-
-                //    storedetail.CustomerId = stocksData.CustomerId;
-                //    storedetail.StoreId = stocksData.StoreId;
-                //    storedetail.StockDate = stocksData.StockDate;
-
-                //    _context.Stocks.Add(storedetail);
-
-                //}
-
-                try
-                {
-                    await _context.BulkInsertAsync(stockList);
-                    stopwatch.Stop();
-                    timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
-
-                    File.Delete(path);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
-
-                    _context.SaveChanges();
-                }
-                isSaveSuccess = true;
-            }
-            catch (Exception e)
-            {
-
-            }
-
-            return new FileUplaodRespone
-            {
-                stockRecordCount = stockList.Count.ToString(),
-                TimeElapsed = timeElapsed,
-                Success = isSaveSuccess
-            }; ; ;
-        }
-
-        public async Task<List<Sales>> GetSalesData(FilterDataRequest request)
-        {
-            return await _context.Sales.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate.Value.Date == request.StockDate.Value.Date).Take(500).ToListAsync();
-
-        }
-        public async Task<List<Master>> GetMasterData(FilterDataRequest request)
-        {
-            return await _context.Master.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate.Value.Date == request.StockDate.Value.Date).Take(500).ToListAsync();
-
-        }
-
-        public async Task<List<Stocks>> GetStocksData(FilterDataRequest request)
-        {
-            return await _context.Stocks.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate.Value.Date == request.StockDate.Value.Date).Take(500).ToListAsync();
-        }
-
         public async Task<List<Departments>> GetDepartmentsData(FilterDataRequest request)
         {
-            return await _context.Departments.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate.Value.Date == request.StockDate.Value.Date).Take(500).ToListAsync();
-
+            try
+            {
+                return await _context.Departments.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate.Value.Date == request.StockDate.Value.Date).Take(500).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
-
         public async Task<List<Reserved>> GetReservedData(FilterDataRequest request)
         {
-            return await _context.Reserved.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate.Value.Date == request.StockDate.Value.Date).Take(500).ToListAsync();
-
+            try
+            {
+                return await _context.Reserved.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate.Value.Date == request.StockDate.Value.Date).Take(500).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
-
         public async Task<List<Stock>> GetNewStockData(FilterDataRequest request)
         {
-            return await _context.Stock.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate.Value.Date == request.StockDate.Value.Date).Take(500).ToListAsync();
-
+            try
+            {
+                return await _context.Stock.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate.Value.Date == request.StockDate.Value.Date).Take(500).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
-
         public async Task<List<Categories>> GetCategoriesData(FilterDataRequest request)
         {
-            return await _context.Categories.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate.Value.Date == request.StockDate.Value.Date).Take(500).ToListAsync();
+            try
+            {
+                return await _context.Categories.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate.Value.Date == request.StockDate.Value.Date).Take(500).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
 
         }
         public async Task<List<ParametersByDepartment>> GetParametersByDepartmentData(FilterDataRequest request)
         {
-            return await _context.ParametersByDepartment.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate.Value.Date == request.StockDate.Value.Date).Take(500).ToListAsync();
+            try
+            {
+                return await _context.ParametersByDepartment.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate.Value.Date == request.StockDate.Value.Date).Take(500).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
 
         }
         public async Task<List<OrderJob>> GetOrderJob(FilterDataRequest request)
         {
-            return await _context.OrderJob.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate.Value.Date == request.StockDate.Value.Date).Take(500).ToListAsync();
-
+            try
+            {
+                return await _context.OrderJob.Where(c => c.CustomerId == request.CustomerId && c.StoreId == request.StoreId && c.StockDate.Value.Date == request.StockDate.Value.Date).Take(500).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
-
-
         public async Task<FileUplaodRespone> OrderJobData(FilterDataModel model)
         {
             bool isSaveSuccess = false;
@@ -797,28 +538,31 @@ namespace TOMI.Services.Repository
 
             try
             {
-                var extension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
-                fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
-
-                var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
-
-                if (!Directory.Exists(pathBuilt))
+                string existingFile = model.File.FileName.ToString();
+                if (existingFile.Contains("MAST"))
                 {
-                    Directory.CreateDirectory(pathBuilt);
-                }
+                    var extension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
+                    fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
 
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
-                 fileName);
+                    var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
+
+                    if (!Directory.Exists(pathBuilt))
+                    {
+                        Directory.CreateDirectory(pathBuilt);
+                    }
+
+                    var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
+                     fileName);
 
 
-                using (var stream = new FileStream(path, FileMode.Create))
-                {
-                    await model.File.CopyToAsync(stream);
-                }
-                var orderJobFile = File.ReadAllLines(path);
+                    using (var stream = new FileStream(path, FileMode.Create))
+                    {
+                        await model.File.CopyToAsync(stream);
+                    }
+                    var orderJobFile = File.ReadAllLines(path);
 
-                string regex = "^0+(?!$)";
-                orderJobList = orderJobFile.Skip(1).SelectMany(x => new List<OrderJob>
+                    string regex = "^0+(?!$)";
+                    orderJobList = orderJobFile.Skip(1).SelectMany(x => new List<OrderJob>
                 {
                    new()
                     {
@@ -838,25 +582,31 @@ namespace TOMI.Services.Repository
                     }
                  }).ToList();
 
-                // Submit the change to the database.
-                try
-                {
-                    await _context.BulkInsertAsync(orderJobList);
-                    stopwatch.Stop();
-                    timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
+                    // Submit the change to the database.
+                    try
+                    {
+                        await _context.BulkInsertAsync(orderJobList);
+                        stopwatch.Stop();
+                        timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
 
-                    File.Delete(path);
+                        File.Delete(path);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception(ex.ToString());
+                    }
+                    isSaveSuccess = true;
                 }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e);
 
+                else
+                {
+                    return new FileUplaodRespone { Success = false, Error = "Invalid File" };
                 }
-                isSaveSuccess = true;
+
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                //log error
+                throw new Exception(ex.ToString());
             }
 
             return new FileUplaodRespone

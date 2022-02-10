@@ -19,7 +19,7 @@ using TOMI.Services.Models;
 
 namespace TOMI.Services.Repository
 {
-    public class InfoLoadRepository: IInfoLoadService
+    public class InfoLoadRepository : IInfoLoadService
     {
         private readonly IMapper _mapper;
         private readonly ILogger<InfoLoadRepository> _logger;
@@ -33,44 +33,72 @@ namespace TOMI.Services.Repository
 
         public async Task<InfoLoad> DeleteInfoLoad(int id)
         {
-            var infoLoad= await _context.InfoLoad.FirstOrDefaultAsync(x => x.Id == id);
-            if(infoLoad!=null)
+            try
             {
-                _context.InfoLoad.Remove(infoLoad);
-                await _context.SaveChangesAsync();
-                return infoLoad;
+                var infoLoad = await _context.InfoLoad.FirstOrDefaultAsync(x => x.Id == id);
+                if (infoLoad != null)
+                {
+                    _context.InfoLoad.Remove(infoLoad);
+                    await _context.SaveChangesAsync();
+                    return infoLoad;
+                }
             }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+
             throw new System.ComponentModel.DataAnnotations.ValidationException("Id not found!");
         }
 
         public async Task<InfoLoad> GetInfoLoadAsync(int id)
         {
-            return await _context.InfoLoad.FirstOrDefaultAsync(x => x.Id == id);
+            try
+            {
+                return await _context.InfoLoad.FirstOrDefaultAsync(x => x.Id == id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
 
         public async Task<List<InfoLoad>> GetInfoLoadListAsync()
         {
-            return await _context.InfoLoad.ToListAsync();
+            try
+            {
+                return await _context.InfoLoad.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
 
         public async Task<InfoLoadResponse> SaveInfoLoad(InfoLoadModel model)
         {
-            InfoLoad infoLoad = await _context.InfoLoad.FirstOrDefaultAsync(c => c.Id == model.Id);
-            var infoload = _mapper.Map<InfoLoad>(model);
-            if (infoLoad == null)
+            try
             {
-                InfoLoad result = _context.InfoLoad.Add(infoload).Entity;
-                await _context.SaveChangesAsync();
-                return new InfoLoadResponse { InfoLoad = result, Success = true };
+                InfoLoad infoLoad = await _context.InfoLoad.FirstOrDefaultAsync(c => c.Id == model.Id);
+                var infoload = _mapper.Map<InfoLoad>(model);
+                if (infoLoad == null)
+                {
+                    InfoLoad result = _context.InfoLoad.Add(infoload).Entity;
+                    await _context.SaveChangesAsync();
+                    return new InfoLoadResponse { InfoLoad = result, Success = true };
+                }
+                else
+                {
+                    var res = _mapper.Map<InfoLoad>(model);
+                    _context.InfoLoad.Update(res);
+                    await _context.SaveChangesAsync();
+                    return new InfoLoadResponse { InfoLoad = res, Success = true };
+                }
             }
-            else
+            catch (Exception ex)
             {
-                var res = _mapper.Map<InfoLoad>(model);
-                _context.InfoLoad.Update(res);
-                await _context.SaveChangesAsync();
-                return new InfoLoadResponse { InfoLoad = res, Success = true };
+                throw new Exception(ex.ToString());
             }
-            throw new System.ComponentModel.DataAnnotations.ValidationException("Id not found!");
         }
 
         public async Task<FileInfoDataResponse> InfoData(FilterInfoDataModel infodata)
@@ -106,7 +134,7 @@ namespace TOMI.Services.Repository
                     Delimiter = ",",
                 };
 
-                using (var reader = new StreamReader(path)) 
+                using (var reader = new StreamReader(path))
                 using (var csv = new CsvReader(reader, config))
                 {
 
@@ -125,19 +153,16 @@ namespace TOMI.Services.Repository
                     await _context.SaveChangesAsync();
                     File.Delete(path);
                 }
-                catch (Exception e)
+                catch (Exception ex)
                 {
-                    Console.WriteLine(e);
-                    // Make some adjustments.
-                    // ...
-                    // Try again.
+                    throw new Exception(ex.ToString());
                     await _context.SaveChangesAsync();
                 }
                 isSaveSuccess = true;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                //log error
+                throw new Exception(ex.ToString());
             }
 
             return new FileInfoDataResponse
