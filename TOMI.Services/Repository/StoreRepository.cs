@@ -4,6 +4,7 @@ using System.Data;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -162,92 +163,248 @@ namespace TOMI.Services.Repository
         {
             bool isSaveSuccess = false;
             string fileName;
-
             List<Stock> stockList = new();
-
+            //for file header
+            List<FileStore> fileStores = new();
+            //for file name
+            List<UploadFileName> uploadFileNames = new();
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-            double timeElapsed = 0;
 
+            double timeElapsed = 0;
             try
             {
-                string existingFile = model.File.FileName.ToString();
-                if (existingFile.Contains("EXIS"))
+                string jobDate = model.StockDate.ToString();
+                string jobOrderStore = model.StoreId.ToString();
+                string jobOrderStoreName = model.StoreName.ToString();
+                string jobOrderDate = String.Format("{0:MMyy}", model.StockDate);
+                string forInnerStockDate = String.Format("{0:ddMMyy}", model.StockDate);
+
+                var tempfileName = model.File.FileName;
+                string filetext = tempfileName.Substring(0, 4);
+                string fileDate = tempfileName.Substring(4, 4);
+                string exDate = string.Format("{0:MMyy}", fileDate);
+                string storeNumber = tempfileName.Substring(9, 4);
+                var checkFileExtension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
+
+                if (checkFileExtension != ".txt" || checkFileExtension != ".zip")
                 {
-                    var extension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
-                    fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
-
-                    var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
-
-                    if (!Directory.Exists(pathBuilt))
+                    if (filetext != "EXIS" && jobOrderStoreName != storeNumber && jobOrderDate != exDate)
                     {
-                        Directory.CreateDirectory(pathBuilt);
+                        return new FileUplaodRespone
+                        {
+                            Success = false,
+                            Error = "please choose correct file."
+                        };
                     }
 
-                    var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
-                     fileName);
-
-
-                    using (var stream = new FileStream(path, FileMode.Create))
+                    if (checkFileExtension == ".txt")
                     {
-                        await model.File.CopyToAsync(stream);
+                        if (filetext == "EXIS" && jobOrderStoreName == storeNumber && jobOrderDate == exDate)
+                        {
+                            var filedata = _context.FileStore.FirstOrDefaultAsync(x => x.StoreNumber == jobOrderStoreName && x.FileDate == jobOrderDate);
+                            if (filedata.Result != null)
+                            {
+                                return new FileUplaodRespone
+                                {
+                                    Success = false,
+                                    Error = "file is already uploaded."
+                                };
+                            }
+                            // condition 
+
+                            var extension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
+                            fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
+
+                            var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
+
+                            if (!Directory.Exists(pathBuilt))
+                            {
+                                Directory.CreateDirectory(pathBuilt);
+                            }
+
+                            var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files", fileName);
+                            using (var stream = new FileStream(path, FileMode.Create))
+                            {
+                                await model.File.CopyToAsync(stream);
+                            }
+
+                            var stockFile = File.ReadAllLines(path);
+                            // for inner header
+                            string stockInnerFileHeader = stockFile[0].Substring(0, 6).Trim();
+                            string stockInnerFileName = stockFile[0].Substring(7, 11).Trim();
+                            string stockInnerStoreNumber = stockFile[0].Substring(18, 4).Trim();
+                            string stockInnerFileDate = stockFile[0].Substring(22, 7).Trim();
+                            string stockInnerDate = string.Format("{0:ddMMyy}", stockInnerFileDate).Trim();
+
+                            if (stockInnerFileName == "EXISTENCIA" && stockInnerStoreNumber == storeNumber && stockInnerDate == forInnerStockDate)
+                            {
+                                uploadFileNames = new List<UploadFileName> { new() { FileName = tempfileName.Substring(0, 4), StoreNumber = tempfileName.Substring(4, 4), FileDate = tempfileName.Substring(9, 4), Category = "Stock" } };
+                                await _context.BulkInsertAsync(uploadFileNames);
+
+                                //for file header
+                                fileStores = stockFile.Take(1).SelectMany(y => new List<FileStore>
+                            {
+                            new()
+                            {
+                                Header=(y.Substring(0,6)),
+                                FileName=(y.Substring(7,11)),
+                                StoreNumber=(y.Substring(18,4)),
+                                FileDate=string.Format("{0:MMyy}",y.Substring(24,4)),
+                                Category="Stock",
+
+                            }}).ToList();
+                                await _context.BulkInsertAsync(fileStores);
+
+                                // file content
+                                stockList = stockFile.Skip(1).SelectMany(x => new List<Stock>
+                            {
+                            new()
+                            {
+                                Store=(x.Substring(0,4)),
+                                SKU=(x.Substring(4,14)),
+                                Departament=(x.Substring(18,4)),
+                                Description=(x.Substring(22,30)),
+                                PrecVtaNorm=(x.Substring(52,8)),
+                                PrecVtaNorm_SImpto=(x.Substring(60,8)),
+                                SOH=(x.Substring(68,12)),
+                                Category=x.Length  ==87 ?x.Substring(81,6):null,
+                                CustomerId = model.CustomerId,
+                                StoreId = model.StoreId,
+                                StockDate = model.StockDate,
+                            }
+                            }).ToList();
+
+                                // Submit the change to the database.
+                                try
+                                {
+                                    await _context.BulkInsertAsync(stockList);
+                                    stopwatch.Stop();
+                                    timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
+                                    File.Delete(path);
+                                }
+                                catch (Exception e)
+                                {
+                                    Console.WriteLine(e);
+
+                                }
+                                isSaveSuccess = true;
+                            }
+                        }
                     }
-                    var stockFile = File.ReadAllLines(path);
-                    string regex = "^0+(?!$)";
-
-
-                    stockList = stockFile.Skip(1).SelectMany(x => new List<Stock>
-                {
-                   new()
-                    {
-                        Store=Regex.Replace(x.Substring(0,4), regex, ""),
-                        SKU = Regex.Replace(x.Substring(4,14), regex, ""),
-                        Departament = Regex.Replace(x.Substring(18,4), regex, ""),
-                        Description = (x.Substring(22,30).Trim()),
-                        PrecVtaNorm= Regex.Replace(x.Substring(52,8), regex, ""),
-                        PrecVtaNorm_SImpto= Regex.Replace(x.Substring(60,8), regex, ""),
-                        SOH= Regex.Replace(x.Substring(68,12), regex, ""),
-                        Category=x.Length ==87 ?x.Substring(81,6):null,
-                        CustomerId = model.CustomerId,
-                        StoreId = model.StoreId,
-                        StockDate = model.StockDate,
-                    }
-
-                 }).ToList();
-
-                    // Submit the change to the database.
-                    try
-                    {
-                        await _context.BulkInsertAsync(stockList);
-                        stopwatch.Stop();
-                        timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
-
-                        File.Delete(path);
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-
-                    }
-                    isSaveSuccess = true;
                 }
-                else
+                if (checkFileExtension == ".zip")
                 {
-                    return new FileUplaodRespone { Success = false, Error = "Invalid File" };
-                }
 
-            }
-            catch (Exception ex)
+                         //for zip file
+                         string existingFile = model.File.FileName.ToString();
+                
+                        // var extension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
+                        // fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
+                        var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
+                        if (!Directory.Exists(pathBuilt))
+                        {
+                            Directory.CreateDirectory(pathBuilt);
+                        }
+                        var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
+                        existingFile);
+                        using (var stream = new FileStream(path, FileMode.Create))
+                        {
+                            await model.File.CopyToAsync(stream);
+                        }
+                        string zipPath = Path.GetFileName(path);
+                        ZipFile.ExtractToDirectory(path, pathBuilt);
+
+
+                        var filePaths = Directory.GetFiles(pathBuilt, "*.txt");
+                        
+
+                        string destinationPath = filePaths[0].ToString();
+                        var extension = "." + destinationPath.Split('.')[model.File.FileName.Split('.').Length - 1];
+
+                        if (filetext == "EXIS" && jobOrderStoreName == storeNumber && jobOrderDate == exDate)
+                            {
+                            var filedata = _context.FileStore.FirstOrDefaultAsync(x => x.StoreNumber == jobOrderStoreName && x.FileDate == jobOrderDate);
+                            if (filedata.Result != null)
+                            {
+                                return new FileUplaodRespone
+                                {
+                                    Success = false,
+                                    Error = "file is already uploaded."
+                                };
+                            }
+                            var stockFile = File.ReadAllLines(destinationPath);
+                            string regex = "^0+(?!$)";
+
+                            string stockInnerFileHeader = stockFile[0].Substring(0, 6).Trim();
+                            string stockInnerFileName = stockFile[0].Substring(7, 11).Trim();
+                            string stockInnerStoreNumber = stockFile[0].Substring(18, 4).Trim();
+                            string stockInnerFileDate = stockFile[0].Substring(22, 7).Trim();
+                            string stockInnerDate = string.Format("{0:ddMMyy}", stockInnerFileDate).Trim();
+
+                            if (stockInnerFileName == "EXISTENCIA" && stockInnerStoreNumber == storeNumber && stockInnerDate == forInnerStockDate)
+                            {
+                                uploadFileNames = new List<UploadFileName> { new() { FileName = tempfileName.Substring(0, 4), StoreNumber = tempfileName.Substring(4, 4), FileDate = tempfileName.Substring(9, 4), Category = "Stock" } };
+                                await _context.BulkInsertAsync(uploadFileNames);
+
+                                //for file header
+                                fileStores = stockFile.Take(1).SelectMany(y => new List<FileStore>
+                                    {
+                                    new()
+                                    {
+                                    Header=(y.Substring(0,6)),
+                                    FileName=(y.Substring(7,11)),
+                                    StoreNumber=(y.Substring(18,4)),
+                                    FileDate=string.Format("{0:MMyy}",y.Substring(24,4)),
+                                    Category="Stock",
+                                    }}).ToList();
+                                await _context.BulkInsertAsync(fileStores);
+                            }
+                            stockList = stockFile.Skip(1).SelectMany(x => new List<Stock>
+                                    {
+                                    new()
+                                    {
+                                    Store=Regex.Replace(x.Substring(0,4),regex,""),
+                                    SKU=Regex.Replace(x.Substring(4,14),regex,""),
+                                    Departament=Regex.Replace(x.Substring(18,4),regex,""),
+                                    Description=Regex.Replace(x.Substring(22,30),regex,""),
+                                    PrecVtaNorm=Regex.Replace(x.Substring(52,8),regex,""),
+                                    PrecVtaNorm_SImpto=Regex.Replace(x.Substring(60,8),regex,""),
+                                    SOH=Regex.Replace(x.Substring(68,12),regex,""),
+                                    Category=x.Length  ==87 ?x.Substring(81,6):null,
+                                    CustomerId = model.CustomerId,
+                                    StoreId = model.StoreId,
+                                    StockDate = model.StockDate,
+                                    }
+                                    }).ToList();
+                        // Submit the change to the database.
+                        try
+                        {
+                            await _context.BulkInsertAsync(stockList);
+                            stopwatch.Stop();
+                            timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
+                            // File.Delete(pathBuilt);
+                            File.Delete(destinationPath);
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e);
+                        }
+                    }
+                        isSaveSuccess = true;    
+                }
+                }
+            
+            catch (Exception e)
             {
-                throw new Exception(ex.ToString());
+                throw new Exception(e.ToString());
             }
-
             return new FileUplaodRespone
             {
                 stockRecordCount = stockList.Count.ToString(),
                 TimeElapsed = timeElapsed,
                 Success = isSaveSuccess
-            }; ; ;
+            };
         }
         public async Task<FileUplaodRespone> ReservedData(FilterDataModel model)
         {
