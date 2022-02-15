@@ -14,5 +14,6 @@ namespace TOMI.Data.Database.Entities
         public string FileDate { get; set; }
         public string StoreNumber { get; set; }
         public string Category { get; set; }
+        public string RecordCount { get; set; }
     }
 }

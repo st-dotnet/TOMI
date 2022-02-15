@@ -23,6 +23,16 @@ namespace TOMI.Data.Database
         public DbSet<ParametersByDepartment> ParametersByDepartment { get; set; }
         public DbSet<MF1> MF1 { get; set; }
         public DbSet<MF2> MF2 { get; set; }
+        public DbSet<FileStore> FileStore { get; set; }
+
+
+
+
+
+
+
+        public DbSet<UploadFileName> UploadFileName { get; set; }
+
 
         public TOMIDataContext(DbContextOptions<TOMIDataContext> options)
             : base(options)
