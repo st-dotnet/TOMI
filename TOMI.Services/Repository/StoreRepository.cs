@@ -180,16 +180,18 @@ namespace TOMI.Services.Repository
                                     await _context.BulkInsertAsync(departmentsList);
                                     stopwatch.Stop();
                                     timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
-                                    File.Delete(path);
-                                    FileStore fileStore = _context.FileStore.Where(u => u.Category == "DPTO" && u.StoreNumber == model.StoreName.ToString() && u.FileDate == exDate).SingleOrDefault();
-                                    fileStore.RecordCount = departmentsList.Count.ToString();
-                                    await _context.SaveChangesAsync();
+                                  
                                 }
                                 catch (Exception e)
                                 {
                                     Console.WriteLine(e);
                                 }
                                 isSaveSuccess = true;
+                                File.Delete(path);
+                                FileStore fileStore = _context.FileStore.Where(u => u.Category == "DPTO" && u.StoreNumber == model.StoreName.ToString() && u.FileDate == exDate).SingleOrDefault();
+                                fileStore.RecordCount = departmentsList.Count.ToString();
+                                fileStore.Status = "OKAY";
+                                await _context.SaveChangesAsync();
                             }
                         }
                     }
@@ -273,9 +275,7 @@ namespace TOMI.Services.Repository
                             await _context.BulkInsertAsync(departmentsList);
                             stopwatch.Stop();
                             timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
-                            // File.Delete(pathBuilt);
-                            File.Delete(destinationPath);
-                            
+                            // File.Delete(pathBuilt);  
                         }
                         catch (Exception e)
                         {
@@ -283,8 +283,10 @@ namespace TOMI.Services.Repository
                         }
                     }
                     isSaveSuccess = true;
+                    File.Delete(destinationPath);
                     FileStore fileStore = _context.FileStore.Where(u => u.Category == "DPTO" && u.StoreNumber == model.StoreName.ToString() && u.FileDate == exDate).SingleOrDefault();
                     fileStore.RecordCount = departmentsList.Count.ToString();
+                    fileStore.Status = "OKAY";
                     await _context.SaveChangesAsync();
                 }
             }
@@ -422,10 +424,7 @@ namespace TOMI.Services.Repository
                                     await _context.BulkInsertAsync(stockList);
                                     stopwatch.Stop();
                                     timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
-                                    File.Delete(path);
-                                    FileStore fileStore = _context.FileStore.Where(u => u.Category == "Stock" && u.StoreNumber == model.StoreName.ToString() && u.FileDate == exDate).SingleOrDefault();
-                                    fileStore.RecordCount = stockList.Count.ToString();
-                                    await _context.SaveChangesAsync();
+                                   
                                 }
                                 catch (Exception e)
                                 {
@@ -433,6 +432,11 @@ namespace TOMI.Services.Repository
 
                                 }
                                 isSaveSuccess = true;
+                                File.Delete(path);
+                                FileStore fileStore = _context.FileStore.Where(u => u.Category == "Stock" && u.StoreNumber == model.StoreName.ToString() && u.FileDate == exDate).SingleOrDefault();
+                                fileStore.RecordCount = stockList.Count.ToString();
+                                fileStore.Status = "OKAY";
+                                await _context.SaveChangesAsync();
                             }
                         }
                     }
@@ -528,17 +532,19 @@ namespace TOMI.Services.Repository
                             stopwatch.Stop();
                             timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
                             // File.Delete(pathBuilt);
-                            File.Delete(destinationPath);
-                            FileStore fileStore = _context.FileStore.Where(u => u.Category == "Stock" && u.StoreNumber == model.StoreName.ToString() && u.FileDate == exDate).SingleOrDefault();
-                            fileStore.RecordCount = stockList.Count.ToString();
-                            await _context.SaveChangesAsync();
+                           
                         }
                         catch (Exception e)
                         {
                             Console.WriteLine(e);
                         }
-                    }
-                        isSaveSuccess = true;    
+                       }
+                        isSaveSuccess = true;
+                        File.Delete(destinationPath);
+                        FileStore fileStore = _context.FileStore.Where(u => u.Category == "Stock" && u.StoreNumber == model.StoreName.ToString() && u.FileDate == exDate).SingleOrDefault();
+                        fileStore.RecordCount = stockList.Count.ToString();
+                        fileStore.Status = "OKAY";
+                        await _context.SaveChangesAsync();
                 }
                 }
             
@@ -557,12 +563,7 @@ namespace TOMI.Services.Repository
         {
             bool isSaveSuccess = false;
             string fileName;
-
-
-
             List<Reserved> reservedList = new();
-
-
 
             //for file header
             List<FileStore> fileStores = new();
@@ -570,13 +571,7 @@ namespace TOMI.Services.Repository
             List<UploadFileName> uploadFileNames = new();
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-
-
-
             double timeElapsed = 0;
-
-
-
             try
             {
                 string jobDate = model.StockDate.ToString();
@@ -584,18 +579,12 @@ namespace TOMI.Services.Repository
                 string jobOrderStoreName = model.StoreName.ToString();
                 string jobOrderDate = String.Format("{0:MMyy}", model.StockDate);
                 string forInnerStockDate = String.Format("{0:ddMMyy}", model.StockDate);
-
-
-
                 var tempfileName = model.File.FileName;
                 string filetext = tempfileName.Substring(0, 4);
                 string fileDate = tempfileName.Substring(4, 4);
                 string exDate = string.Format("{0:MMyy}", fileDate);
                 string storeNumber = tempfileName.Substring(9, 4);
                 var checkFileExtension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
-
-
-
                 if (checkFileExtension != ".txt" || checkFileExtension != ".zip")
                 {
                     if (filetext != "APAR" && jobOrderStoreName != storeNumber && jobOrderDate != exDate)
@@ -606,9 +595,6 @@ namespace TOMI.Services.Repository
                             Error = "please choose correct file."
                         };
                     }
-
-
-
                     if (checkFileExtension == ".txt")
                     {
                         if (filetext == "APAR" && jobOrderStoreName == storeNumber && jobOrderDate == exDate)
@@ -623,33 +609,18 @@ namespace TOMI.Services.Repository
                                 };
                             }
                             // condition
-
-
-
                             var extension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
                             fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
-
-
-
                             var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
-
-
-
                             if (!Directory.Exists(pathBuilt))
                             {
                                 Directory.CreateDirectory(pathBuilt);
                             }
-
-
-
                             var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files", fileName);
                             using (var stream = new FileStream(path, FileMode.Create))
                             {
                                 await model.File.CopyToAsync(stream);
                             }
-
-
-
                             var reservedFile = File.ReadAllLines(path);
                             // for inner header
                             string stockInnerFileHeader = reservedFile[0].Substring(0, 6).Trim();
@@ -657,49 +628,37 @@ namespace TOMI.Services.Repository
                             string stockInnerStoreNumber = reservedFile[0].Substring(18, 4).Trim();
                             string stockInnerFileDate = reservedFile[0].Substring(22, 7).Trim();
                             string stockInnerDate = string.Format("{0:ddMMyy}", stockInnerFileDate).Trim();
-
-
-
                             if (stockInnerFileName == "APARTADOS" && stockInnerStoreNumber == storeNumber && stockInnerDate == forInnerStockDate)
                             {
-                                uploadFileNames = new List<UploadFileName> { new() { FileName = tempfileName.Substring(0, 4), StoreNumber = tempfileName.Substring(4, 4), FileDate = tempfileName.Substring(9, 4), Category = "Stock" } };
+                                uploadFileNames = new List<UploadFileName> { new() { FileName = tempfileName.Substring(0, 4), StoreNumber = tempfileName.Substring(4, 4), FileDate = tempfileName.Substring(9, 4), Category = "Reserved" } };
                                 await _context.BulkInsertAsync(uploadFileNames);
-
-
-
                                 //for file header
                                 fileStores = reservedFile.Take(1).SelectMany(y => new List<FileStore>
-{
-new()
-{
-Header=(y.Substring(0,6)),
-FileName=(y.Substring(7,11)),
-StoreNumber=(y.Substring(18,4)),
-FileDate=string.Format("{0:MMyy}",y.Substring(24,4)),
-Category="Stock",
-
-
-
-}}).ToList();
+                                {
+                                new()
+                                {
+                                Header=(y.Substring(0,6)),
+                                FileName=(y.Substring(7,11)),
+                                StoreNumber=(y.Substring(18,4)),
+                                FileDate=string.Format("{0:MMyy}",y.Substring(24,4)),
+                                Category="Reserved",
+                                }}).ToList();
                                 await _context.BulkInsertAsync(fileStores);
                                 string regex = "^0+(?!$)";
                                 // file content
                                 reservedList = reservedFile.Skip(1).SelectMany(x => new List<Reserved>
-{
-new()
-{
-Store=Regex.Replace(x.Substring(0,4),regex,""),
-Code=Regex.Replace(x.Substring(4,14),regex,""),
-Quantity=Regex.Replace(x.Substring(18,9),regex,""),
-Filler=Regex.Replace(x.Substring(27,1),regex,""),
-CustomerId = model.CustomerId,
-StoreId = model.StoreId,
-StockDate = model.StockDate,
-}
-}).ToList();
-
-
-
+                                {
+                                new()
+                                {
+                                Store=Regex.Replace(x.Substring(0,4),regex,""),
+                                Code=Regex.Replace(x.Substring(4,14),regex,""),
+                                Quantity=Regex.Replace(x.Substring(18,9),regex,""),
+                                Filler=Regex.Replace(x.Substring(27,1),regex,""),
+                                CustomerId = model.CustomerId,
+                                StoreId = model.StoreId,
+                                StockDate = model.StockDate,
+                                }
+                                }).ToList();
                                 // Submit the change to the database.
                                 try
                                 {
@@ -711,9 +670,6 @@ StockDate = model.StockDate,
                                 catch (Exception e)
                                 {
                                     Console.WriteLine(e);
-
-
-
                                 }
                                 isSaveSuccess = true;
                             }
@@ -722,14 +678,8 @@ StockDate = model.StockDate,
                 }
                 if (checkFileExtension == ".zip")
                 {
-
-
-
                     //for zip file
                     string existingFile = model.File.FileName.ToString();
-
-
-
                     // var extension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
                     // fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
                     var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
@@ -745,20 +695,9 @@ StockDate = model.StockDate,
                     }
                     string zipPath = Path.GetFileName(path);
                     ZipFile.ExtractToDirectory(path, pathBuilt);
-
-
-
-
                     var filePaths = Directory.GetFiles(pathBuilt, "*.txt");
-
-
-
-
                     string destinationPath = filePaths[0].ToString();
                     var extension = "." + destinationPath.Split('.')[model.File.FileName.Split('.').Length - 1];
-
-
-
                     if (filetext == "APAR" && jobOrderStoreName == storeNumber && jobOrderDate == exDate)
                     {
                         var filedata = _context.FileStore.FirstOrDefaultAsync(x => x.StoreNumber == jobOrderStoreName && x.FileDate == jobOrderDate);
@@ -772,50 +711,41 @@ StockDate = model.StockDate,
                         }
                         var reservedFile = File.ReadAllLines(destinationPath);
                         string regex = "^0+(?!$)";
-
-
-
                         string stockInnerFileHeader = reservedFile[0].Substring(0, 6).Trim();
                         string stockInnerFileName = reservedFile[0].Substring(7, 11).Trim();
                         string stockInnerStoreNumber = reservedFile[0].Substring(18, 4).Trim();
                         string stockInnerFileDate = reservedFile[0].Substring(22, 7).Trim();
                         string stockInnerDate = string.Format("{0:ddMMyy}", stockInnerFileDate).Trim();
-
-
-
                         if (stockInnerFileName == "APARTADOS" && stockInnerStoreNumber == storeNumber && stockInnerDate == forInnerStockDate)
                         {
-                            uploadFileNames = new List<UploadFileName> { new() { FileName = tempfileName.Substring(0, 4), StoreNumber = tempfileName.Substring(4, 4), FileDate = tempfileName.Substring(9, 4), Category = "Stock" } };
+                            uploadFileNames = new List<UploadFileName> { new() { FileName = tempfileName.Substring(0, 4), StoreNumber = tempfileName.Substring(4, 4), FileDate = tempfileName.Substring(9, 4), Category = "Reserved" } };
                             await _context.BulkInsertAsync(uploadFileNames);
-
-
-
                             //for file header
                             fileStores = reservedFile.Take(1).SelectMany(y => new List<FileStore>
-{
-new()
-{
-Header=(y.Substring(0,6)),
-FileName=(y.Substring(7,11)),
-StoreNumber=(y.Substring(18,4)),
-FileDate=string.Format("{0:MMyy}",y.Substring(24,4)),
-Category="Stock",
-}}).ToList();
+                            {
+                            new()
+                            {
+                            Header=(y.Substring(0,6)),
+                            FileName=(y.Substring(7,11)),
+                            StoreNumber=(y.Substring(18,4)),
+                            FileDate=string.Format("{0:MMyy}",y.Substring(24,4)),
+                            Category="Reserved",
+                            }}).ToList();
                             await _context.BulkInsertAsync(fileStores);
                         }
                         reservedList = reservedFile.Skip(1).SelectMany(x => new List<Reserved>
-{
-new()
-{
-Store=Regex.Replace(x.Substring(0,4),regex,""),
-Code=Regex.Replace(x.Substring(4,14),regex,""),
-Quantity=Regex.Replace(x.Substring(18,9),regex,""),
-Filler=Regex.Replace(x.Substring(27,1),regex,""),
-CustomerId = model.CustomerId,
-StoreId = model.StoreId,
-StockDate = model.StockDate,
-}
-}).ToList();
+                        {
+                        new()
+                        {
+                        Store=Regex.Replace(x.Substring(0,4),regex,""),
+                        Code=Regex.Replace(x.Substring(4,14),regex,""),
+                        Quantity=Regex.Replace(x.Substring(18,9),regex,""),
+                        Filler=Regex.Replace(x.Substring(27,1),regex,""),
+                        CustomerId = model.CustomerId,
+                        StoreId = model.StoreId,
+                        StockDate = model.StockDate,
+                        }
+                        }).ToList();
                         // Submit the change to the database.
                         try
                         {
@@ -833,9 +763,6 @@ StockDate = model.StockDate,
                     isSaveSuccess = true;
                 }
             }
-
-
-
             catch (Exception e)
             {
                 throw new Exception(e.ToString());
@@ -851,9 +778,6 @@ StockDate = model.StockDate,
         {
             bool isSaveSuccess = false;
             string fileName;
-
-
-
             List<Categories> catergoriesList = new();
             //for file header
             List<FileStore> fileStores = new();
@@ -861,13 +785,7 @@ StockDate = model.StockDate,
             List<UploadFileName> uploadFileNames = new();
             var stopwatch = new Stopwatch();
             stopwatch.Start();
-
-
-
             double timeElapsed = 0;
-
-
-
             try
             {
                 string jobDate = model.StockDate.ToString();
@@ -875,18 +793,12 @@ StockDate = model.StockDate,
                 string jobOrderStoreName = model.StoreName.ToString();
                 string jobOrderDate = String.Format("{0:MMyy}", model.StockDate);
                 string forInnerStockDate = String.Format("{0:ddMMyy}", model.StockDate);
-
-
-
                 var tempfileName = model.File.FileName;
                 string filetext = tempfileName.Substring(0, 4);
                 string fileDate = tempfileName.Substring(4, 4);
                 string exDate = string.Format("{0:MMyy}", fileDate);
                 string storeNumber = tempfileName.Substring(9, 4);
                 var checkFileExtension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
-
-
-
                 if (checkFileExtension != ".txt" || checkFileExtension != ".zip")
                 {
                     if (filetext != "CATE" && jobOrderStoreName != storeNumber && jobOrderDate != exDate)
@@ -897,9 +809,6 @@ StockDate = model.StockDate,
                             Error = "please choose correct file."
                         };
                     }
-
-
-
                     if (checkFileExtension == ".txt")
                     {
                         if (filetext == "CATE" && jobOrderStoreName == storeNumber && jobOrderDate == exDate)
@@ -914,33 +823,18 @@ StockDate = model.StockDate,
                                 };
                             }
                             // condition
-
-
-
                             var extension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
                             fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
-
-
-
                             var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
-
-
-
                             if (!Directory.Exists(pathBuilt))
                             {
                                 Directory.CreateDirectory(pathBuilt);
                             }
-
-
-
                             var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files", fileName);
                             using (var stream = new FileStream(path, FileMode.Create))
                             {
                                 await model.File.CopyToAsync(stream);
                             }
-
-
-
                             var catergoriesFile = File.ReadAllLines(path);
                             // for inner header
                             string stockInnerFileHeader = catergoriesFile[0].Substring(0, 6).Trim();
@@ -948,48 +842,37 @@ StockDate = model.StockDate,
                             string stockInnerStoreNumber = catergoriesFile[0].Substring(18, 4).Trim();
                             string stockInnerFileDate = catergoriesFile[0].Substring(22, 7).Trim();
                             string stockInnerDate = string.Format("{0:ddMMyy}", stockInnerFileDate).Trim();
-
-
-
                             if (stockInnerFileName == "CATE DIV" && stockInnerStoreNumber == storeNumber && stockInnerDate == forInnerStockDate)
                             {
                                 uploadFileNames = new List<UploadFileName> { new() { FileName = tempfileName.Substring(0, 4), StoreNumber = tempfileName.Substring(4, 4), FileDate = tempfileName.Substring(9, 4), Category = "Stock" } };
                                 await _context.BulkInsertAsync(uploadFileNames);
-
-
-
                                 //for file header
                                 fileStores = catergoriesFile.Take(1).SelectMany(y => new List<FileStore>
-{
-new()
-{
-Header=(y.Substring(0,6)),
-FileName=(y.Substring(7,11)),
-StoreNumber=(y.Substring(18,4)),
-FileDate=string.Format("{0:MMyy}",y.Substring(24,4)),
-Category="Stock",
-
-
-
-}}).ToList();
-                                await _context.BulkInsertAsync(fileStores);
-                                string regex = "^0+(?!$)";
+                                    {
+                                    new()
+                                    {
+                                    Header=(y.Substring(0,6)),
+                                    FileName=(y.Substring(7,11)),
+                                    StoreNumber=(y.Substring(18,4)),
+                                    FileDate=string.Format("{0:MMyy}",y.Substring(24,4)),
+                                    Category="Cat",
+                                    }}).ToList();
+                                    await _context.BulkInsertAsync(fileStores);
+                                    string regex = "^0+(?!$)";
                                 // file content
-                                catergoriesList = catergoriesFile.Skip(1).SelectMany(x => new List<Categories>
-{
-new()
-{
-Division=Regex.Replace(x.Substring(0,2),regex,""),
-DivisionName=Regex.Replace(x.Substring(2,30),regex,""),
-Category=Regex.Replace(x.Substring(32,6),regex,""),
-CategoryName=Regex.Replace(x.Substring(38,40),regex,""),
-CustomerId = model.CustomerId,
-StoreId = model.StoreId,
-StockDate = model.StockDate,
-}
-}).ToList();
-
-
+                                    catergoriesList = catergoriesFile.Skip(1).SelectMany(x => new List<Categories>
+                                    {
+                                    new()
+                                    {
+                                    Division=Regex.Replace(x.Substring(0,2),regex,""),
+                                    DivisionName=Regex.Replace(x.Substring(2,30),regex,""),
+                                    Category=Regex.Replace(x.Substring(32,6),regex,""),
+                                    CategoryName=Regex.Replace(x.Substring(38,40),regex,""),
+                                    CustomerId = model.CustomerId,
+                                    StoreId = model.StoreId,
+                                    StockDate = model.StockDate,
+                                    }
+                                    }).ToList();
 
                                 // Submit the change to the database.
                                 try
@@ -997,30 +880,26 @@ StockDate = model.StockDate,
                                     await _context.BulkInsertAsync(catergoriesList);
                                     stopwatch.Stop();
                                     timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
-                                    File.Delete(path);
+                                   
                                 }
                                 catch (Exception e)
                                 {
                                     Console.WriteLine(e);
-
-
-
                                 }
                                 isSaveSuccess = true;
+                                File.Delete(path);
+                                FileStore fileStore = _context.FileStore.Where(u => u.Category == "Cat" && u.StoreNumber == model.StoreName.ToString() && u.FileDate == jobOrderDate).SingleOrDefault();
+                                fileStore.RecordCount = catergoriesList.Count.ToString();
+                                fileStore.Status = "OKAY";
+                                await _context.SaveChangesAsync();
                             }
                         }
                     }
                 }
                 if (checkFileExtension == ".zip")
                 {
-
-
-
                     //for zip file
                     string existingFile = model.File.FileName.ToString();
-
-
-
                     // var extension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
                     // fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
                     var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
@@ -1037,19 +916,9 @@ StockDate = model.StockDate,
                     string zipPath = Path.GetFileName(path);
                     ZipFile.ExtractToDirectory(path, pathBuilt);
 
-
-
-
                     var filePaths = Directory.GetFiles(pathBuilt, "*.txt");
-
-
-
-
                     string destinationPath = filePaths[0].ToString();
                     var extension = "." + destinationPath.Split('.')[model.File.FileName.Split('.').Length - 1];
-
-
-
                     if (filetext == "CATE" && jobOrderStoreName == storeNumber && jobOrderDate == exDate)
                     {
                         var filedata = _context.FileStore.FirstOrDefaultAsync(x => x.StoreNumber == jobOrderStoreName && x.FileDate == jobOrderDate);
@@ -1063,50 +932,41 @@ StockDate = model.StockDate,
                         }
                         var categoriesFile = File.ReadAllLines(destinationPath);
                         string regex = "^0+(?!$)";
-
-
-
                         string stockInnerFileHeader = categoriesFile[0].Substring(0, 6).Trim();
                         string stockInnerFileName = categoriesFile[0].Substring(7, 11).Trim();
                         string stockInnerStoreNumber = categoriesFile[0].Substring(18, 4).Trim();
                         string stockInnerFileDate = categoriesFile[0].Substring(22, 7).Trim();
                         string stockInnerDate = string.Format("{0:ddMMyy}", stockInnerFileDate).Trim();
-
-
-
                         if (stockInnerFileName == "CATE DIV" && stockInnerStoreNumber == storeNumber && stockInnerDate == forInnerStockDate)
                         {
                             uploadFileNames = new List<UploadFileName> { new() { FileName = tempfileName.Substring(0, 4), StoreNumber = tempfileName.Substring(4, 4), FileDate = tempfileName.Substring(9, 4), Category = "Stock" } };
                             await _context.BulkInsertAsync(uploadFileNames);
-
-
-
                             //for file header
                             fileStores = categoriesFile.Take(1).SelectMany(y => new List<FileStore>
-{
-new()
-{
-Header=(y.Substring(0,6)),
-FileName=(y.Substring(7,11)),
-StoreNumber=(y.Substring(18,4)),
-FileDate=string.Format("{0:MMyy}",y.Substring(24,4)),
-Category="Stock",
-}}).ToList();
+                            {
+                            new()
+                            {
+                            Header=(y.Substring(0,6)),
+                            FileName=(y.Substring(7,11)),
+                            StoreNumber=(y.Substring(18,4)),
+                            FileDate=string.Format("{0:MMyy}",y.Substring(24,4)),
+                            Category="Cat",
+                            }}).ToList();
                             await _context.BulkInsertAsync(fileStores);
                         }
                         catergoriesList = categoriesFile.Skip(1).SelectMany(x => new List<Categories>
-{
-new()
-{
-Division=Regex.Replace(x.Substring(0,2),regex,""),
-DivisionName=Regex.Replace(x.Substring(2,30),regex,""),
-Category=Regex.Replace(x.Substring(32,6),regex,""),
-CategoryName=Regex.Replace(x.Substring(38,40),regex,""),
-CustomerId = model.CustomerId,
-StoreId = model.StoreId,
-StockDate = model.StockDate,
-}
-}).ToList();
+                            {
+                            new()
+                            {
+                            Division=Regex.Replace(x.Substring(0,2),regex,""),
+                            DivisionName=Regex.Replace(x.Substring(2,30),regex,""),
+                            Category=Regex.Replace(x.Substring(32,6),regex,""),
+                            CategoryName=Regex.Replace(x.Substring(38,40),regex,""),
+                            CustomerId = model.CustomerId,
+                            StoreId = model.StoreId,
+                            StockDate = model.StockDate,
+                            }
+                            }).ToList();
                         // Submit the change to the database.
                         try
                         {
@@ -1114,7 +974,7 @@ StockDate = model.StockDate,
                             stopwatch.Stop();
                             timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
                             // File.Delete(pathBuilt);
-                            File.Delete(destinationPath);
+                           
                         }
                         catch (Exception e)
                         {
@@ -1122,11 +982,13 @@ StockDate = model.StockDate,
                         }
                     }
                     isSaveSuccess = true;
+                    File.Delete(destinationPath);
+                    FileStore fileStore = _context.FileStore.Where(u => u.Category == "Cat" && u.StoreNumber == model.StoreName.ToString() && u.FileDate == jobOrderDate).SingleOrDefault();
+                    fileStore.RecordCount = catergoriesList.Count.ToString();
+                    fileStore.Status = "OKAY";
+                    await _context.SaveChangesAsync();
                 }
             }
-
-
-
             catch (Exception e)
             {
                 throw new Exception(e.ToString());
@@ -1138,11 +1000,23 @@ StockDate = model.StockDate,
                 Success = isSaveSuccess
             };
 
-
-
         }
         public async Task<FileUplaodRespone> ParametersByDepartmentData(FilterDataModel model)
         {
+            if (model.File == null || model.File.Length == 0)
+                return new FileUplaodRespone
+                {
+                    Success = false,
+                    Error = "File Not Selected"
+                };
+            string fileExtension = Path.GetExtension(model.File.FileName);
+            if (fileExtension != ".xls" && fileExtension != ".xlsx")
+                return new FileUplaodRespone
+                {
+                    Success = false,
+                    Error = "File Not Selected"
+                };
+            string tempfileName = Path.GetExtension(model.File.FileName);
             bool isSaveSuccess = false;
             List<ParametersByDepartment> parametersbydepartmentList = new();
             var stopwatch = new Stopwatch();
@@ -1378,10 +1252,6 @@ StockDate = model.StockDate,
                                     await _context.BulkInsertAsync(orderJobList);
                                     stopwatch.Stop();
                                     timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
-                                    File.Delete(path);
-                                    FileStore fileStore = _context.FileStore.Where(u => u.Category == "OrderJob" && u.StoreNumber == model.StoreName.ToString() && u.FileDate == jobOrderDate).SingleOrDefault();
-                                    fileStore.RecordCount = orderJobList.Count.ToString();
-                                    await _context.SaveChangesAsync();
                                 }
                                 catch (Exception e)
                                 {
@@ -1389,6 +1259,11 @@ StockDate = model.StockDate,
 
                                 }
                                 isSaveSuccess = true;
+                                File.Delete(path);
+                                FileStore fileStore = _context.FileStore.Where(u => u.Category == "OrderJob" && u.StoreNumber == model.StoreName.ToString() && u.FileDate == jobOrderDate).SingleOrDefault();
+                                fileStore.RecordCount = orderJobList.Count.ToString();
+                                fileStore.Status = "OKAY";
+                                await _context.SaveChangesAsync();
                             }
                         }
                     }
@@ -1483,12 +1358,7 @@ StockDate = model.StockDate,
                             await _context.BulkInsertAsync(orderJobList);
                             stopwatch.Stop();
                             timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
-                            // File.Delete(pathBuilt);
-                            File.Delete(destinationPath);
-                            FileStore fileStore = _context.FileStore.Where(u => u.Category==filetext  && u.StoreNumber== model.StoreName.ToString() && u.FileDate== jobOrderDate).SingleOrDefault();
-                            fileStore.RecordCount = orderJobList.Count.ToString();
-                            await _context.SaveChangesAsync();
-
+                        
                         }
                         catch (Exception e)
                         {
@@ -1496,6 +1366,12 @@ StockDate = model.StockDate,
                         }
                     }
                     isSaveSuccess = true;
+                    File.Delete(pathBuilt);
+                    File.Delete(destinationPath);
+                    FileStore fileStore = _context.FileStore.Where(u => u.Category == filetext && u.StoreNumber == model.StoreName.ToString() && u.FileDate == jobOrderDate).SingleOrDefault();
+                    fileStore.RecordCount = orderJobList.Count.ToString();
+                    fileStore.Status = "OKAY";
+                    await _context.SaveChangesAsync();
                 }
             }
 

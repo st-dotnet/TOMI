@@ -1,0 +1,36 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using AutoMapper;
+using Microsoft.Extensions.Logging;
+using TOMI.Data.Database;
+using TOMI.Data.Database.Entities;
+using TOMI.Services.Interfaces;
+using TOMI.Services.Models;
+
+namespace TOMI.Services.Repository
+{
+    public class ReportOptionRepository : IReportOptionService
+    {
+        private readonly IMapper _mapper;
+        private readonly ILogger<ReportOptionRepository> _logger;
+        private readonly TOMIDataContext _context;
+        public ReportOptionRepository(ILogger<ReportOptionRepository> logger, TOMIDataContext context, IMapper mapper)
+        {
+            _logger = logger;
+            _context = context;
+            _mapper = mapper;
+        }
+        //public async Task<List<StockAdjustment>> GetCodeNotFoundAsync(FilterDataModel filterDataModel)
+        //{
+        //   // return await _context.StockAdjustment.Where(x=>x.)
+        //}
+
+        //public async Task<List<StockAdjustment>> GetLabelDetailsAsync(FilterDataModel filterDataModel)
+        //{
+        //    throw new NotImplementedException();
+        //}
+    }
+}

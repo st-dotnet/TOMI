@@ -1,0 +1,59 @@
+HEADER  DPTO DIV  0620210920 000000...............................
+01ROPA                          0355CABALLEROS INTERIOR           
+01ROPA                          0401DAMAS EXTERIOR                
+01ROPA                          0419DAMAS INTERIOR                
+01ROPA                          0440NIÑAS EXTERIOR                
+01ROPA                          0465NIÑAS INTERIOR                
+01ROPA                          0480BEBES CONFECCIÓN              
+01ROPA                          0497BEBES MUEBLES Y ACCESORIOS    
+01ROPA                          0504CABALLEROS EXTERIOR           
+01ROPA                          0511PAÑALES                       
+01ROPA                          0529ALIMENTOS                     
+01ROPA                          0536NIÑOS EXTERIOR                
+01ROPA                          0543NIÑOS INTERIOR                
+01ROPA                          0550BLANCOS                       
+01ROPA                          0575ZAPATOS                       
+01ROPA                          0607SIN GRUPO DE CATEGORIA (DIV 1)
+01ROPA                          0678BEBES ROPA INTERIOR           
+02MERCANCIAS GENERALES          0206ISLA DE FOTOGRAFIA            
+02MERCANCIAS GENERALES          0213DECORACIÓN Y NOVEDAD          
+02MERCANCIAS GENERALES          0220ELECTRÓNICA                   
+02MERCANCIAS GENERALES          0252MÚSICA                        
+02MERCANCIAS GENERALES          0260PERFUMERÍA                    
+02MERCANCIAS GENERALES          0277LIBROS Y REVISTAS             
+02MERCANCIAS GENERALES          0284TELEFONÍA CELULAR             
+02MERCANCIAS GENERALES          0291PAPELERÍA                     
+02MERCANCIAS GENERALES          0309FERRERTERÍA Y PINTURA         
+02MERCANCIAS GENERALES          0316DEPORTES                      
+02MERCANCIAS GENERALES          0330JARDINERÍA                    
+02MERCANCIAS GENERALES          0348AUTOMOTRIZ                    
+02MERCANCIAS GENERALES          0370HOGAR                         
+02MERCANCIAS GENERALES          0387ARTÍCULOS NAVIDEÑOS           
+02MERCANCIAS GENERALES          0394JUGUETERÍA                    
+02MERCANCIAS GENERALES          0472FIESTA                        
+02MERCANCIAS GENERALES          0621SIN GRUPO DE CATEGORÍA (DIV 2)
+02MERCANCIAS GENERALES          0646MUEBLES                       
+02MERCANCIAS GENERALES          0976ELECTRODOMÉSTICOS             
+03ABARROTES                     0103AZUCAR                        
+03ABARROTES                     0110REFRESCOS Y BEBIDAS           
+03ABARROTES                     0128COMESTIBLES EN GENERAL        
+03ABARROTES                     0135CEREALES, GALLETAS Y PANES    
+03ABARROTES                     0150BEBES PAÑALES Y ALIMENTOS     
+03ABARROTES                     0174VINOS Y CERVEZAS              
+03ABARROTES                     0639SIN GRUPO DE CATEGORÍA (DIV 3)
+03ABARROTES                     0827ACEITES, GRANOS Y SOPAS       
+03ABARROTES                     0920CAFES, LECHES Y SABORIZANTES  
+03ABARROTES                     0944DULCERÍA, CHOCOLATES Y BOTANAS
+03ABARROTES                     0951MASCOTAS                      
+03ABARROTES                     0969LIMPIEZA Y DETERGENTE         
+03ABARROTES                     0983DESECHABLES                   
+04FRESCOS                       0142CONGELADOS                    
+06PROMOCIONES ESPECIALES        0766PROMOCIONES ESPECIALES        
+18ABARROTES NO COMESTIBLES      0150BEBES PAÑALES Y ALIMENTOS     
+18ABARROTES NO COMESTIBLES      0260PERFUMERÍA                    
+18ABARROTES NO COMESTIBLES      0511PAÑALES                       
+18ABARROTES NO COMESTIBLES      0529ALIMENTOS                     
+18ABARROTES NO COMESTIBLES      0951MASCOTAS                      
+18ABARROTES NO COMESTIBLES      0969LIMPIEZA Y DETERGENTE         
+18ABARROTES NO COMESTIBLES      0983DESECHABLES                   
+TRAILER DPTO DIV  0620210920 000057...............................
