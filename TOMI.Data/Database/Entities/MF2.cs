@@ -9,12 +9,15 @@ namespace TOMI.Data.Database.Entities
 {
     public class MF2 : EntityBase
     {
-        [Key]
+        
         public Guid Id { get; set; }
+        [Key]
         public string Department { get; set; }
         public DateTimeOffset creation_time { get; set; }
 
-       // public virtual OrderJob OrderJob { get; set; }
+       public virtual ICollection<MF1> MF1 { get; set; }
+
+      
 
     }
 

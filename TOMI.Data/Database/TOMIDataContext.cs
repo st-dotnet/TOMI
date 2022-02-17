@@ -24,13 +24,6 @@ namespace TOMI.Data.Database
         public DbSet<MF1> MF1 { get; set; }
         public DbSet<MF2> MF2 { get; set; }
         public DbSet<FileStore> FileStore { get; set; }
-
-
-
-
-
-
-
         public DbSet<UploadFileName> UploadFileName { get; set; }
 
 
@@ -67,18 +60,10 @@ namespace TOMI.Data.Database
  .WithOne(s => s.Store)
  .HasForeignKey<User>(x => x.StoreId)
  .OnDelete(DeleteBehavior.NoAction);
-
-
-
-
-            //modelBuilder.Entity<MF2>()
-            // .HasMany(c => c.MF1)
-            // .WithOne(c => c.MF2)
-            // .HasForeignKey(x => x.Department);
-
-
-
-
+            modelBuilder.Entity<MF2>()
+             .HasMany(c => c.MF1)
+             .WithOne(c => c.MF2)
+             .HasForeignKey(x => x.Department);
             //modelBuilder.Entity<OrderJob>()
             //.HasMany(c => c.MF1)
             //.WithOne(c => c.OrderJob)
@@ -133,6 +118,7 @@ namespace TOMI.Data.Database
                 Role = RoleType.SuperAdmin.ToString(),
                 PhoneNumber = "1234567890",
                 CustomerId = Guid.Parse("b74ddd14-6340-4840-95c2-db12554843e5"),
+                EmployeeNumber="987654",
             };
 
             PasswordHasher<User> passwordHasher = new PasswordHasher<User>();

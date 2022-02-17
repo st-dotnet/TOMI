@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using TOMI.Data.Database;
 using TOMI.Data.Database.Entities;
 using TOMI.Services.Interfaces;
+using TOMI.Services.Models;
 
 namespace TOMI.Services.Repository
 {
@@ -25,11 +26,11 @@ namespace TOMI.Services.Repository
             _context = context;
             _mapper = mapper;
         }
-        public async Task<FileStore> GetFileStroreAsync(string store, string date)
+        public async Task<FileStore> GetFileStoreAsync(FileStoreModel model)
         {
-            //string StockDate = date;
-            //string ActStockDate = String.Format("{0:MMyy}", StockDate);
-            return await _context.FileStore.FirstOrDefaultAsync(x => x.StoreNumber==store && x.FileDate== date && x.Category== "OrderJob");
+            return await _context.FileStore.FirstOrDefaultAsync(x => x.StoreNumber == model.Store && x.FileDate == model.Date && model.Category == model.Category ); 
         }
+
+        
     }
 }
