@@ -15,6 +15,7 @@ namespace TOMI.Data.Database.Entities
         public string LastName { get; set; }
         public string PhoneNumber { get; set; }
         public string Role { get; set; }
+        public string EmployeeNumber { get; set; }
         public virtual Customer Customer { get; set; }
         public virtual Store Store { get; set; }
     }

@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TOMI.Services.Interfaces;
+using TOMI.Services.Models;
 
 namespace TOMI.Web.Controllers
 {
@@ -28,12 +29,12 @@ namespace TOMI.Web.Controllers
         /// GetInfoFileLoadedList
         /// </summary>
         /// <returns></returns>
-        [HttpGet("GetInfoFileLoadedListAsync/{storeId}/{date}")]
-        public async Task<IActionResult> GetInfoFileLoadedListAsync(string storeId,string date)
+        [HttpPost("GetInfoFileLoadedListAsync")]
+        public async Task<IActionResult> GetInfoFileLoadedListAsync(FileStoreModel model)
         {
             try
             {
-               var response = await _fileStoreService.GetFileStroreAsync(storeId,date);
+                var response = await _fileStoreService.GetFileStoreAsync(model);
                 return Ok(response);
             }
             catch (Exception ex)

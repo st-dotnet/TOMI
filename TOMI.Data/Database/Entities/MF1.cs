@@ -39,6 +39,6 @@ namespace TOMI.Data.Database.Entities
 
 
 
-        // public virtual MF2 MF2 { get; set; }
+        public virtual MF2 MF2 { get; set; }
     }
 }

@@ -11,5 +11,7 @@ namespace TOMI.Services.Interfaces
    public interface IProgramTerminalService
     {
         Task<TerminalResponse> GenerateMF1(TerminalModel model);
+        //Task<TerminalMF2Response> GenerateMF2(MF2Model model);
+        Task<TerminalResponse> GetMFData(TerminalModel terminal);
     }
 }

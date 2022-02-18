@@ -30,8 +30,15 @@ namespace TOMI.Services.Repository
             try
             {
                 var existingRanges = await _context.Ranges.FirstOrDefaultAsync(x => x.Id == id);
+
                 if (existingRanges != null)
                 {
+                    var rangesexist = await _context.StockAdjustment.FirstOrDefaultAsync(x => x.Id == id);
+                    if (rangesexist != null)
+                    {
+                        throw new ValidationException("Tag ranges already in used!");
+                    }
+
                     _context.Ranges.Remove(existingRanges);
                     await _context.SaveChangesAsync();
                     return existingRanges;
