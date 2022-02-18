@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using TOMI.Data.Database;
 using TOMI.Data.Database.Entities;
@@ -23,11 +24,17 @@ namespace TOMI.Services.Repository
             _context = context;
             _mapper = mapper;
         }
-        //public async Task<List<StockAdjustment>> GetCodeNotFoundAsync(FilterDataModel filterDataModel)
-        //{
-        //   // return await _context.StockAdjustment.Where(x=>x.)
-        //}
 
+        public async Task<List<StockAdjustment>> GetCodeNotFoundAsync()
+        {
+            return await _context.StockAdjustment.Include(x => x.OrderJob).ToListAsync();
+        }
+
+        public async Task<List<StockAdjustment>> GetLabelDetailsAsync()
+        {
+            return await _context.StockAdjustment.Include(x => x.OrderJob).OrderBy(x => x.Rec).ToListAsync();
+
+        }
         //public async Task<List<StockAdjustment>> GetLabelDetailsAsync(FilterDataModel filterDataModel)
         //{
         //    throw new NotImplementedException();

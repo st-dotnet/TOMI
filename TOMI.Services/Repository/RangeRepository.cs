@@ -49,7 +49,7 @@ namespace TOMI.Services.Repository
         {
             try
             {
-                return await _context.Ranges.FirstOrDefaultAsync(x => x.Id == id);
+                return await _context.Ranges.OrderBy(x => x.TagFrom).FirstOrDefaultAsync();
             }
             catch (Exception ex)
             {

@@ -10,7 +10,7 @@ namespace TOMI.Services.Interfaces
 {
    public interface IReportOptionService
     {
-       // Task<List<StockAdjustment>> GetLabelDetailsAsync(FilterDataModel model);
-       // Task<List<StockAdjustment>> GetCodeNotFoundAsync(FilterDataModel model);
+       Task<List<StockAdjustment>> GetLabelDetailsAsync();
+       Task<List<StockAdjustment>> GetCodeNotFoundAsync();
     }
 }

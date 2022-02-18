@@ -92,8 +92,6 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
-
-
         [HttpPost("ImportCategoriesFile")]
         public async Task<IActionResult> CategoriesFile([FromForm] FilterDataModel model)
         {
@@ -109,7 +107,6 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
-
         [HttpPost("ImportOrderJobFile")]
         public async Task<IActionResult> OrderJobFile([FromForm] FilterDataModel model)
         {
@@ -125,7 +122,6 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
-
         [HttpPost("ImportParametersByDepartmentFile")]
         public async Task<IActionResult> ParametersByDepartmentFile([FromForm] FilterDataModel model)
         {
