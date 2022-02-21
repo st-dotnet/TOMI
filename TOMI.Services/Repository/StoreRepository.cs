@@ -594,7 +594,7 @@ namespace TOMI.Services.Repository
                 var forInnerdeptartmentDate = string.Empty;
                 try
                 {
-                    forInnerdeptartmentDate = model.StockDate.Value.Date.Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
+                    forInnerdeptartmentDate = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
                     model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
                 }
                 catch (Exception ex)
@@ -892,7 +892,7 @@ namespace TOMI.Services.Repository
                 var finalInnerreservedDate = string.Empty;
                 try
                 {
-                    finalInnerreservedDate = model.StockDate.Value.Date.Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
+                    finalInnerreservedDate = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
                     model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
                 }
                 catch (Exception ex)
@@ -1203,7 +1203,7 @@ namespace TOMI.Services.Repository
                 var forInnerStockDate = string.Empty;
                 try
                 {
-                    forInnerStockDate = model.StockDate.Value.Date.Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
+                    forInnerStockDate = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
 
                model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
                 }
@@ -1524,7 +1524,7 @@ namespace TOMI.Services.Repository
                 var forInnerCategoryDate = string.Empty;
                 try
                 {
-                    forInnerCategoryDate = model.StockDate.Value.Date.Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
+                    forInnerCategoryDate = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
 
                model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
                 }
@@ -1551,7 +1551,7 @@ namespace TOMI.Services.Repository
 
                 if (checkFileExtension == txtFileExtension || checkFileExtension == zipFileExtension)
                 {
-                    if (filetext != categoryFileExtension || categoryStoreName != storeNumber || categoryDate != exDate)
+                    if (filetext != categoryFileExtension || categoryStoreName != storeNumber || finalCategoryDate != exDate)
                     {
                         return new FileUplaodRespone
                         {
