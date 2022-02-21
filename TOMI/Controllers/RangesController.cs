@@ -46,12 +46,12 @@ namespace TOMI.Web.Controllers
         /// Deleterange
         /// </summary>
         /// <returns></returns>
-        [HttpDelete("DeleteRange/{rangeId}")]
-        public async Task<IActionResult> DeleteRangeAsync(Guid rangeId)
+        [HttpDelete("DeleteRange/{id}")]
+        public async Task<IActionResult> DeleteRangeAsync(Guid id)
         {
             try
             {
-                return Ok(await _rangeService.DeleteRange(rangeId));
+                return Ok(await _rangeService.DeleteRange(id));
             }
             catch (Exception ex)
             {

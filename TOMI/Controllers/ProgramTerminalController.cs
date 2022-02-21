@@ -45,24 +45,6 @@ namespace TOMI.Web.Controllers
             }
         }
 
-        ///// <summary>
-        ///// InsertDataInMF2
-        ///// </summary>
-        ///// <returns></returns>
-        //[HttpPost]
-        //[Route("GenerateMF2")]
-        //public async Task<IActionResult> GenerateMF2(MF2Model model)
-        //{
-        //    try
-        //    {
-        //        return Ok(await _programTerminalService.GenerateMF2(model));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception(ex.ToString());
-        //    }
-        //}
-
         /// <summary>
         /// GetMFData
         /// </summary>
@@ -73,7 +55,8 @@ namespace TOMI.Web.Controllers
         {
             try
             {
-                return Ok(await _programTerminalService.GetMFData(terminal));
+                var response = await _programTerminalService.GetMFData(terminal);
+                return Ok(response.Value); 
             }
             catch (Exception ex)
             {

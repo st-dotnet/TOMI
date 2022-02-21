@@ -25,7 +25,7 @@ namespace TOMI.Services.Repository
             _mapper = mapper;
         }
 
-        public async Task<Ranges> DeleteRange(Guid id)
+        public async Task<RangesResponse> DeleteRange(Guid id)
         {
             try
             {
@@ -33,15 +33,17 @@ namespace TOMI.Services.Repository
 
                 if (existingRanges != null)
                 {
-                    var rangesexist = await _context.StockAdjustment.FirstOrDefaultAsync(x => x.Id == id);
+                    var rangesexist = await _context.StockAdjustment.FirstOrDefaultAsync(x => x.Tag >= existingRanges.TagFrom && x.Tag <= existingRanges.TagTo);
                     if (rangesexist != null)
                     {
-                        throw new ValidationException("Tag ranges already in used!");
+                        return new RangesResponse { Error = "Tag ranges already in used! ", Success = false };
+                        
                     }
 
                     _context.Ranges.Remove(existingRanges);
-                    await _context.SaveChangesAsync();
-                    return existingRanges;
+                     _context.SaveChanges();
+                    return new RangesResponse { range= existingRanges, Success = true };
+                  
                 }
                 throw new ValidationException("Range not found!");
             }
@@ -67,7 +69,7 @@ namespace TOMI.Services.Repository
         {
             try
             {
-                return await _context.Ranges.Include(x => x.Group).ToListAsync();
+                return await _context.Ranges.Include(x => x.Group).OrderBy(x=>x.TagFrom).ToListAsync();
             }
             catch (Exception ex)
             {
