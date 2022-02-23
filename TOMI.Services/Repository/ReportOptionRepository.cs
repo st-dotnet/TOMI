@@ -35,9 +35,9 @@ namespace TOMI.Services.Repository
             return await _context.StockAdjustment.Include(x => x.OrderJob).OrderBy(x => x.Rec).ToListAsync();
 
         }
-        //public async Task<List<StockAdjustment>> GetLabelDetailsAsync(FilterDataModel filterDataModel)
-        //{
-        //    throw new NotImplementedException();
-        //}
+        public async Task<List<StockAdjustment>> GetExtendedPricesAsync()
+        {
+            return await _context.StockAdjustment.Include(x => x.OrderJob).OrderBy(x => x.Tag).ToListAsync();
+        }
     }
 }

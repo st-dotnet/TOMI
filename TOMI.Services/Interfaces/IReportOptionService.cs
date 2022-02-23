@@ -12,5 +12,6 @@ namespace TOMI.Services.Interfaces
     {
        Task<List<StockAdjustment>> GetLabelDetailsAsync();
        Task<List<StockAdjustment>> GetCodeNotFoundAsync();
+       Task<List<StockAdjustment>> GetExtendedPricesAsync();
     }
 }
