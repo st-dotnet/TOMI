@@ -45,6 +45,12 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
+
+        /// <summary>
+        /// GetCodeNotFoundAsync
+        /// </summary>
+        /// <returns></returns>
+
         [HttpGet]
         [Route("GetCodeNotFoundAsync")]
         public async Task<IActionResult> GetCodeNotFoundAsync()
@@ -60,6 +66,13 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
+
+
+
+        /// <summary>
+        /// GetExtendedPricesAsync
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
         [Route("GetExtendedPricesAsync")]
         public async Task<IActionResult> GetExtendedPricesAsync()
@@ -68,6 +81,25 @@ namespace TOMI.Web.Controllers
             try
             {
                 var response = await _reportOptionRepository.GetExtendedPricesAsync();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+        /// <summary>
+        /// GetUncountedItemsAsync
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetUncountedItemsAsync")]
+        public IActionResult GetUncountedItemsAsync()
+        {
+
+            try
+            {
+                var response =  _reportOptionRepository.GetUncountedItemsAsync();
                 return Ok(response);
             }
             catch (Exception ex)

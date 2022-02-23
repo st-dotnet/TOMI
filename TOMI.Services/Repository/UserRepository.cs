@@ -58,7 +58,8 @@ namespace TOMI.Services.Repository
             }
             catch (Exception ex)
             {
-                throw new Exception(ex.ToString());
+                return new UserModelResponse { Error = ex.ToString() };
+              
             }
         }
         //public UserModelResponse Authenticate(string email, string password)

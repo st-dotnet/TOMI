@@ -35,9 +35,82 @@ namespace TOMI.Services.Repository
             return await _context.StockAdjustment.Include(x => x.OrderJob).OrderBy(x => x.Rec).ToListAsync();
 
         }
+
         public async Task<List<StockAdjustment>> GetExtendedPricesAsync()
         {
             return await _context.StockAdjustment.Include(x => x.OrderJob).OrderBy(x => x.Tag).ToListAsync();
         }
+
+
+        //public List<Stock> GetUncountedItemsAsync()
+        //{
+        //    var query = (from a in _context.Stock
+        //                 group a by a.SKU into pg
+        //                 join b in _context.OrderJob on pg.FirstOrDefault().SKU equals b.SKU
+        //                 select new
+        //                 {
+        //                     pg.FirstOrDefault().SKU,
+        //                     pg.FirstOrDefault().Description,
+        //                     pg.FirstOrDefault().SOH,
+        //                     pg.FirstOrDefault().PrecVtaNorm,
+        //                     b.Code
+        //                 }).ToList();
+           
+        //    return query.ToList();
+        //}
+
+        public List<stockandorder> GetUncountedItemsAsync()
+        {
+            try
+            {
+                var query = (from b in _context.OrderJob
+                            join a in _context.Stock on b.Department equals a.Departament
+                            select new stockandorder
+                            {
+                                SKU = a.SKU,
+                                Description = a.Description,
+                                SOH = a.SOH,
+                                PrecVtaNorm = a.PrecVtaNorm,
+                                Code = b.Code
+                            }).Take(20).ToList();
+                return query;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        //public async Task<List<Stock>> GetVariationBySKUAsync()
+        //{
+        //    var query = (from a in _context.Stock
+        //                 join b in _context.StockAdjustment on a.Id equals b.SKU
+
+        //                 select new
+        //                 {
+        //                     a.SKU,
+        //                     a.Description,
+        //                     a.SOH,
+        //                     a.PrecVtaNorm,
+        //                     b.Quantity,
+        //                     b.Barcode,
+        //                     b.Tag,
+        //                     b.Id
+        //                 }).ToList();
+        //    return (List<Stock>)query;
+
+        //}
+
+
+
+        //public async Task<List<StockAdjustment>> getcorrectionsreportasync()
+        //{
+        //    //return await _context.StockAdjustment.include(x => x.orderjob).orderby(x => x.tag).tolistasync();
+        //}
+        //public async Task<List<StockAdjustment>> GetLabelDetailsAsync(FilterDataModel filterDataModel)
+        //{
+        //    throw new NotImplementedException();
+        //}
+
     }
 }
