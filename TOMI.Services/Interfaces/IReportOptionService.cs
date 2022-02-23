@@ -8,9 +8,12 @@ using TOMI.Services.Models;
 
 namespace TOMI.Services.Interfaces
 {
-   public interface IReportOptionService
+    public interface IReportOptionService
     {
-       Task<List<StockAdjustment>> GetLabelDetailsAsync();
-       Task<List<StockAdjustment>> GetCodeNotFoundAsync();
+        Task<List<StockAdjustment>> GetLabelDetailsAsync();
+        Task<List<StockAdjustment>> GetCodeNotFoundAsync();
+        Task<List<StockAdjustment>> GetExtendedPricesAsync();
+        //List<Stock> GetUncountedItemsAsync();
+        List<stockandorder> GetUncountedItemsAsync();
     }
 }
