@@ -82,32 +82,45 @@ namespace TOMI.Services.Repository
             }
         }
 
-        //public async Task<List<Stock>> GetVariationBySKUAsync()
-        //{
-        //    var query = (from a in _context.Stock
-        //                 join b in _context.StockAdjustment on a.Id equals b.SKU
-
-        //                 select new
-        //                 {
-        //                     a.SKU,
-        //                     a.Description,
-        //                     a.SOH,
-        //                     a.PrecVtaNorm,
-        //                     b.Quantity,
-        //                     b.Barcode,
-        //                     b.Tag,
-        //                     b.Id
-        //                 }).ToList();
-        //    return (List<Stock>)query;
-
-        //}
-
-
-
-        public async task<list<stockadjustment>> getcorrectionsreportasync()
+        public List<StockAndStockAdjust> GetVariationBySKUAsync()
         {
-            return await _context.stockadjustment.include(x => x.orderjob).orderby(x => x.tag).tolistasync();
+            try
+            {
+                var query = (from a in _context.Stock
+                             join c in _context.OrderJob on a.Departament equals c.Department
+                             join b in _context.StockAdjustment on c.Id equals b.SKU
+                             select new StockAndStockAdjust
+                             {
+                                 SKU = a.SKU,
+                                 Description = a.Description,
+                                 SOH = a.SOH,
+                                 PrecVtaNorm = a.PrecVtaNorm,
+                                 Quantity = (int)b.Quantity,
+                                 Barcode = b.Barcode,
+                                 Tag = (int)b.Tag,
+                                 Id = b.Id
+
+                             }).Take(20).ToList();
+
+                return query;
+            }
+            catch (Exception ex)
+            {
+
+                throw ex;
+            }
+           
+
         }
+
+        public async Task<List<StockAdjustment>> GetCorrectionsReportAsync()
+        {
+            return await _context.StockAdjustment.Include(x => x.OrderJob).OrderBy(x => x.Tag).Take(500).ToListAsync();
+
+        }
+
+
+        
         //public async Task<List<StockAdjustment>> GetLabelDetailsAsync(FilterDataModel filterDataModel)
         //{
         //    throw new NotImplementedException();
