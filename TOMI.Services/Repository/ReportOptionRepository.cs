@@ -116,10 +116,51 @@ namespace TOMI.Services.Repository
 
         }
 
+        public List<DeptAndStockAdjust> GetBreakDownReportAsync()
+        {
+            try
+            {
+                var query = (from a in _context.Departments
+                             join c in _context.OrderJob on a.Department equals c.Department
+                             join b in _context.StockAdjustment on c.Id equals b.SKU
+                             orderby a.Division
+                             select new DeptAndStockAdjust
+                             {
+                                 Department = b.Department,
+                                 DepartmentName = a.DepartmentName,
+                                 Quantity = b.Quantity,
+                                 SalePrice = c.SalePrice,
+                                 PriceWithoutTaxes = c.PriceWithoutTaxes
+                             }).Take(20).ToList();
+
+
+
+                return query;
+            }
+            catch (Exception ex)
+            {
+
+
+
+                throw ex;
+            }
+
+
+
+
+        }
+
+        public async Task<List<StockAdjustment>> GetDateTimeCheckReport()
+        {
+            return await _context.StockAdjustment.Include(x => x.OrderJob).OrderBy(x => x.Tag).Take(500).ToListAsync();
+        }
+
+
+    }
         //public async Task<List<StockAdjustment>> GetLabelDetailsAsync(FilterDataModel filterDataModel)
         //{
         //    throw new NotImplementedException();
         //}
 
     }
-}
+

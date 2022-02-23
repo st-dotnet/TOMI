@@ -150,6 +150,44 @@ namespace TOMI.Web.Controllers
             }
         }
 
+        /// <summary>
+        /// GetBreakDownReportAsync
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetBreakDownReportAsync")]
+        public IActionResult GetBreakDownReportAsync()
+        {
+
+            try
+            {
+                var response = _reportOptionRepository.GetBreakDownReportAsync();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        /// <summary>
+        /// GetDateTimeCheckReport
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetDateTimeCheckReport")]
+        public async Task<IActionResult> GetDateTimeCheckReport()
+        {
+            try
+            {
+                var response = await _reportOptionRepository.GetDateTimeCheckReport();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
         #endregion Public methods
     }
 }
