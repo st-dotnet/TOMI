@@ -107,6 +107,49 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
+
+        /// <summary>
+        /// GetVariationBySKUAsync
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetVariationBySKUAsync")]
+        public IActionResult GetVariationBySKUAsync()
+        {
+
+            try
+            {
+                var response = _reportOptionRepository.GetVariationBySKUAsync();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        
+
+        /// <summary>
+        /// GetCorrectionsReportAsync
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetCorrectionsReportAsync")]
+        public async Task<IActionResult> GetCorrectionsReportAsync()
+        {
+
+            try
+            {
+                var response = await _reportOptionRepository.GetCorrectionsReportAsync();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
         #endregion Public methods
     }
 }
