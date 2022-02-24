@@ -63,6 +63,24 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
+
+        /// <summary>
+        /// PostTerminal
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("PostTerminal")]
+        public async Task<IActionResult> PostTerminal(TerminalPost post)
+        {
+            try
+            {
+                return Ok(await _programTerminalService.PostTerminal(post));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
         #endregion
     }
 }

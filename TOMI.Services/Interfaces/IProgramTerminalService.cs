@@ -14,6 +14,8 @@ namespace TOMI.Services.Interfaces
         Task<TerminalResponse> GenerateMF1(TerminalModel model);
         //Task<TerminalMF2Response> GenerateMF2(MF2Model model);
         Task<JsonResult> GetMFData(TerminalModel terminal);
-       // Task<TerminalResponse> GetMFData(TerminalModel terminal);
+        // Task<TerminalResponse> GetMFData(TerminalModel terminal);
+
+        Task<TerminalPost> PostTerminal(TerminalPost post);
     }
 }

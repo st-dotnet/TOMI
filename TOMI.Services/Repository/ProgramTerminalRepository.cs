@@ -128,5 +128,28 @@ namespace TOMI.Services.Repository
                 throw new Exception(ex.ToString());
             }
         }
+
+        public async Task<TerminalPost> PostTerminal(TerminalPost post)
+        {
+            try
+            {
+                //MF1 IsExisting = await _context.MF1.FirstOrDefaultAsync(x=>x.tag==post.Tag);
+                var map = _mapper.Map<MF1>(post);
+
+                var result = _context.MF1.Add(map).Entity;
+                await _context.SaveChangesAsync();
+                return post;
+
+
+
+            }
+            catch (Exception ex)
+            {
+
+
+
+                throw ex;
+            }
+        }
     }
 }

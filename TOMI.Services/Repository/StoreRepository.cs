@@ -2,19 +2,17 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
-using CsvHelper;
-using CsvHelper.Configuration;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using NLog;
 using OfficeOpenXml;
 using TOMI.Data.Database;
 using TOMI.Data.Database.Entities;
@@ -26,7 +24,7 @@ namespace TOMI.Services.Repository
     public class StoreRepository : IStoreService
     {
         private readonly IMapper _mapper;
-        private readonly ILogger<StoreRepository> _logger;
+        private readonly Logger logger;
         private readonly TOMIDataContext _context;
         private IConfiguration _configuration;
         private IWebHostEnvironment _environment;
@@ -42,9 +40,9 @@ namespace TOMI.Services.Repository
         private const string stockFile = "EXISTENCIA";
         private const string categoryFileExtension = "CATE";
         private const string categoryFile = "CATE DIV";
-        public StoreRepository(ILogger<StoreRepository> logger, TOMIDataContext context, IMapper mapper, IConfiguration configuration, IWebHostEnvironment environment)
+        public StoreRepository(TOMIDataContext context, IMapper mapper, IConfiguration configuration, IWebHostEnvironment environment)
         {
-            _logger = logger;
+            logger = LogManager.GetCurrentClassLogger();
             _context = context;
             _mapper = mapper;
             _configuration = configuration;
@@ -87,10 +85,6 @@ namespace TOMI.Services.Repository
 
             }
         }
-
-       
-        
-      
         public async Task<FileUplaodRespone> ParametersByDepartmentData(FilterDataModel model)
         {
             if (model.File == null || model.File.Length == 0)
@@ -120,7 +114,7 @@ namespace TOMI.Services.Repository
                     using (var package = new ExcelPackage(stream))
                     {
                         ExcelWorksheet worksheet = package.Workbook.Worksheets["Sheet1"];
-                        var rowcount = worksheet.Dimension.Rows;
+                        var rowcount = worksheet.Dimension.Rows + 1;
                         var colcount = worksheet.Dimension.Columns;
                         for (int row = 2; row < rowcount; row++)
                         {
@@ -224,10 +218,17 @@ namespace TOMI.Services.Repository
 
         public async Task<FileUplaodRespone> OrderJobData(FilterDataModel model)
         {
+            logger.Info("OrderJobData method started");
             bool isSaveSuccess = false;
             string fileName;
-            var innerDataError = model.StockDate.Value.Date.Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
+            var innerDataError = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
                 model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
+            //var innerDataError = model.StockDate.Value.Date.Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
+            //   model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
+
+            logger.Info("innerDataError for check error");
+            var forInnerStockDate = string.Empty;
+            var forInventoryDate = string.Empty;
             List<OrderJob> orderJobList = new();
             //for file header
             List<FileStore> fileStores = new();
@@ -236,13 +237,14 @@ namespace TOMI.Services.Repository
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
-
+            logger.Info("get pathBuilt");
             if (Directory.Exists(pathBuilt))
             {
                 DirectoryInfo di = new DirectoryInfo(pathBuilt);
                 FileInfo[] files = di.GetFiles();
                 foreach (FileInfo file in files)
                 {
+                    logger.Info("Delete file");
                     file.Delete();
                 }
             }
@@ -250,19 +252,25 @@ namespace TOMI.Services.Repository
             double timeElapsed = 0;
             try
             {
+                logger.Info("First try started");
                 var jobDate = model.StockDate.ToString();
                 var jobOrderStore = model.StoreId.ToString();
-                var jobOrderStoreName = model.StoreName.ToString();
+                var jobOrderStoreName = model.StoreName.ToString().Substring(0, 4);
+
+             
+                var jobOrderPreviousDate = model.StockDate.Value.Date.Month.ToString("#00") +
+                   model.StockDate.Value.Date.AddDays(-2).Day.ToString("#00");
 
                 var jobOrderDate = model.StockDate.Value.Date.Month.ToString("#00") +
-                   model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
-                //  var forInnerStockDates = Convert.ToDateTime("35-13-2029");
-                var forInnerStockDate = string.Empty;
+                   model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
+                logger.Info($"Get jobOrderDate : {jobOrderDate}");
                 try
                 {
-                    forInnerStockDate = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
+                    forInnerStockDate = model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString()
+                         + model.StockDate.Value.Date.Month.ToString("#00")
+                         + model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
 
-               model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
+                    logger.Info($"Get jobOrforInnerStockDatederDate : {forInnerStockDate}");
                 }
                 catch (Exception ex)
                 {
@@ -273,33 +281,41 @@ namespace TOMI.Services.Repository
                     };
                 }
 
-                //  var stockDate = model.StockDate.Value.Date;
+                //file name validation 
 
-                // var forInnerStockDate =  stockDate.Day.ToString("#00")
-                // + stockDate.Month.ToString("#00")
-                //    + stockDate.Year.ToString().Substring(2, 2).ToString();
+                var pathFile = model.File.FileName;
+                logger.Info($"Get pathFile : {pathFile}");
+                var tempfileName = new DirectoryInfo(pathFile).Name;
+                logger.Info($"Get tempfileName : {tempfileName}");
 
-                var tempfileName = model.File.FileName;
+                //file Name
                 var filetext = tempfileName.Substring(0, 4);
+                //file month
                 var exDate = tempfileName.Substring(4, 4);
+                //file storeName
                 var storeNumber = tempfileName.Substring(9, 4);
-                var checkFileExtension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
 
+                logger.Info($"Get filetext : {filetext} , exDate : {exDate} , storeNumber : {storeNumber} ");
+                var checkFileExtension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
+                logger.Info($"checkFileExtension : {checkFileExtension}");
                 if (checkFileExtension == txtFileExtension || checkFileExtension == zipFileExtension)
                 {
-                    if (filetext != masterFileExtension || jobOrderStoreName != storeNumber || jobOrderDate != exDate)
+                    // if (filetext != masterFileExtension || jobOrderStoreName != storeNumber && (exDate.Equals((jobOrderPreviousDate))||exDate.Equals((jobOrderDate))))
+                    if (filetext != masterFileExtension || jobOrderStoreName != storeNumber && (jobOrderDate != exDate || exDate == jobOrderPreviousDate))
                     {
                         return new FileUplaodRespone
                         {
                             Success = false,
-                            Error = "Please choose correct file."
+                            Error = $"Incorrect file with tempfileName : {tempfileName} , filetext:{filetext} , masterFileExtension:{masterFileExtension} , jobOrderStoreName:{jobOrderStoreName} , storeNumber:{storeNumber} , jobOrderDate:{jobOrderDate} , exDate:{exDate}"
                         };
                     }
 
                     if (checkFileExtension != zipFileExtension)
                     {
-                        if (filetext == masterFileExtension && jobOrderStoreName == storeNumber && jobOrderDate == exDate)
+                        logger.Info($"Enter in if confotion");
+                        if (filetext == masterFileExtension && jobOrderStoreName == storeNumber && (jobOrderDate == exDate || exDate == jobOrderPreviousDate))
                         {
+                            logger.Info($"Check file validations");
                             var filedata = _context.FileStore.FirstOrDefaultAsync(x => x.StoreNumber == jobOrderStoreName && x.FileDate == jobOrderDate && x.Category == "OrderJob");
                             if (filedata.Result != null)
                             {
@@ -320,38 +336,39 @@ namespace TOMI.Services.Repository
                             }
 
                             var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files", fileName);
+                            logger.Info($"Get path");
                             using (var stream = new FileStream(path, FileMode.Create))
                             {
+                                logger.Info($"stream");
                                 await model.File.CopyToAsync(stream);
                             }
 
-
+                            logger.Info($"After stream");
                             string regex = "^0+(?!$)";
                             var orderJobFile = File.ReadAllLines(path);
+
+
                             // for inner header
                             string jobOrderInnerFileHeader = orderJobFile[0].Substring(0, 6).Trim();
+                            logger.Info($"jobOrderInnerFileHeader : {jobOrderInnerFileHeader}");
                             string jobOrderInnerFileName = orderJobFile[0].Substring(7, 11).Trim();
+                            logger.Info($"jobOrderInnerFileName : {jobOrderInnerFileName}");
                             string jobOrderInnerStoreNumber = orderJobFile[0].Substring(18, 4).Trim();
+                            logger.Info($"jobOrderInnerStoreNumber : {jobOrderInnerStoreNumber}");
                             string jobOrderInnerFileDate = orderJobFile[0].Substring(22, 7).Trim();
+                            logger.Info($"jobOrderInnerFileDate : {jobOrderInnerFileDate}");
                             //string jobOrderInnerDate = "210920";// string.Format("{0:ddMMyy}", jobOrderInnerFileDate).Trim();
                             try
                             {
+                                logger.Info($"masterFile : {masterFile} ,storeNumber : {storeNumber} , forInnerStockDate : {forInnerStockDate}");
                                 if (jobOrderInnerFileName == masterFile && jobOrderInnerStoreNumber == storeNumber && jobOrderInnerFileDate == forInnerStockDate)
                                 {
                                     // file content
-                                    orderJobList = orderJobFile.Skip(1).SelectMany(x => new List<OrderJob>
+                                    orderJobList = orderJobFile.Skip(1).SkipLast(1).SelectMany(x => new List<OrderJob>
                                     {
                                     new()
                                     {
-                                        //Store = Regex.Replace(x.Substring(0,3),regex, ""),
-                                        //Code= Regex.Replace(x.Substring(3,16),regex, ""),
-                                        //Department=Regex.Replace(x.Substring(20,4),regex, ""),
-                                        //Description =Regex.Replace(x.Substring(24,30),regex, ""),
-                                        //SalePrice= Regex.Replace(x.Substring(54,8),regex, ""),
-                                        //PriceWithoutTaxes= Regex.Replace(x.Substring(60,8),regex, ""),
-                                        //SKU = Regex.Replace(x.Substring(70, 14), regex, ""),
-                                        //Category=x.Length ==88 ?x.Substring(82,6):null,
-                                         Store = Regex.Replace(x.Substring(0,3),regex, ""),
+                                        Store = Regex.Replace(x.Substring(0,3),regex, ""),
                                         Code= Regex.Replace(x.Substring(3,15),regex, ""),
                                         Department=Regex.Replace(x.Substring(18,4),regex, ""),
                                         Description =Regex.Replace(x.Substring(22,30),regex, ""),
@@ -364,42 +381,28 @@ namespace TOMI.Services.Repository
                                         StockDate = model.StockDate,
                                     }
                                     }).ToList();
-
-                                    // Submit the change to the database.
-                                    try
-                                    {
+                                    logger.Info($"orderJobList data : {orderJobList}");
+                                 
                                         await _context.BulkInsertAsync(orderJobList);
                                         stopwatch.Stop();
                                         timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
                                         uploadFileNames = new List<UploadFileName> { new() { FileName = tempfileName.Substring(0, 4), StoreNumber = tempfileName.Substring(4, 4), FileDate = tempfileName.Substring(9, 4), Category = "OrderJob" } };
                                         await _context.BulkInsertAsync(uploadFileNames);
-
                                         //for file header
                                         fileStores = orderJobFile.Take(1).SelectMany(y => new List<FileStore>
-                                    {
-                                    new()
-                                    {
-                                        Header=y.Substring(0,6),
-                                        FileName=y.Substring(7,7),
-                                        StoreNumber=y.Substring(18,4),
-                                        FileDate=exDate,
-                                        Category="OrderJob",
-                                    }}).ToList();
-                                        await _context.BulkInsertAsync(fileStores);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        File.Delete(path);
-                                        return new FileUplaodRespone
                                         {
-                                            Success = false,
-                                            Error = e.Message
-                                        };
-
-                                    }
+                                        new()
+                                        {
+                                            Header=y.Substring(0,6),
+                                            FileName=y.Substring(8,7),
+                                            StoreNumber=y.Substring(18,4),
+                                            FileDate=exDate,
+                                            Category="OrderJob",
+                                        }}).ToList();
+                                        await _context.BulkInsertAsync(fileStores);
                                     isSaveSuccess = true;
                                     File.Delete(path);
-                                    FileStore fileStore = _context.FileStore.Where(u => u.Category == "OrderJob" && u.StoreNumber == model.StoreName.ToString() && u.FileDate == jobOrderDate).SingleOrDefault();
+                                    FileStore fileStore = _context.FileStore.Where(u => u.Category == "OrderJob" && u.StoreNumber == jobOrderStoreName && u.FileName == "MASTER" && u.Header == "HEADER").SingleOrDefault();
                                     fileStore.RecordCount = orderJobList.Count.ToString();
                                     fileStore.Status = "OKAY";
                                     await _context.SaveChangesAsync();
@@ -426,28 +429,36 @@ namespace TOMI.Services.Repository
                 }
                 if (checkFileExtension == zipFileExtension)
                 {
+                    logger.Info("Master zip file started");
                     //for zip file
                     string existingFile = model.File.FileName.ToString();
-
+                    logger.Info($"existingFile : {existingFile}");
                     // var extension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
                     // fileName = DateTime.Now.Ticks + extension; //Create a new Name for the file due to security reasons.
                     pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
+                    logger.Info($"pathBuilt : {pathBuilt}");
                     if (!Directory.Exists(pathBuilt))
                     {
+                        logger.Info($"Create directory");
                         Directory.CreateDirectory(pathBuilt);
                     }
                     var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files",
                     existingFile);
+                    logger.Info($"path : {path}");
+
                     using (var stream = new FileStream(path, FileMode.Create))
                     {
+                        logger.Info($"stream started");
                         await model.File.CopyToAsync(stream);
                     }
-
+                    logger.Info($"stream ended");
                     string zipPath = Path.GetFileName(path);
+                    logger.Info($"Extracting zip");
                     ZipFile.ExtractToDirectory(path, pathBuilt);
+                    logger.Info($"Extracted zip");
 
                     var filePaths = Directory.GetFiles(pathBuilt, "*.txt");
-
+                    logger.Info($"filePaths : {filePaths}");
                     string destinationPath = filePaths[0].ToString();
                     var extension = "." + destinationPath.Split('.')[model.File.FileName.Split('.').Length - 1];
 
@@ -474,11 +485,11 @@ namespace TOMI.Services.Repository
                         {
                             if (jobOrderInnerFileName == masterFile || jobOrderInnerStoreNumber == storeNumber || jobOrderInnerFileDate == forInnerStockDate)
                             {
-                                orderJobList = zipOrderJobFile.Skip(1).SelectMany(x => new List<OrderJob>
+                                orderJobList = zipOrderJobFile.Skip(1).SkipLast(1).SelectMany(x => new List<OrderJob>
                                     {
                                     new()
                                     {
-                                      Store = Regex.Replace(x.Substring(0,3),regex, ""),
+                                        Store = Regex.Replace(x.Substring(0,3),regex, ""),
                                         Code= Regex.Replace(x.Substring(3,15),regex, ""),
                                         Department=Regex.Replace(x.Substring(18,4),regex, ""),
                                         Description =Regex.Replace(x.Substring(22,30),regex, ""),
@@ -492,26 +503,25 @@ namespace TOMI.Services.Repository
                                     }
                                     }).ToList();
                             }
-                            await _context.BulkInsertAsync(orderJobList);
-                            stopwatch.Stop();
-                            timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
+                                await _context.BulkInsertAsync(orderJobList);
+                                stopwatch.Stop();
+                                timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
 
-                            uploadFileNames = new List<UploadFileName> { new() { FileName = tempfileName.Substring(0, 4), StoreNumber = tempfileName.Substring(4, 4), FileDate = tempfileName.Substring(9, 4), Category = "OrderJob" } };
-                            await _context.BulkInsertAsync(uploadFileNames);
+                                uploadFileNames = new List<UploadFileName> { new() { FileName = tempfileName.Substring(0, 4), StoreNumber = tempfileName.Substring(4, 4), FileDate = tempfileName.Substring(9, 4), Category = "OrderJob" } };
+                                await _context.BulkInsertAsync(uploadFileNames);
 
-                            //for file header
-                            fileStores = zipOrderJobFile.Take(1).SelectMany(y => new List<FileStore>
+                                //for file header
+                                fileStores = zipOrderJobFile.Take(1).SelectMany(y => new List<FileStore>
                                     {
                                     new()
                                     {
-                                    Header=y.Substring(0,6),
-                                    FileName=y.Substring(7,11),
-                                    StoreNumber=y.Substring(18,4),
-                                    FileDate=string.Format("{0:MMyy}",y.Substring(24,4)),
-                                    Category="OrderJob",
+                                   Header=y.Substring(0,6),
+                                            FileName=y.Substring(8,7),
+                                            StoreNumber=y.Substring(18,4),
+                                            FileDate=exDate,
+                                            Category="OrderJob",
                                     }}).ToList();
-                            await _context.BulkInsertAsync(fileStores);
-
+                                await _context.BulkInsertAsync(fileStores);
                         }
                         catch (Exception e)
                         {
@@ -528,7 +538,7 @@ namespace TOMI.Services.Repository
                         }
                     }
                     isSaveSuccess = true;
-                    FileStore fileStore = _context.FileStore.Where(u => u.Category == "OrderJob" && u.StoreNumber == model.StoreName.ToString() && u.FileDate == jobOrderDate).SingleOrDefault();
+                    FileStore fileStore = _context.FileStore.Where(u => u.Category == "OrderJob" && u.StoreNumber == jobOrderStoreName && u.FileName == "MASTER" && u.Header == "HEADER").SingleOrDefault();
                     fileStore.RecordCount = orderJobList.Count.ToString();
                     fileStore.Status = "OKAY";
                     await _context.SaveChangesAsync();
@@ -553,15 +563,27 @@ namespace TOMI.Services.Repository
             return new FileUplaodRespone
             {
                 Success = false,
-                Error = "Some errors occurred!" + innerDataError
+                Error = $"Some errors occurred! forInnerStockDate : {forInnerStockDate} , innerDataError : {innerDataError}"
             };
         }
         public async Task<FileUplaodRespone> DepartmentsData(FilterDataModel model)
         {
+            string regex = "^0+(?!$)";
+            logger.Info("DepartmentsData method started");
             bool isSaveSuccess = false;
             string fileName;
-            var innerDataError = model.StockDate.Value.Date.Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
+            var innerDataError = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
                 model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
+            logger.Info("innerDataError for check error");
+
+            var finaldeptartmentDate = model.StockDate.Value.Date.Month.ToString("#00") +
+              model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
+
+            var departmentPreviousDate = model.StockDate.Value.Date.Month.ToString("#00") +
+                   model.StockDate.Value.Date.AddDays(-2).Day.ToString("#00");
+            var forInnerdeptartmentDate = string.Empty;
+
+
             List<Departments> departmentsList = new();
             //for file header
             List<FileStore> fileDepartment = new();
@@ -570,7 +592,7 @@ namespace TOMI.Services.Repository
             var stopwatch = new Stopwatch();
             stopwatch.Start();
             var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
-
+            logger.Info("get pathBuilt");
             if (Directory.Exists(pathBuilt))
             {
                 DirectoryInfo di = new DirectoryInfo(pathBuilt);
@@ -586,16 +608,21 @@ namespace TOMI.Services.Repository
 
                 var deptartmentDate = model.StockDate.ToString();
                 var deptartmentStore = model.StoreId.ToString();
-                var deptartmentStoreName = model.StoreName.ToString();
+                var deptartmentStoreName = model.StoreName.ToString().Substring(0, 4);
 
-                var finaldeptartmentDate = model.StockDate.Value.Date.Month.ToString("#00") +
-                   model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
+                var deptartmentPreviousDate = model.StockDate.Value.Date.Month.ToString("#00") +
+                 model.StockDate.Value.Date.AddDays(-2).Day.ToString("#00");
+
+
                 //  var forInnerStockDates = Convert.ToDateTime("35-13-2029");
-                var forInnerdeptartmentDate = string.Empty;
+                logger.Info($"Get finaldeptartmentDate : {finaldeptartmentDate}");
+
                 try
                 {
-                    forInnerdeptartmentDate = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
-                    model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
+                    forInnerdeptartmentDate = model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString()
+                         + model.StockDate.Value.Date.Month.ToString("#00")
+                         + model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
+                    logger.Info($"Get forInnerdeptartmentDate : {forInnerdeptartmentDate}");
                 }
                 catch (Exception ex)
                 {
@@ -606,34 +633,38 @@ namespace TOMI.Services.Repository
                     };
                 }
 
-                //  var stockDate = model.StockDate.Value.Date;
 
-                // var forInnerStockDate =  stockDate.Day.ToString("#00")
-                // + stockDate.Month.ToString("#00")
-                //    + stockDate.Year.ToString().Substring(2, 2).ToString();
-
-                var tempfileName = model.File.FileName;
+                var pathFile = model.File.FileName;
+                logger.Info($"Get pathFile : {pathFile}");
+                var tempfileName = new DirectoryInfo(pathFile).Name;
                 var filetext = tempfileName.Substring(0, 4);
                 var exDate = tempfileName.Substring(4, 4);
                 var storeNumber = tempfileName.Substring(9, 4);
                 var checkFileExtension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
 
-
-
+                logger.Info($"checkFileExtension : {checkFileExtension}");
                 if (checkFileExtension == txtFileExtension || checkFileExtension == zipFileExtension)
                 {
+                    logger.Info($"filetext : {filetext}");
+                    logger.Info($"deptFileExtension : {deptFileExtension}");
+                    logger.Info($"deptartmentStoreName : {deptartmentStoreName}");
+                    logger.Info($"storeNumber : {storeNumber}");
+                    logger.Info($"finaldeptartmentDate : {finaldeptartmentDate}");
+                    logger.Info($"exDate : {exDate}");
+
                     if (filetext != deptFileExtension && deptartmentStoreName != storeNumber && finaldeptartmentDate != exDate)
                     {
                         return new FileUplaodRespone
                         {
                             Success = false,
-                            Error = "Please choose correct file."
+                            Error = $"Incorrect file with tempfileName : {tempfileName} , filetext:{filetext} , departmentFileExtension:{deptFileExtension} , departmentStoreName:{deptartmentStoreName} , storeNumber:{storeNumber} , departmentDate:{finaldeptartmentDate} , exDate:{exDate}"
                         };
                     }
 
                     if (checkFileExtension != zipFileExtension)
                     {
-                        if (filetext == deptFileExtension && deptartmentStoreName == storeNumber && finaldeptartmentDate == exDate)
+                        logger.Info($"Enter in if (checkFileExtension) ");
+                        if (filetext == deptFileExtension && deptartmentStoreName == storeNumber || finaldeptartmentDate == exDate)
                         {
                             var filedata = _context.FileStore.FirstOrDefaultAsync(x => x.StoreNumber == deptartmentStoreName && x.FileDate == finaldeptartmentDate && x.Category == "DPTO");
                             if (filedata.Result != null)
@@ -651,23 +682,28 @@ namespace TOMI.Services.Repository
                                 Directory.CreateDirectory(pathBuilt);
                             }
                             var path = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files", fileName);
+                            logger.Info($"Getpath");
                             using (var stream = new FileStream(path, FileMode.Create))
                             {
+                                logger.Info($"stream");
                                 await model.File.CopyToAsync(stream);
                             }
 
                             var deptFileData = File.ReadAllLines(path);
 
-                            string regex = "^0+(?!$)";
+                            //for the trailor
+                            logger.Info($"After stream"); 
+
                             string deptInnerFileHeader = deptFileData[0].Substring(0, 6).Trim();
-                            string deptInnerFileName = deptFileData[0].Substring(7, 5).Trim();
+                            string deptInnerFileName = deptFileData[0].Substring(7, 9).Trim();
                             string deptInnerStoreNumber = deptFileData[0].Substring(18, 4).Trim();
                             string deptInnerFileDate = deptFileData[0].Substring(22, 7).Trim();
                             try
                             {
-                                if (deptInnerFileName == deptFileExtension && deptInnerStoreNumber == storeNumber && deptInnerFileDate == forInnerdeptartmentDate)
+                                logger.Info($"departmentFile : {deptFile} ,storeNumber : {storeNumber} , forInnerStockDate : {forInnerdeptartmentDate}");
+                                if (deptInnerFileName == deptFile && deptInnerStoreNumber == storeNumber && deptInnerFileDate == forInnerdeptartmentDate)
                                 {
-                                    departmentsList = deptFileData.Skip(1).SelectMany(x => new List<Departments>
+                                    departmentsList = deptFileData.Skip(1).SkipLast(1).SelectMany(x => new List<Departments>
                                     {
                                         new()
                                         {
@@ -682,8 +718,16 @@ namespace TOMI.Services.Repository
                                         }).ToList();
 
                                 }
-                                try
-                                {
+                                    //var trailorFileExist = _context.FileStore.FirstOrDefaultAsync(x => x.StoreNumber == deptartmentStoreName && x.Category == "DPTO" && x.Header == "TRAILER" && x.RecordCount != departmentsList.Count.ToString());
+                                    //if (trailorFileExist.Result != null)
+                                    //{
+                                    //    return new FileUplaodRespone
+                                    //    {
+                                    //        Success = false,
+                                    //        Error = "TRAILER master file count records not match."
+                                    //    };
+                                    //}
+
                                     await _context.BulkInsertAsync(departmentsList);
                                     stopwatch.Stop();
                                     timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
@@ -695,25 +739,17 @@ namespace TOMI.Services.Repository
                                     new()
                                     {
                                         Header=y.Substring(0,6),
-                                        FileName=y.Substring(7,7),
+                                        FileName=y.Substring(8,8),
                                         StoreNumber=y.Substring(18,4),
                                         FileDate=exDate,
                                         Category="DPTO",
                                     }}).ToList();
                                     await _context.BulkInsertAsync(fileDepartment);
-                                }
-                                catch (Exception e)
-                                {
-                                    File.Delete(path);
-                                    return new FileUplaodRespone
-                                    {
-                                        Success = false,
-                                        Error = e.Message
-                                    };
-                                }
+
+                           
                                 isSaveSuccess = true;
                                 File.Delete(path);
-                                FileStore fileStore = _context.FileStore.Where(u => u.Category == "DPTO" && u.StoreNumber == model.StoreName.ToString() && u.FileDate == finaldeptartmentDate).SingleOrDefault();
+                                FileStore fileStore = _context.FileStore.Where(u => u.Category == "DPTO" && u.StoreNumber == deptartmentStoreName && u.Header == "HEADER" && u.FileName == "DPTO DIV").SingleOrDefault();
                                 fileStore.RecordCount = departmentsList.Count.ToString();
                                 fileStore.Status = "OKAY";
                                 await _context.SaveChangesAsync();
@@ -733,7 +769,6 @@ namespace TOMI.Services.Repository
                                     Error = "Please select correct file......"
                                 };
                             }
-
                         }
                     }
                 }
@@ -771,8 +806,9 @@ namespace TOMI.Services.Repository
                                 Error = "Department zip file is already uploaded."
                             };
                         }
-                        var zipDepartmentFile = File.ReadAllLines(destinationPath);
-                        string regex = "^0+(?!$)";
+                        var zipDepartmentFile = File.ReadAllLines(destinationPath); 
+
+                        await _context.BulkInsertAsync(fileDepartment);
                         string deptInnerFileHeader = zipDepartmentFile[0].Substring(0, 6).Trim();
                         string deptInnerFileName = zipDepartmentFile[0].Substring(7, 5).Trim();
                         string deptInnerStoreNumber = zipDepartmentFile[0].Substring(18, 4).Trim();
@@ -782,7 +818,7 @@ namespace TOMI.Services.Repository
                         {
                             if (deptInnerFileName == deptFileExtension || deptInnerStoreNumber == storeNumber || deptInnerFileDate == finaldeptartmentDate)
                             {
-                                departmentsList = zipDepartmentFile.Skip(1).SelectMany(x => new List<Departments>
+                                departmentsList = zipDepartmentFile.Skip(1).SkipLast(1).SelectMany(x => new List<Departments>
                                     {
                                     new()
                                     {
@@ -796,23 +832,24 @@ namespace TOMI.Services.Repository
                                     }
                                     }).ToList();
                             }
-                            await _context.BulkInsertAsync(departmentsList);
-                            stopwatch.Stop();
-                            timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
-                            uploadFileNames = new List<UploadFileName> { new() { FileName = tempfileName.Substring(0, 4), StoreNumber = tempfileName.Substring(4, 4), FileDate = tempfileName.Substring(9, 4), Category = "DPTO" } };
-                            await _context.BulkInsertAsync(uploadFileNames);
+                            
+                                await _context.BulkInsertAsync(departmentsList);
+                                stopwatch.Stop();
+                                timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
+                                uploadFileNames = new List<UploadFileName> { new() { FileName = tempfileName.Substring(0, 4), StoreNumber = tempfileName.Substring(4, 4), FileDate = tempfileName.Substring(9, 4), Category = "DPTO" } };
+                                await _context.BulkInsertAsync(uploadFileNames);
 
-                            fileDepartment = zipDepartmentFile.Take(1).SelectMany(y => new List<FileStore>
-                            {
-                            new()
-                            {
-                            Header=(y.Substring(0,6)),
-                            FileName=(y.Substring(7,11)),
-                            StoreNumber=(y.Substring(18,4)),
-                            FileDate=string.Format("{0:MMyy}",y.Substring(24,4)),
-                            Category="DPTO",
-                            }}).ToList();
-                            await _context.BulkInsertAsync(fileDepartment);
+                                fileDepartment = zipDepartmentFile.Take(1).SelectMany(y => new List<FileStore>
+                                {
+                                new()
+                                {
+                                Header=y.Substring(0,6),
+                                FileName=y.Substring(8,8),
+                                StoreNumber=y.Substring(18,4),
+                                FileDate=exDate,
+                                Category="DPTO",
+                                }}).ToList();
+                                await _context.BulkInsertAsync(fileDepartment);
                         }
                         catch (Exception e)
                         {
@@ -827,7 +864,7 @@ namespace TOMI.Services.Repository
                         }
                     }
                     isSaveSuccess = true;
-                    FileStore fileStore = _context.FileStore.Where(u => u.Category == "DPTO" && u.StoreNumber == model.StoreName.ToString() && u.FileDate == finaldeptartmentDate).SingleOrDefault();
+                    FileStore fileStore = _context.FileStore.Where(u => u.Category == "DPTO" && u.StoreNumber == deptartmentStoreName && u.Header == "HEADER" && u.FileName == "DPTO DIV").SingleOrDefault();
                     fileStore.RecordCount = departmentsList.Count.ToString();
                     fileStore.Status = "OKAY";
                     await _context.SaveChangesAsync();
@@ -851,15 +888,14 @@ namespace TOMI.Services.Repository
             return new FileUplaodRespone
             {
                 Success = false,
-                Error = "Some errors occurred!" + innerDataError
+                Error = $"Some errors occurred! forInnerdeptartmentDate : {forInnerdeptartmentDate} , innerDataError : {innerDataError}"
             };
         }
         public async Task<FileUplaodRespone> ReservedData(FilterDataModel model)
         {
+            string regex = "^0+(?!$)";
             bool isSaveSuccess = false;
             string fileName;
-            var innerDataError = model.StockDate.Value.Date.Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
-                model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
             List<Reserved> reservedList = new();
             //for file header
             List<FileStore> fileStores = new();
@@ -884,16 +920,20 @@ namespace TOMI.Services.Repository
             {
                 var reservedDate = model.StockDate.ToString();
                 var reservedStore = model.StoreId.ToString();
-                var reservedStoreName = model.StoreName.ToString();
+                var reservedStoreName = model.StoreName.ToString().Substring(0, 4);
 
                 var finalReservedDate = model.StockDate.Value.Date.Month.ToString("#00") +
-                   model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
+                   model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
+
+                var ReservedPreviousDate = model.StockDate.Value.Date.Month.ToString("#00") +
+                model.StockDate.Value.Date.AddDays(-2).Day.ToString("#00");
                 //  var forInnerStockDates = Convert.ToDateTime("35-13-2029");
                 var finalInnerreservedDate = string.Empty;
                 try
                 {
-                    finalInnerreservedDate = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
-                    model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
+                    finalInnerreservedDate = model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString()
+                         + model.StockDate.Value.Date.Month.ToString("#00")
+                         + model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
                 }
                 catch (Exception ex)
                 {
@@ -903,12 +943,13 @@ namespace TOMI.Services.Repository
                         Error = "Inner Reserved Date error"
                     };
                 }
-                var tempfileName = model.File.FileName;
+                var pathFile = model.File.FileName;
+                logger.Info($"Get pathFile : {pathFile}");
+                var tempfileName = new DirectoryInfo(pathFile).Name;
                 var filetext = tempfileName.Substring(0, 4);
                 var exDate = tempfileName.Substring(4, 4);
                 var storeNumber = tempfileName.Substring(9, 4);
                 var checkFileExtension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
-
                 if (checkFileExtension == txtFileExtension || checkFileExtension == zipFileExtension)
                 {
                     if (filetext != reservedFileExtension || reservedStoreName != storeNumber || finalReservedDate != exDate)
@@ -948,10 +989,10 @@ namespace TOMI.Services.Repository
                             {
                                 await model.File.CopyToAsync(stream);
                             }
+                            var ReservedFile = File.ReadAllLines(path); 
 
+                            //await _context.BulkInsertAsync(fileStores);
 
-                            string regex = "^0+(?!$)";
-                            var ReservedFile = File.ReadAllLines(path);
                             // for inner header
                             string reservedInnerFileHeader = ReservedFile[0].Substring(0, 6).Trim();
                             string reservedInnerFileName = ReservedFile[0].Substring(7, 5).Trim();
@@ -963,7 +1004,7 @@ namespace TOMI.Services.Repository
                                 if (reservedInnerFileName == reservedFileExtension && reservedInnerStoreNumber == storeNumber && reservedInnerFileDate == finalInnerreservedDate)
                                 {
                                     // file content
-                                    reservedList = ReservedFile.Skip(1).SelectMany(x => new List<Reserved>
+                                    reservedList = ReservedFile.Skip(1).SkipLast(1).SelectMany(x => new List<Reserved>
                                     {
                                     new()
                                     {
@@ -977,9 +1018,7 @@ namespace TOMI.Services.Repository
                                     }
                                     }).ToList();
 
-                                    // Submit the change to the database.
-                                    try
-                                    {
+                                   
                                         await _context.BulkInsertAsync(reservedList);
                                         stopwatch.Stop();
                                         timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
@@ -991,27 +1030,17 @@ namespace TOMI.Services.Repository
                                         {
                                         new()
                                         {
-                                            Header=(y.Substring(0,6)),
-                                            FileName=(y.Substring(7,11)),
-                                            StoreNumber=(y.Substring(18,4)),
-                                            FileDate=string.Format("{0:MMyy}",y.Substring(24,4)),
+                                            Header=y.Substring(0,6),
+                                            FileName=y.Substring(8,9),
+                                            StoreNumber=y.Substring(18,4),
+                                            FileDate=exDate,
                                             Category="Reserved",
                                             }}).ToList();
                                         await _context.BulkInsertAsync(fileStores);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        File.Delete(path);
-                                        return new FileUplaodRespone
-                                        {
-                                            Success = false,
-                                            Error = e.Message
-                                        };
-
-                                    }
+                                    
                                     isSaveSuccess = true;
                                     File.Delete(path);
-                                    FileStore fileStore = _context.FileStore.Where(u => u.Category == "Reserved" && u.StoreNumber == model.StoreName.ToString() && u.FileDate == finalReservedDate).SingleOrDefault();
+                                    FileStore fileStore = _context.FileStore.Where(u => u.Category == "Reserved" && u.StoreNumber == reservedStoreName && u.FileName == "APARTADOS" && u.Header == "HEADER").SingleOrDefault();
                                     fileStore.RecordCount = reservedList.Count.ToString();
                                     fileStore.Status = "OKAY";
                                     await _context.SaveChangesAsync();
@@ -1074,9 +1103,9 @@ namespace TOMI.Services.Repository
                                 Error = "Reserved zip file is already uploaded."
                             };
                         }
-                        var zipReservedFile = File.ReadAllLines(destinationPath);
-                        string regex = "^0+(?!$)";
+                        var zipReservedFile = File.ReadAllLines(destinationPath); 
 
+                        await _context.BulkInsertAsync(fileStores);
                         string jobOrderInnerFileHeader = zipReservedFile[0].Substring(0, 6).Trim();
                         string jobOrderInnerFileName = zipReservedFile[0].Substring(7, 11).Trim();
                         string jobOrderInnerStoreNumber = zipReservedFile[0].Substring(18, 4).Trim();
@@ -1086,7 +1115,7 @@ namespace TOMI.Services.Repository
                         {
                             if (jobOrderInnerFileName == reservedFile || jobOrderInnerStoreNumber == storeNumber || jobOrderInnerFileDate == finalInnerreservedDate)
                             {
-                                reservedList = zipReservedFile.Skip(1).SelectMany(x => new List<Reserved>
+                                reservedList = zipReservedFile.Skip(1).SkipLast(1).SelectMany(x => new List<Reserved>
                                     {
                                     new()
                                     {
@@ -1100,26 +1129,25 @@ namespace TOMI.Services.Repository
                                     }
                                     }).ToList();
                             }
-                            await _context.BulkInsertAsync(reservedList);
-                            stopwatch.Stop();
-                            timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
+                                await _context.BulkInsertAsync(reservedList);
+                                stopwatch.Stop();
+                                timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
 
-                            uploadFileNames = new List<UploadFileName> { new() { FileName = tempfileName.Substring(0, 4), StoreNumber = tempfileName.Substring(4, 4), FileDate = tempfileName.Substring(9, 4), Category = "Reserved" } };
-                            await _context.BulkInsertAsync(uploadFileNames);
+                                uploadFileNames = new List<UploadFileName> { new() { FileName = tempfileName.Substring(0, 4), StoreNumber = tempfileName.Substring(4, 4), FileDate = tempfileName.Substring(9, 4), Category = "Reserved" } };
+                                await _context.BulkInsertAsync(uploadFileNames);
 
-                            //for file header
-                            fileStores = zipReservedFile.Take(1).SelectMany(y => new List<FileStore>
+                                //for file header
+                                fileStores = zipReservedFile.Take(1).SelectMany(y => new List<FileStore>
                                     {
                                     new()
                                     {
-                                    Header=y.Substring(0,6),
-                                    FileName=y.Substring(7,11),
-                                    StoreNumber=y.Substring(18,4),
-                                    FileDate=string.Format("{0:MMyy}",y.Substring(24,4)),
-                                    Category="Reserved",
+                                            Header=y.Substring(0,6),
+                                            FileName=y.Substring(8,9),
+                                            StoreNumber=y.Substring(18,4),
+                                            FileDate=exDate,
+                                            Category="Reserved",
                                     }}).ToList();
-                            await _context.BulkInsertAsync(fileStores);
-
+                                await _context.BulkInsertAsync(fileStores);
                         }
                         catch (Exception e)
                         {
@@ -1136,7 +1164,7 @@ namespace TOMI.Services.Repository
                         }
                     }
                     isSaveSuccess = true;
-                    FileStore fileStore = _context.FileStore.Where(u => u.Category == "Reserved" && u.StoreNumber == model.StoreName.ToString() && u.FileDate ==finalReservedDate).SingleOrDefault();
+                    FileStore fileStore = _context.FileStore.Where(u => u.Category == "Reserved" && u.StoreNumber == reservedStoreName && u.FileName == "APARTADOS" && u.Header == "HEADER").SingleOrDefault();
                     fileStore.RecordCount = reservedList.Count.ToString();
                     fileStore.Status = "OKAY";
                     await _context.SaveChangesAsync();
@@ -1161,15 +1189,16 @@ namespace TOMI.Services.Repository
             return new FileUplaodRespone
             {
                 Success = false,
-                Error = "Some errors occurred!" + innerDataError
+                Error = "Some errors occurred!"
             };
 
         }
         public async Task<FileUplaodRespone> StockData(FilterDataModel model)
         {
+            string regex = "^0+(?!$)";
             bool isSaveSuccess = false;
             string fileName;
-            var innerDataError = model.StockDate.Value.Date.Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
+            var innerDataError = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
                 model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
             List<Stock> stockList = new();
             //for file header
@@ -1180,6 +1209,8 @@ namespace TOMI.Services.Repository
             stopwatch.Start();
             var pathBuilt = Path.Combine(Directory.GetCurrentDirectory(), "Upload\\files");
 
+            var StockDataPreviousDate = model.StockDate.Value.Date.Month.ToString("#00") +
+                              model.StockDate.Value.Date.AddDays(-2).Day.ToString("#00");
             if (Directory.Exists(pathBuilt))
             {
                 DirectoryInfo di = new DirectoryInfo(pathBuilt);
@@ -1195,17 +1226,21 @@ namespace TOMI.Services.Repository
             {
                 var stockDate = model.StockDate.ToString();
                 var stockStore = model.StoreId.ToString();
-                var stockStoreName = model.StoreName.ToString();
+                var stockStoreName = model.StoreName.ToString().Substring(0, 4);
 
                 var finalStockDate = model.StockDate.Value.Date.Month.ToString("#00") +
-                   model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
+                   model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
                 //  var forInnerStockDates = Convert.ToDateTime("35-13-2029");
+
+                logger.Info($"Get StockData : {finalStockDate}");
+
                 var forInnerStockDate = string.Empty;
                 try
                 {
-                    forInnerStockDate = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
+                    forInnerStockDate = model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString()
+                         + model.StockDate.Value.Date.Month.ToString("#00")
+                         + model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
 
-               model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
                 }
                 catch (Exception ex)
                 {
@@ -1215,8 +1250,10 @@ namespace TOMI.Services.Repository
                         Error = "Inner Stock Date error"
                     };
                 }
-
-                var tempfileName = model.File.FileName;
+                var pathFile = model.File.FileName;
+                logger.Info($"Get pathFile : {pathFile}");
+                var tempfileName = new DirectoryInfo(pathFile).Name;
+                logger.Info($"Get tempfileName : {tempfileName}");
                 var filetext = tempfileName.Substring(0, 4);
                 var exDate = tempfileName.Substring(4, 4);
                 var storeNumber = tempfileName.Substring(9, 4);
@@ -1261,10 +1298,9 @@ namespace TOMI.Services.Repository
                             {
                                 await model.File.CopyToAsync(stream);
                             }
+                            var stockFileData = File.ReadAllLines(path); 
 
-
-                            string regex = "^0+(?!$)";
-                            var stockFileData = File.ReadAllLines(path);
+                           // await _context.BulkInsertAsync(fileStores);
                             // for inner header
                             string stockInnerFileHeader = stockFileData[0].Substring(0, 6).Trim();
                             string stockInnerFileName = stockFileData[0].Substring(7, 11).Trim();
@@ -1276,7 +1312,7 @@ namespace TOMI.Services.Repository
                                 if (stockInnerFileName == stockFile && stockInnerStoreNumber == storeNumber && stockInnerFileDate == forInnerStockDate)
                                 {
                                     // file content
-                                    stockList = stockFileData.Skip(1).SelectMany(x => new List<Stock>
+                                    stockList = stockFileData.Skip(1).SkipLast(1).SelectMany(x => new List<Stock>
                                     {
                                     new()
                                     {
@@ -1293,10 +1329,6 @@ namespace TOMI.Services.Repository
                                         StockDate = model.StockDate,
                                     }
                                     }).ToList();
-
-                                    // Submit the change to the database.
-                                    try
-                                    {
                                         await _context.BulkInsertAsync(stockList);
                                         stopwatch.Stop();
                                         timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
@@ -1308,27 +1340,16 @@ namespace TOMI.Services.Repository
                                             {
                                             new()
                                             {
-                                                 Header=(y.Substring(0,6)),
-                                                FileName=(y.Substring(7,11)),
-                                                StoreNumber=(y.Substring(18,4)),
-                                                FileDate=string.Format("{0:MMyy}",y.Substring(24,4)),
+                                                Header=y.Substring(0,6),
+                                                FileName=y.Substring(8,10),
+                                                StoreNumber=y.Substring(18,4),
+                                                FileDate=exDate,
                                                 Category="Stock",
                                             }}).ToList();
                                         await _context.BulkInsertAsync(fileStores);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        File.Delete(path);
-                                        return new FileUplaodRespone
-                                        {
-                                            Success = false,
-                                            Error = e.Message
-                                        };
-
-                                    }
                                     isSaveSuccess = true;
                                     File.Delete(path);
-                                    FileStore fileStore = _context.FileStore.Where(u => u.Category == "Stock" && u.StoreNumber == model.StoreName.ToString() && u.FileDate == finalStockDate).SingleOrDefault();
+                                    FileStore fileStore = _context.FileStore.Where(u => u.Category == "Stock" && u.StoreNumber == stockStoreName && u.Header == "HEADER" && u.FileName == "EXISTENCIA").SingleOrDefault();
                                     fileStore.RecordCount = stockList.Count.ToString();
                                     fileStore.Status = "OKAY";
                                     await _context.SaveChangesAsync();
@@ -1391,8 +1412,7 @@ namespace TOMI.Services.Repository
                                 Error = "Stock zip file is already uploaded."
                             };
                         }
-                        var zipStockFile = File.ReadAllLines(destinationPath);
-                        string regex = "^0+(?!$)";
+                        var zipStockFile = File.ReadAllLines(destinationPath); 
 
                         string stockInnerFileHeader = zipStockFile[0].Substring(0, 6).Trim();
                         string stockInnerFileName = zipStockFile[0].Substring(7, 11).Trim();
@@ -1403,7 +1423,7 @@ namespace TOMI.Services.Repository
                         {
                             if (stockInnerFileName == stockFile || stockInnerStoreNumber == storeNumber || stockInnerFileDate == forInnerStockDate)
                             {
-                                stockList = zipStockFile.Skip(1).SelectMany(x => new List<Stock>
+                                stockList = zipStockFile.Skip(1).SkipLast(1).SelectMany(x => new List<Stock>
                                     {
                                     new()
                                     {
@@ -1421,26 +1441,25 @@ namespace TOMI.Services.Repository
                                     }
                                     }).ToList();
                             }
-                            await _context.BulkInsertAsync(stockList);
-                            stopwatch.Stop();
-                            timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
+                                await _context.BulkInsertAsync(stockList);
+                                stopwatch.Stop();
+                                timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
 
-                            uploadFileNames = new List<UploadFileName> { new() { FileName = tempfileName.Substring(0, 4), StoreNumber = tempfileName.Substring(4, 4), FileDate = tempfileName.Substring(9, 4), Category = "Stock" } };
-                            await _context.BulkInsertAsync(uploadFileNames);
+                                uploadFileNames = new List<UploadFileName> { new() { FileName = tempfileName.Substring(0, 4), StoreNumber = tempfileName.Substring(4, 4), FileDate = tempfileName.Substring(9, 4), Category = "Stock" } };
+                                await _context.BulkInsertAsync(uploadFileNames);
 
-                            //for file header
-                            fileStores = zipStockFile.Take(1).SelectMany(y => new List<FileStore>
+                                //for file header
+                                fileStores = zipStockFile.Take(1).SelectMany(y => new List<FileStore>
                                     {
                                     new()
                                     {
-                                    Header=(y.Substring(0,6)),
-                                    FileName=(y.Substring(7,11)),
-                                    StoreNumber=(y.Substring(18,4)),
-                                    FileDate=string.Format("{0:MMyy}",y.Substring(24,4)),
+                                            Header=y.Substring(0,6),
+                                            FileName=y.Substring(8,10),
+                                            StoreNumber=y.Substring(18,4),
+                                            FileDate=exDate,
                                     Category="Stock",
                                     }}).ToList();
-                            await _context.BulkInsertAsync(fileStores);
-
+                                await _context.BulkInsertAsync(fileStores);
                         }
                         catch (Exception e)
                         {
@@ -1457,7 +1476,7 @@ namespace TOMI.Services.Repository
                         }
                     }
                     isSaveSuccess = true;
-                    FileStore fileStore = _context.FileStore.Where(u => u.Category == "Stock" && u.StoreNumber == model.StoreName.ToString() && u.FileDate == finalStockDate).SingleOrDefault();
+                    FileStore fileStore = _context.FileStore.Where(u => u.Category == "Stock" && u.StoreNumber == stockStoreName && u.Header == "HEADER" && u.FileName == "EXISTENCIA").SingleOrDefault();
                     fileStore.RecordCount = stockList.Count.ToString();
                     fileStore.Status = "OKAY";
                     await _context.SaveChangesAsync();
@@ -1482,16 +1501,17 @@ namespace TOMI.Services.Repository
             return new FileUplaodRespone
             {
                 Success = false,
-                Error = "Some errors occurred!" + innerDataError
+                Error = "Some errors occurred!"
             };
         }
         public async Task<FileUplaodRespone> CatergoriesData(FilterDataModel model)
         {
-
+            string regex = "^0+(?!$)";
             bool isSaveSuccess = false;
             string fileName;
-            var innerDataError = model.StockDate.Value.Date.Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
+            var innerDataError = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
                 model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
+
             List<Categories> categoryList = new();
             //for file header
             List<FileStore> fileStores = new();
@@ -1516,17 +1536,21 @@ namespace TOMI.Services.Repository
             {
                 var categoryDate = model.StockDate.ToString();
                 var caytegoryStore = model.StoreId.ToString();
-                var categoryStoreName = model.StoreName.ToString();
+                var categoryStoreName = model.StoreName.ToString().Substring(0, 4);
 
                 var finalCategoryDate = model.StockDate.Value.Date.Month.ToString("#00") +
-                   model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
+                   model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00"); ;
                 //  var forInnerStockDates = Convert.ToDateTime("35-13-2029");
+
+                var categoryPreviousDate = model.StockDate.Value.Date.Month.ToString("#00") +
+                  model.StockDate.Value.Date.AddDays(-2).Day.ToString("#00");
+
                 var forInnerCategoryDate = string.Empty;
                 try
                 {
-                    forInnerCategoryDate = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
-
-               model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
+                    forInnerCategoryDate = model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString()
+                         + model.StockDate.Value.Date.Month.ToString("#00")
+                         + model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
                 }
                 catch (Exception ex)
                 {
@@ -1536,22 +1560,19 @@ namespace TOMI.Services.Repository
                         Error = "Inner Category Date error"
                     };
                 }
-
-                //  var stockDate = model.StockDate.Value.Date;
-
-                // var forInnerStockDate =  stockDate.Day.ToString("#00")
-                // + stockDate.Month.ToString("#00")
-                //    + stockDate.Year.ToString().Substring(2, 2).ToString();
-
-                var tempfileName = model.File.FileName;
+                var pathFile = model.File.FileName;
+                logger.Info($"Get pathFile : {pathFile}");
+                var tempfileName = new DirectoryInfo(pathFile).Name;
                 var filetext = tempfileName.Substring(0, 4);
                 var exDate = tempfileName.Substring(4, 4);
                 var storeNumber = tempfileName.Substring(9, 4);
                 var checkFileExtension = "." + model.File.FileName.Split('.')[model.File.FileName.Split('.').Length - 1];
+                logger.Info($"Get categoryDate : {finalCategoryDate}");
 
                 if (checkFileExtension == txtFileExtension || checkFileExtension == zipFileExtension)
                 {
-                    if (filetext != categoryFileExtension || categoryStoreName != storeNumber || finalCategoryDate != exDate)
+                    logger.Info($"Get categoryFileExtension : {categoryFileExtension}, categoryStoreName:   {categoryStoreName}, finalCategoryDate:{finalCategoryDate}");
+                    if (filetext != categoryFileExtension || categoryStoreName != storeNumber && finalCategoryDate != exDate )
                     {
                         return new FileUplaodRespone
                         {
@@ -1564,13 +1585,14 @@ namespace TOMI.Services.Repository
                     {
                         if (filetext == categoryFileExtension && categoryStoreName == storeNumber && finalCategoryDate == exDate)
                         {
+                            logger.Info($"Get categoryFileExtension : {categoryFileExtension}, categoryStoreName:   {categoryStoreName}, finalCategoryDate:{finalCategoryDate}, exDate:{exDate} ");
                             var filedata = _context.FileStore.FirstOrDefaultAsync(x => x.StoreNumber == categoryStoreName && x.FileDate == finalCategoryDate && x.Category == "Category");
                             if (filedata.Result != null)
                             {
                                 return new FileUplaodRespone
                                 {
                                     Success = false,
-                                    Error = "File is already uploaded."
+                                    Error = $"Incorrect file with tempfileName : {tempfileName} , filetext:{filetext} , categoryFileExtension:{checkFileExtension} , categoryStoreName:{categoryStoreName} , storeNumber:{storeNumber} , jobOrderDate:{categoryDate} , exDate:{exDate}"
                                 };
                             }
                             // condition 
@@ -1588,10 +1610,8 @@ namespace TOMI.Services.Repository
                             {
                                 await model.File.CopyToAsync(stream);
                             }
-
-
-                            string regex = "^0+(?!$)";
                             var CategoryFileData = File.ReadAllLines(path);
+                            
                             // for inner header
                             string categoryInnerFileHeader = CategoryFileData[0].Substring(0, 6).Trim();
                             string categoryInnerFileName = CategoryFileData[0].Substring(7, 11).Trim();
@@ -1603,7 +1623,7 @@ namespace TOMI.Services.Repository
                                 if (categoryInnerFileName == categoryFile && categoryInnerStoreNumber == storeNumber && categoryInnerFileDate == forInnerCategoryDate)
                                 {
                                     // file content
-                                    categoryList = CategoryFileData.Skip(1).SelectMany(x => new List<Categories>
+                                    categoryList = CategoryFileData.Skip(1).SkipLast(1).SelectMany(x => new List<Categories>
                                     {
                                     new()
                                     {
@@ -1617,10 +1637,8 @@ namespace TOMI.Services.Repository
                                     }
                                     }).ToList();
 
-                                    // Submit the change to the database.
-                                    try
-                                    {
-                                        await _context.BulkInsertAsync(categoryList);
+                                   
+                                       await _context.BulkInsertAsync(categoryList);
                                         stopwatch.Stop();
                                         timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
                                         uploadFileNames = new List<UploadFileName> { new() { FileName = tempfileName.Substring(0, 4), StoreNumber = tempfileName.Substring(4, 4), FileDate = tempfileName.Substring(9, 4), Category = "Category" } };
@@ -1628,30 +1646,20 @@ namespace TOMI.Services.Repository
 
                                         //for file header
                                         fileStores = CategoryFileData.Take(1).SelectMany(y => new List<FileStore>
-                                    {
-                                    new()
-                                    {
-                                        Header=y.Substring(0,6),
-                                        FileName=y.Substring(7,7),
-                                        StoreNumber=y.Substring(18,4),
-                                        FileDate=exDate,
-                                        Category="Category",
-                                    }}).ToList();
-                                        await _context.BulkInsertAsync(fileStores);
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        File.Delete(path);
-                                        return new FileUplaodRespone
-                                        {
-                                            Success = false,
-                                            Error = e.Message
-                                        };
-
-                                    }
+                                            {
+                                            new()
+                                            {
+                                            Header=y.Substring(0,6),
+                                            FileName=y.Substring(8,8),
+                                            StoreNumber=y.Substring(18,4),
+                                            FileDate=exDate,
+                                            Category="Category",
+                                            }}).ToList();
+                                                await _context.BulkInsertAsync(fileStores);
+                                   
                                     isSaveSuccess = true;
                                     File.Delete(path);
-                                    FileStore fileStore = _context.FileStore.Where(u => u.Category == "Category" && u.StoreNumber == model.StoreName.ToString() && u.FileDate == finalCategoryDate).SingleOrDefault();
+                                    FileStore fileStore = _context.FileStore.Where(u => u.Category == "Category" && u.StoreNumber == categoryInnerStoreNumber && u.Header == "HEADER" && u.FileName == "CATE DIV").SingleOrDefault();
                                     fileStore.RecordCount = categoryList.Count.ToString();
                                     fileStore.Status = "OKAY";
                                     await _context.SaveChangesAsync();
@@ -1715,8 +1723,7 @@ namespace TOMI.Services.Repository
                             };
                         }
                         var categoryFileData = File.ReadAllLines(destinationPath);
-                        string regex = "^0+(?!$)";
-
+                       
                         string categoryInnerFileHeader = categoryFileData[0].Substring(0, 6).Trim();
                         string categoryInnerFileName = categoryFileData[0].Substring(7, 11).Trim();
                         string categoryInnerStoreNumber = categoryFileData[0].Substring(18, 4).Trim();
@@ -1726,11 +1733,11 @@ namespace TOMI.Services.Repository
                         {
                             if (categoryInnerFileName == categoryFile || categoryInnerStoreNumber == storeNumber || categoryInnerFileDate == forInnerCategoryDate)
                             {
-                                categoryList = categoryFileData.Skip(1).SelectMany(x => new List<Categories>
+                                categoryList = categoryFileData.Skip(1).SkipLast(1).SelectMany(x => new List<Categories>
                                     {
                                     new()
                                     {
-                                      Division=Regex.Replace(x.Substring(0,2),regex,""),
+                                        Division=Regex.Replace(x.Substring(0,2),regex,""),
                                         DivisionName=Regex.Replace(x.Substring(2,30),regex,""),
                                         Category=Regex.Replace(x.Substring(32,6),regex,""),
                                         CategoryName=Regex.Replace(x.Substring(38,40),regex,""),
@@ -1740,6 +1747,7 @@ namespace TOMI.Services.Repository
                                     }
                                     }).ToList();
                             }
+                           
                             await _context.BulkInsertAsync(categoryList);
                             stopwatch.Stop();
                             timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
@@ -1752,10 +1760,10 @@ namespace TOMI.Services.Repository
                                     {
                                     new()
                                     {
-                                    Header=y.Substring(0,6),
-                                    FileName=y.Substring(7,11),
-                                    StoreNumber=y.Substring(18,4),
-                                    FileDate=string.Format("{0:MMyy}",y.Substring(24,4)),
+                                                Header=y.Substring(0,6),
+                                            FileName=y.Substring(8,8),
+                                            StoreNumber=y.Substring(18,4),
+                                            FileDate=exDate,
                                     Category="Category",
                                     }}).ToList();
                             await _context.BulkInsertAsync(fileStores);
@@ -1801,7 +1809,7 @@ namespace TOMI.Services.Repository
             return new FileUplaodRespone
             {
                 Success = false,
-                Error = "Some errors occurred!" + innerDataError
+                Error = "Some errors occurred!"
             };
 
         }
