@@ -33,15 +33,11 @@ namespace TOMI.Services.Repository
         public async Task<List<StockAdjustment>> GetLabelDetailsAsync()
         {
             return await _context.StockAdjustment.Include(x => x.OrderJob).OrderBy(x => x.Rec).ToListAsync();
-
         }
-
         public async Task<List<StockAdjustment>> GetExtendedPricesAsync()
         {
             return await _context.StockAdjustment.Include(x => x.OrderJob).OrderBy(x => x.Tag).ToListAsync();
         }
-
-
         //public List<Stock> GetUncountedItemsAsync()
         //{
         //    var query = (from a in _context.Stock
@@ -77,7 +73,7 @@ namespace TOMI.Services.Repository
             }
             catch (Exception ex)
             {
-                throw ex;
+                throw new Exception(ex.ToString());
             }
         }
 
@@ -107,7 +103,7 @@ namespace TOMI.Services.Repository
             catch (Exception ex)
             {
 
-                throw ex;
+                throw new Exception(ex.ToString());
             }
         }
         public async Task<List<StockAdjustment>> GetCorrectionsReportAsync()
@@ -139,15 +135,8 @@ namespace TOMI.Services.Repository
             }
             catch (Exception ex)
             {
-
-
-
-                throw ex;
+                throw new Exception(ex.ToString());
             }
-
-
-
-
         }
 
         public async Task<List<StockAdjustment>> GetDateTimeCheckReport()
@@ -155,12 +144,15 @@ namespace TOMI.Services.Repository
             return await _context.StockAdjustment.Include(x => x.OrderJob).OrderBy(x => x.Tag).Take(500).ToListAsync();
         }
 
+        public async Task<List<Departments>> GetDepartments()
+        {
+            return await _context.Departments.OrderBy(x => x.DepartmentName).ToListAsync();
+        }
 
+        public async Task<List<Ranges>> GetRangesforReport()
+        {
+            return await _context.Ranges.OrderBy(x => x.Id).ToListAsync();
+        }
     }
-        //public async Task<List<StockAdjustment>> GetLabelDetailsAsync(FilterDataModel filterDataModel)
-        //{
-        //    throw new NotImplementedException();
-        //}
-
     }
 

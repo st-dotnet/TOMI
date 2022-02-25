@@ -28,9 +28,7 @@ namespace TOMI.Services.Repository
         }
         public async Task<FileStore> GetFileStoreAsync(FileStoreModel model)
         {
-            return await _context.FileStore.FirstOrDefaultAsync(x => x.StoreNumber == model.Store && x.FileDate == model.Date && x.Category == model.Category ); 
-        }
-
-        
+             return await _context.FileStore.FirstOrDefaultAsync(x => x.StoreNumber == model.Store && x.FileDate == model.Date && x.Category == model.Category ); 
+        } 
     }
 }
