@@ -51,9 +51,12 @@ namespace TOMI.Services.Models
 
     public class Empdata
     {
-        public int EmpId { get; set; }
+        public string EmpNumber { get; set; }
         public string EmpName { get; set; }
-
+        public string LastName { get; set; }
+        //public string Postion { get; set; }
+        //public string inventory_key { get; set; }
+      
     }
 
     public class EmpdataDataResponse

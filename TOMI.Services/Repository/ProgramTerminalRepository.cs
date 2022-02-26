@@ -99,9 +99,10 @@ namespace TOMI.Services.Repository
 
                 List<Employee> emp = new List<Employee>
                 {
-                new Employee { EmpId = 1, EmpName = "Mario Moreno",inventory_key="12345" },
-                new Employee { EmpId = 2, EmpName = "Miguel Zavala",inventory_key="123456" },
-                new Employee { EmpId = 3, EmpName = "Manish Katoch", inventory_key="12345"}
+                new Employee {EmpNumber="4001OM", EmpName = "MIGUEL",LastName="OCAMPO HERNANDEZ",Postion="IM", inventory_key="12345" },
+                new Employee { EmpNumber="4001GA", EmpName = "GREGORIO",LastName="ADAN GONZALEZ",Postion="IM", inventory_key="12345"  },
+                new Employee { EmpNumber="4028MM", EmpName = "MARIO",LastName="MORENO",Postion="IT", inventory_key="12345" },
+                new Employee { EmpNumber="6023AP", EmpName = "ALFONSO",LastName="PRADO",Postion="AM", inventory_key="12345" }
                 };
 
                 await _context.BulkInsertAsync(emp);
@@ -151,8 +152,9 @@ namespace TOMI.Services.Repository
                                            where a.inventory_key == b.inventory_key
                                            select new Empdata
                                            {
-                                               EmpId = a.EmpId,
-                                               EmpName = a.EmpName
+                                              EmpNumber = a.EmpNumber,
+                                               EmpName = a.EmpName,
+                                               LastName=a.LastName
                                            }).Take(10)
                      .ToListAsync();
 
@@ -256,21 +258,6 @@ namespace TOMI.Services.Repository
                  _context.SaveChangesAsync();
 
                 return post;
-
-                //var ranges = _mapper.Map<MF1>(post);
-                //if (existingRanges == null)
-                //{
-                //    MF1 result = _context.MF1.Add(ranges).Entity;
-                //}
-                //else
-                //{
-                //    _context.MF1.Update(ranges);
-                //    await _context.SaveChangesAsync();
-                //    //return ranges;
-                //    return null;
-                //}
-
-                //.throw new ValidationException("Tag not found!");
             }
             catch (Exception ex)
             {

@@ -16,7 +16,9 @@ namespace TOMI.Services.Interfaces
         //List<Stock> GetUncountedItemsAsync();
         List<stockandorder> GetUncountedItemsAsync();
         List<StockAndStockAdjust> GetVariationBySKUAsync();
-
         Task<List<StockAdjustment>> GetCorrectionsReportAsync();
+        List<DeptAndStockAdjust> GetBreakDownReportAsync();
+        Task<List<Ranges>> GetTagsNotCountedReport();
+        Task<List<StockAdjustment>> GetDateTimeCheckReport();
     }
 }
