@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace TOMI.Data.Database.Entities
@@ -27,5 +28,7 @@ namespace TOMI.Data.Database.Entities
         public bool Isdeleted { get; set; }
         //public virtual Master Master { get; set; }
         public virtual OrderJob OrderJob { get; set; }
+
+       
     }
 }

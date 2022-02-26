@@ -51,12 +51,48 @@ namespace TOMI.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("GetMFData")]
-        public async Task<IActionResult> GetMFData(TerminalModel terminal)
+        public async Task<IActionResult> GetMFData(GetTerminalModel terminal)
         {
             try
             {
                 var response = await _programTerminalService.GetMFData(terminal);
                 return Ok(response.Value); 
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        /// <summary>
+        /// PostTerminal
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("PostTerminal")]
+        public async Task<IActionResult> PostTerminal(TerminalDataModels post)
+        {
+            try
+            {
+                return Ok(await _programTerminalService.PostTerminal(post));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        /// <summary>
+        /// Empdata
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost]
+        [Route("Empdata")]
+        public async Task<IActionResult> Empdata()
+        {
+            try
+            {
+                return Ok(await _programTerminalService.AddEmployeeData());
             }
             catch (Exception ex)
             {

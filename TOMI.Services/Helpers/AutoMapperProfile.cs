@@ -16,6 +16,8 @@ namespace TOMI.Services.Helpers
             CreateMap<RangesModel, Ranges>();
             CreateMap<GroupModel, Group>();
             CreateMap<StockAdjustmentModel, StockAdjustment>();
+            CreateMap<TerminalPost, MF1>();
+            CreateMap<TerminalDataModels, MF1>();
         }
     }
 }

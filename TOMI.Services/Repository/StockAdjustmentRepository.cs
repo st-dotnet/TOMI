@@ -46,16 +46,17 @@ namespace TOMI.Services.Repository
                 }
                 else
                 {
-                    var res = _mapper.Map<StockAdjustment>(model);
+                    //var res = _mapper.Map<StockAdjustment>(model);
                     stockAdjustment.Term = model.Term;
+                    stockAdjustment.Rec = model.Rec;
                     stockAdjustment.Dload = model.Dload;
                     stockAdjustment.Tag = model.Tag;
                     stockAdjustment.Shelf = model.Shelf;
                     stockAdjustment.Barcode = model.Barcode;
-                    stockAdjustment.SKU = model.SKU;
+                    stockAdjustment.Quantity = model.Quantity;
                     _context.StockAdjustment.Update(stockAdjustment);
                     await _context.SaveChangesAsync();
-                    return new StockAdjustmentResponse { Adjustment = res, Success = true };
+                    return new StockAdjustmentResponse { Adjustment = stockAdjustment, Success = true };
                 }
                 throw new ValidationException("Data not found!");
             }

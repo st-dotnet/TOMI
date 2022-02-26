@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using TOMI.Data.Database.Entities;
 
@@ -27,6 +28,75 @@ namespace TOMI.Services.Models
         public int CountType { get; set; }
         public string InventaryKey { get; set; }
 
+    }
+
+    public class GetTerminalModel
+    {
+       
+        public int CountType { get; set; }
+        public string InventaryKey { get; set; }
+
+    }
+
+    public class TerminalPost
+    {
+       public int Tag { get; set; }
+        public int? Shelf { get; set; }
+        public int? Quantity { get; set; }
+        public string Code { get; set; }
+        public List<ShelfList> ShelfList { get; set; }
+    }
+
+    public class TerminalDataModels
+    {
+        public Guid CustomerId { get; set; }
+        public Guid StoreId { get; set; }
+        public int Tag { get; set; }
+        public List<Shelves> Shelves { get; set; }
+    }
+
+    public class TerminalDataResponse
+    {
+        public Guid CustomerId { get; set; }
+        public Guid StoreId { get; set; }
+        public int Tag { get; set; }
+        public List<Shelves> Shelves { get; set; }
+    }
+
+    public class Shelves
+    {
+        public int? Shelf { get; set; }
+        public List<Products> products { get; set; }
+
+
+    }
+
+    public class Products
+    {
+        public string Code { get; set; }
+        public string Department { get; set; }
+        public int total_counted { get; set; }
+        public DateTimeOffset? Inventory_Date { get; set; }
+    }
+
+    public class ShelfList
+    {
+        public int? Shelf { get; set; }
+        public int? Quantity { get; set; }
+        public string Code { get; set; }
+    }
+
+    public class Taglist
+    {
+        public int Tag { get; set; }
+     
+    }
+
+    public class TerminalPostResponse
+    {
+        public List<Taglist> Taglist { get; set; }
+        public List<ShelfList> ShelfList { get; set; }
+        
     }
 
     public class MF2Model

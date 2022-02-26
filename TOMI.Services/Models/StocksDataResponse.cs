@@ -1,4 +1,7 @@
-﻿namespace TOMI.Services.Models
+﻿using System.Collections.Generic;
+using TOMI.Data.Database.Entities;
+
+namespace TOMI.Services.Models
 {
     public class StocksDataResponse
     {
@@ -11,4 +14,15 @@
         public string OHQuantity { get; set; }
         public string Unity { get; set; }
     }
+
+    public class StockDataResponse : BaseResponse
+    {
+        public Stock Stock { get; set; }
+    }
+
+    public class EmpDataResponse : BaseResponse
+    {
+        public Employee Employee { get; set; }
+    }
+
 }

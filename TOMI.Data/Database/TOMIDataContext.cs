@@ -25,11 +25,13 @@ namespace TOMI.Data.Database
         public DbSet<MF2> MF2 { get; set; }
         public DbSet<FileStore> FileStore { get; set; }
         public DbSet<UploadFileName> UploadFileName { get; set; }
+        public DbSet<Employee> Employee { get; set; }
 
 
         public TOMIDataContext(DbContextOptions<TOMIDataContext> options)
             : base(options)
         {
+            Database.SetCommandTimeout(150000);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -76,6 +78,13 @@ namespace TOMI.Data.Database
             .WithOne(c => c.Store)
             .HasForeignKey(x => x.StoreId)
             .OnDelete(DeleteBehavior.NoAction);
+
+           // modelBuilder.Entity<StockAdjustment>()
+           //.HasMany(c => c.Employee)
+           //.WithOne(c => c.StockAdjustment)
+           //.HasForeignKey(x => x.inventory_key)
+           //.OnDelete(DeleteBehavior.NoAction);
+
 
             modelBuilder.Entity<Customer>()
            .HasMany(c => c.MF1)

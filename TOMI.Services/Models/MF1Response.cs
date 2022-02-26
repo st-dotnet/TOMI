@@ -34,4 +34,62 @@ namespace TOMI.Services.Models
 
 
     }
+
+    public class PostData
+    {
+        public string Code { get; set; }
+        public decimal SalePrice { get; set; }
+        public int Tag { get; set; }
+        public int Shelf { get; set; }
+
+    }
+
+    public class PostDataResponse
+    {
+        public List<PostData> PostData { get; set; }
+    }
+
+    public class Empdata
+    {
+        public int EmpId { get; set; }
+        public string EmpName { get; set; }
+
+    }
+
+    public class EmpdataDataResponse
+    {
+        public List<Empdata> Empdata { get; set; }
+    }
+
+    public class MF1DataModel
+    {
+        public Guid Customer { get; set; }
+        public string Terminal { get; set; }
+        public string Store { get; set; }
+        public string EmployeeNumber { get; set; }
+        public DateTimeOffset InventoryDate { get; set; }
+        public string Department { get; set; }
+        public string Code { get; set; }
+        public decimal SalePrice { get; set; }
+        public int Tag { get; set; }
+        public int Shelf { get; set; }
+        public int Operation { get; set; }
+        public string InventoryKey { get; set; }
+        public int CountType { get; set; }
+        public int TotalCounted { get; set; }
+        public DateTime CountTime { get; set; }
+        public bool Nof { get; set; }
+        public bool CountedStatus { get; set; }
+
+        public int EmpId { get; set; }
+        public string EmpName { get; set; }
+
+
+    }
+
+    public class MF1AndEmp
+    {
+        public List<TerminalSmf> TerminalSmf { get; set; }
+        public List<Empdata> Empdata { get; set; }
+    }
 }
