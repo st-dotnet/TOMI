@@ -26,7 +26,7 @@ namespace TOMI.Data.Database
         public DbSet<FileStore> FileStore { get; set; }
         public DbSet<UploadFileName> UploadFileName { get; set; }
 
-
+        public DbSet<Employee> Employee { get; set; }
         public TOMIDataContext(DbContextOptions<TOMIDataContext> options)
             : base(options)
         {
@@ -56,10 +56,10 @@ namespace TOMI.Data.Database
           .HasForeignKey(x => x.SKU);
 
             modelBuilder.Entity<Store>()
- .HasOne(c => c.User)
- .WithOne(s => s.Store)
- .HasForeignKey<User>(x => x.StoreId)
- .OnDelete(DeleteBehavior.NoAction);
+             .HasOne(c => c.User)
+             .WithOne(s => s.Store)
+             .HasForeignKey<User>(x => x.StoreId)
+             .OnDelete(DeleteBehavior.NoAction);
             modelBuilder.Entity<MF2>()
              .HasMany(c => c.MF1)
              .WithOne(c => c.MF2)
@@ -82,19 +82,6 @@ namespace TOMI.Data.Database
            .WithOne(c => c.customer)
            .HasForeignKey(x => x.CustomerId)
            .OnDelete(DeleteBehavior.NoAction);
-
-           // modelBuilder.Entity<OrderJob>()
-           //.HasMany(c => c.MF2)
-           //.WithOne(c => c.OrderJob)
-           //.HasForeignKey(x => x.Id)
-           //.OnDelete(DeleteBehavior.NoAction);
-
-            //modelBuilder.Entity<OrderJob>()
-            // .HasMany(c => c.MF1)
-            // .WithOne(c => c.OrderJob)
-            // .HasForeignKey(x => x.Inventory_Date);
-
-
 
             this.SeedUsers(modelBuilder);
         }

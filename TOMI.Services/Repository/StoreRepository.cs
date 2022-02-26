@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
+using Microsoft.Data.SqlClient;
 using System.Diagnostics;
 using System.IO;
 using System.IO.Compression;
@@ -307,7 +309,8 @@ namespace TOMI.Services.Repository
                         return new FileUplaodRespone
                         {
                             Success = false,
-                            Error = $"Incorrect file with tempfileName : {tempfileName} , filetext:{filetext} , masterFileExtension:{masterFileExtension} , jobOrderStoreName:{jobOrderStoreName} , storeNumber:{storeNumber} , jobOrderDate:{jobOrderDate} , exDate:{exDate}"
+                          //  Error = $"Incorrect file with tempfileName : {tempfileName} , filetext:{filetext} , masterFileExtension:{masterFileExtension} , jobOrderStoreName:{jobOrderStoreName} , storeNumber:{storeNumber} , jobOrderDate:{jobOrderDate} , exDate:{exDate}"
+                             Error= "Incorrect file",
                         };
                     }
                     if (checkFileExtension != zipFileExtension)
@@ -561,7 +564,8 @@ namespace TOMI.Services.Repository
             return new FileUplaodRespone
             {
                 Success = false,
-                Error = $"Some errors occurred! forInnerStockDate : {forInnerStockDate} , innerDataError : {innerDataError}"
+              //  Error = $"Some errors occurred for mismatch date.! forInnerStockDate : {forInnerStockDate} , innerDataError : {innerDataError}"
+                Error = "Some errors occurred for mismatch date.",//! forInnerStockDate : {forInnerStockDate} , innerDataError : {innerDataError}"
             };
         }
         public async Task<FileUplaodRespone> DepartmentsData(FilterDataModel model)
@@ -570,12 +574,12 @@ namespace TOMI.Services.Repository
             logger.Info("DepartmentsData method started");
             bool isSaveSuccess = false;
             string fileName;
-            var innerDataError = model.StockDate.Value.Date.Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
+            var innerDataError = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
                 model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
             logger.Info("innerDataError for check error");
 
             var finaldeptartmentDate = model.StockDate.Value.Date.Month.ToString("#00") +
-              model.StockDate.Value.Date.Day.ToString("#00");
+              model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
 
             var departmentPreviousDate = model.StockDate.Value.Date.Month.ToString("#00") +
                    model.StockDate.Value.Date.AddDays(-2).Day.ToString("#00");
@@ -608,10 +612,7 @@ namespace TOMI.Services.Repository
                 var deptartmentStore = model.StoreId.ToString();
                 var deptartmentStoreName = model.StoreName.ToString().Substring(0, 4);
 
-                var deptartmentPreviousDate = model.StockDate.Value.Date.Month.ToString("#00") +
-                 model.StockDate.Value.Date.AddDays(-2).Day.ToString("#00");
-
-
+               
                 //  var forInnerStockDates = Convert.ToDateTime("35-13-2029");
                 logger.Info($"Get finaldeptartmentDate : {finaldeptartmentDate}");
 
@@ -619,7 +620,7 @@ namespace TOMI.Services.Repository
                 {
                     forInnerdeptartmentDate = model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString()
                          + model.StockDate.Value.Date.Month.ToString("#00")
-                         + model.StockDate.Value.Date.Day.ToString("#00");
+                         + model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
                     logger.Info($"Get forInnerdeptartmentDate : {forInnerdeptartmentDate}");
                 }
                 catch (Exception ex)
@@ -886,7 +887,8 @@ namespace TOMI.Services.Repository
             return new FileUplaodRespone
             {
                 Success = false,
-                Error = $"Some errors occurred! forInnerdeptartmentDate : {forInnerdeptartmentDate} , innerDataError : {innerDataError}"
+                // Error = $"Some errors occurred! forInnerdeptartmentDate : {forInnerdeptartmentDate} , innerDataError : {innerDataError}"
+                 Error = "Some errors occurred for mismatch date!",
             };
         }
         public async Task<FileUplaodRespone> ReservedData(FilterDataModel model)
@@ -895,6 +897,7 @@ namespace TOMI.Services.Repository
             bool isSaveSuccess = false;
             string fileName;
             List<Reserved> reservedList = new();
+            List<StockAdjustment> stockAdjustmentList = new();
             //for file header
             List<FileStore> fileStores = new();
             //for file name
@@ -1000,21 +1003,57 @@ namespace TOMI.Services.Repository
                             {
                                 if (reservedInnerFileName == reservedFileExtension && reservedInnerStoreNumber == storeNumber && reservedInnerFileDate == finalInnerreservedDate)
                                 {
-                                        reservedList = ReservedFile.Skip(1).SkipLast(1).SelectMany(x => new List<Reserved>
-                                        {
-                                        new()
-                                        {
-                                            Store=Regex.Replace(x.Substring(0,4),regex,""),
-                                            Code=Regex.Replace(x.Substring(4,14),regex,""),
-                                            Quantity=Regex.Replace(x.Substring(18,9),regex,""),
-                                            Filler=Regex.Replace(x.Substring(27,1),regex,""),
-                                            CustomerId = model.CustomerId,
-                                            StoreId = model.StoreId,
-                                            StockDate = model.StockDate,
-                                        }
-                                        }).ToList();
-                                        await _context.BulkInsertAsync(reservedList);
-                                        stopwatch.Stop();
+                                    reservedList = ReservedFile.Skip(1).SkipLast(1).SelectMany(x => new List<Reserved>
+                                    {
+                                    new()
+                                    {
+                                        Store=Regex.Replace(x.Substring(0,4),regex,""),
+                                        Code=Regex.Replace(x.Substring(4,14),regex,""),
+                                        Quantity=Regex.Replace(x.Substring(18,9),regex,""),
+                                        Filler=Regex.Replace(x.Substring(27,1),regex,""),
+                                        CustomerId = model.CustomerId,
+                                        StoreId = model.StoreId,
+                                        StockDate = model.StockDate,
+                                    }
+                                    }).ToList();
+                                      // await _context.BulkInsertAsync(reservedList);
+                                     //   var customerId = new SqlParameter("@customerId", model.CustomerId);
+                                     //   await _context.StockAdjustment.FromSqlRaw("EXECUTE dbo.AutoAppendReservedRecords {0}", customerId).ToListAsync();
+                                    var query = (from b in _context.OrderJob
+                                                 join a in _context.Reserved on b.Code equals a.Code
+                                                 select new ReservedAndOrderModel
+                                                 {
+                                                     SKU = b.Id,
+                                                     barCode=a.Code,
+                                                     NOF=false,
+                                                     Isactive=false,
+                                                     Isdeleted=false,
+                                                     Tag="3001",
+                                                     Qty=Convert.ToDouble(a.Quantity),
+                                                     Shelf="01",
+                                                     Date= a.CreatedAt,
+                                                 }).ToList();
+
+                                    stockAdjustmentList = query.SelectMany(x => new List<StockAdjustment>
+                                    {
+                                    new()
+                                    {
+                                        SKU=x.SKU,
+                                        Barcode=x.barCode,
+                                        NOF=0,
+                                        Isdeleted=x.Isdeleted,
+                                        Tag=Convert.ToInt32(x.Tag),
+                                        Shelf=Convert.ToInt32(x.Shelf),
+                                        Quantity=(int?)x.Qty,
+                                        CreatedAt=x.Date,
+                                    }
+                                    }).ToList();
+                                    await _context.BulkInsertAsync(stockAdjustmentList);
+
+                                    //  await _context.Reserved.FromSqlRaw(@"exec AutoAppendReservedRecords").ToListAsync();
+                                    // var results = _context.Reserved.FromSqlRaw("INSERT INTO StockAdjustment (Id, Barcode, IsActive, SKU, NOF, Isdeleted, Tag, Shelf, Quantity, CreatedAt) SELECT  NEWID() AS Id, Reserved.Code, Reserved.IsActive, OrderJob.Id AS JobOrderId, 0 AS nof, 0 AS isDeleted, 3001 AS Tag, 01 AS shelf, CAST(CAST(Reserved.Quantity AS NUMERIC) AS INT) AS Qty, { fn NOW() } AS Date FROM Reserved INNER JOIN OrderJob ON Reserved.Code = OrderJob.Code");
+
+                                    stopwatch.Stop();
                                         timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
                                         uploadFileNames = new List<UploadFileName> { new() { FileName = tempfileName.Substring(0, 4), StoreNumber = tempfileName.Substring(4, 4), FileDate = tempfileName.Substring(9, 4), Category = "Reserved" } };
                                         await _context.BulkInsertAsync(uploadFileNames);
@@ -1191,7 +1230,7 @@ namespace TOMI.Services.Repository
             string regex = "^0+(?!$)";
             bool isSaveSuccess = false;
             string fileName;
-            var innerDataError = model.StockDate.Value.Date.Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
+            var innerDataError = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
                 model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
             List<Stock> stockList = new();
             //for file header
@@ -1222,7 +1261,7 @@ namespace TOMI.Services.Repository
                 var stockStoreName = model.StoreName.ToString().Substring(0, 4);
 
                 var finalStockDate = model.StockDate.Value.Date.Month.ToString("#00") +
-                   model.StockDate.Value.Date.Day.ToString("#00");
+                   model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
                 //  var forInnerStockDates = Convert.ToDateTime("35-13-2029");
 
                 logger.Info($"Get StockData : {finalStockDate}");
@@ -1232,7 +1271,7 @@ namespace TOMI.Services.Repository
                 {
                     forInnerStockDate = model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString()
                          + model.StockDate.Value.Date.Month.ToString("#00")
-                         + model.StockDate.Value.Date.Day.ToString("#00");
+                         + model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
 
                 }
                 catch (Exception ex)
@@ -1502,7 +1541,7 @@ namespace TOMI.Services.Repository
             string regex = "^0+(?!$)";
             bool isSaveSuccess = false;
             string fileName;
-            var innerDataError = model.StockDate.Value.Date.Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
+            var innerDataError = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
                 model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
 
             List<Categories> categoryList = new();
@@ -1532,7 +1571,7 @@ namespace TOMI.Services.Repository
                 var categoryStoreName = model.StoreName.ToString().Substring(0, 4);
 
                 var finalCategoryDate = model.StockDate.Value.Date.Month.ToString("#00") +
-                   model.StockDate.Value.Date.Day.ToString("#00"); ;
+                   model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00"); ;
                 //  var forInnerStockDates = Convert.ToDateTime("35-13-2029");
 
                 var categoryPreviousDate = model.StockDate.Value.Date.Month.ToString("#00") +
@@ -1543,7 +1582,7 @@ namespace TOMI.Services.Repository
                 {
                     forInnerCategoryDate = model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString()
                          + model.StockDate.Value.Date.Month.ToString("#00")
-                         + model.StockDate.Value.Date.Day.ToString("#00");
+                         + model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
                 }
                 catch (Exception ex)
                 {
@@ -1585,7 +1624,8 @@ namespace TOMI.Services.Repository
                                 return new FileUplaodRespone
                                 {
                                     Success = false,
-                                    Error = $"Incorrect file with tempfileName : {tempfileName} , filetext:{filetext} , categoryFileExtension:{checkFileExtension} , categoryStoreName:{categoryStoreName} , storeNumber:{storeNumber} , jobOrderDate:{categoryDate} , exDate:{exDate}"
+                                    // Error = $"Incorrect file with tempfileName : {tempfileName} , filetext:{filetext} , categoryFileExtension:{checkFileExtension} , categoryStoreName:{categoryStoreName} , storeNumber:{storeNumber} , jobOrderDate:{categoryDate} , exDate:{exDate}"
+                                    Error = "Incorrect file",// with tempfileName : {tempfileName} , filetext:{filetext} , categoryFileExtension:{checkFileExtension} , categoryStoreName:{categoryStoreName}
                                 };
                             }
                             // condition 

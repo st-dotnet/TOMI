@@ -81,7 +81,11 @@ namespace TOMI.Services.Repository
                 }
                 await _context.BulkInsertAsync(mf2);
 
+
+
                 await _context.BulkInsertAsync(mf1);
+
+
 
                 return new TerminalResponse { Success = true };
             }
@@ -91,37 +95,111 @@ namespace TOMI.Services.Repository
             }
         }
 
-        public async Task<JsonResult> GetMFData(TerminalModel terminal)
+
+
+        public async Task<EmpDataResponse> AddEmployeeData()
         {
             try
             {
-                var mF1 = await _context.MF1.Include(c => c.MF2)
-                     .Where(x => x.count_type == terminal.CountType && x.inventory_key == x.inventory_key)
-                     .Select(x => new TerminalSmf
-                     {
-                         Code=x.Code,
-                         CountedStatus=x.counted_status,
-                         Department=x.MF2.Department,
-                         Customer= x.CustomerId,
-                         Terminal=x.Terminal,
-                         Store= x.Store.Name, 
-                         EmployeeNumber=x.Employee_Number,
-                         InventoryDate=(DateTimeOffset)x.Inventory_Date,
-                         SalePrice=x.Sale_Price,
-                         Tag=x.tag,
-                         Shelf=x.shelf,
-                         Operation=x.operation,
-                         InventoryKey=x.inventory_key,
-                         CountType=x.count_type,
-                         TotalCounted=x.total_counted,
-                         CountTime=x.count_time,
-                         Nof=x.nof
 
-                     })
-                     .ToListAsync(); 
-                var data = mF1.Take(10);
-                return new JsonResult(data);
+                List<Employee> emp = new List<Employee>
+                {
+                new Employee {EmpNumber="4001OM", EmpName = "MIGUEL",LastName="OCAMPO HERNANDEZ",Postion="IM", inventory_key="12345" },
+                new Employee { EmpNumber="4001GA", EmpName = "GREGORIO",LastName="ADAN GONZALEZ",Postion="IM", inventory_key="12345" },
+                new Employee { EmpNumber="4028MM", EmpName = "MARIO",LastName="MORENO",Postion="IT", inventory_key="12345" },
+                new Employee { EmpNumber="6023AP", EmpName = "ALFONSO",LastName="PRADO",Postion="AM", inventory_key="12345" }
+                };
 
+                await _context.BulkInsertAsync(emp);
+
+                return new EmpDataResponse { Success = true };
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+        public async Task<JsonResult> GetMFData(GetTerminalModel terminal)
+        {
+            MF1AndEmp mF1AndEmp = new();
+            try
+            {
+                mF1AndEmp.TerminalSmf = await _context.MF1.Include(c => c.MF2)
+                .Where(x => x.count_type == terminal.CountType && x.inventory_key == x.inventory_key)
+                .Select(x => new TerminalSmf
+                {
+                    Code = x.Code,
+                    CountedStatus = x.counted_status,
+                    Department = x.MF2.Department,
+                    Customer = x.CustomerId,
+                    Terminal = x.Terminal,
+                    Store = x.Store.Name,
+                    EmployeeNumber = x.Employee_Number,
+                    InventoryDate = (DateTimeOffset)x.Inventory_Date,
+                    SalePrice = x.Sale_Price,
+                    Tag = x.tag,
+                    Shelf = x.shelf,
+                    Operation = x.operation,
+                    InventoryKey = x.inventory_key,
+                    CountType = x.count_type,
+                    TotalCounted = x.total_counted,
+                    CountTime = x.count_time,
+                    Nof = x.nof
+                })
+                .ToListAsync();
+
+                mF1AndEmp.Empdata = await (from a in _context.Employee
+                                           select new Empdata
+                                           {
+                                               EmpNumber = a.EmpNumber,
+                                               EmpName = a.EmpName,
+                                               LastName = a.LastName
+                                           })
+                .ToListAsync();
+
+                return new JsonResult(mF1AndEmp);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+        public async Task<TerminalDataModels> PostTerminal(TerminalDataModels post)
+        {
+            try
+            {
+                List<MF1> mf1 = new();
+                MF1 existingRanges = await _context.MF1.FirstOrDefaultAsync(c => c.tag == post.Tag);
+                MF1 mF = new MF1();
+                var posts = post.Shelves;
+
+
+
+                foreach (var item in posts)
+                {
+                    mF = new MF1();
+                    mF.Id = new Guid();
+                    mF.tag = post.Tag;
+                    mF.shelf = (int)item.Shelf;
+                    mF.CustomerId = post.CustomerId;
+                    mF.StoreId = post.StoreId;
+                    foreach (var item1 in item.products)
+                    {
+                        mF.Code = item1.Code;
+                        mF.Department = item1.Department;
+                        mF.total_counted = item1.total_counted;
+                        mF.Inventory_Date = item1.Inventory_Date;
+                        mf1.Add(mF);
+                    }
+
+                }
+
+                await _context.BulkInsertAsync(mf1);
+                // _context.SaveChangesAsync();
+
+
+
+                return post;
             }
             catch (Exception ex)
             {
@@ -129,27 +207,6 @@ namespace TOMI.Services.Repository
             }
         }
 
-        public async Task<TerminalPost> PostTerminal(TerminalPost post)
-        {
-            try
-            {
-                //MF1 IsExisting = await _context.MF1.FirstOrDefaultAsync(x=>x.tag==post.Tag);
-                var map = _mapper.Map<MF1>(post);
 
-                var result = _context.MF1.Add(map).Entity;
-                await _context.SaveChangesAsync();
-                return post;
-
-
-
-            }
-            catch (Exception ex)
-            {
-
-
-
-                throw ex;
-            }
-        }
     }
 }

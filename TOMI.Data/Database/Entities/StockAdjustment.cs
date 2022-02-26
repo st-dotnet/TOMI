@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TOMI.Data.Database.Entities
 {
@@ -11,7 +12,7 @@ namespace TOMI.Data.Database.Entities
         }
 
         [Key]
-        public Guid Id { get; set; }
+        public Guid? Id { get; set; }
         public int? Empno { get; set; }
 
         public int? Rec { get; set; }
