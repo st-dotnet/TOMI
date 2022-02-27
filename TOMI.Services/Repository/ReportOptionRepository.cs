@@ -29,11 +29,26 @@ namespace TOMI.Services.Repository
         {
             return await _context.StockAdjustment.Include(x => x.OrderJob).ToListAsync();
         }
-
-        public async Task<List<StockAdjustment>> GetLabelDetailsAsync()
+        public async Task<List<StockAdjustment>> GetLabelDetailsAsync(int tag)
         {
-            return await _context.StockAdjustment.Include(x => x.OrderJob).OrderBy(x => x.Rec).ToListAsync();
+            if (tag != null)
+            {
+                return await _context.StockAdjustment.Include(x => x.OrderJob).Where(x => x.Tag >= tag && x.Tag <= tag).OrderBy(x => x.Rec).ToListAsync();
+            }
+            else
+            {
+                return await _context.StockAdjustment.Include(x => x.OrderJob).OrderBy(x => x.Rec).ToListAsync();
+            }
+
+
+
         }
+        //  public async Task<List<StockAdjustment>> GetLabelDetailsAsync()
+        //   {
+        //     return await _context.StockAdjustment.Include(x => x.OrderJob).OrderBy(x => x.Rec).ToListAsync();
+        // var customerId = new SqlParameter("@customerId", model.CustomerId);
+        //  return  await _context.StockAdjustment.FromSqlRaw("EXECUTE dbo.DetailLabelRecords").ToListAsync();
+        //}
         public async Task<List<StockAdjustment>> GetExtendedPricesAsync()
         {
             return await _context.StockAdjustment.Include(x => x.OrderJob).OrderBy(x => x.Tag).ToListAsync();
@@ -51,67 +66,108 @@ namespace TOMI.Services.Repository
         //                     pg.FirstOrDefault().PrecVtaNorm,
         //                     b.Code
         //                 }).ToList();
-           
+
         //    return query.ToList();
         //}
 
-        public List<stockandorder> GetUncountedItemsAsync()
+        public List<stockandorder> GetUncountedItemsAsync(string department)
         {
             try
             {
-                var query = (from b in _context.OrderJob
-                            join a in _context.Stock on b.Department equals a.Departament
-                            select new stockandorder
-                            {
-                                SKU = a.SKU,
-                                Description = a.Description,
-                                SOH = a.SOH,
-                                PrecVtaNorm = a.PrecVtaNorm,
-                                Code = b.Code
-                            }).Take(20).ToList();
-                return query;
+                if (department != null)
+                {
+                    var query = (from b in _context.OrderJob
+                                 join a in _context.Stock on b.Department equals a.Departament
+                                 where b.Department == department
+                                 select new stockandorder
+                                 {
+                                     SKU = a.SKU,
+                                     Description = a.Description,
+                                     SOH = a.SOH,
+                                     PrecVtaNorm = a.PrecVtaNorm,
+                                     Code = b.Code
+                                 }).Take(500).ToList();
+                    return query;
+                }
+                else
+                {
+                    var query = (from b in _context.OrderJob
+                                     // group a by a.SKU into pg
+                                 join a in _context.Stock on b.Department equals a.Departament
+                                 // where b.Department=="128"
+                                 select new stockandorder
+                                 {
+                                     SKU = a.SKU,
+                                     Description = a.Description,
+                                     SOH = a.SOH,
+                                     PrecVtaNorm = a.PrecVtaNorm,
+                                     Code = b.Code
+                                 }).Take(500).ToList();
+                    return query;
+                }
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.ToString());
             }
         }
-
-
-        public List<StockAndStockAdjust> GetVariationBySKUAsync()
+        public List<StockAndStockAdjust> GetVariationBySKUAsync(string department)
         {
             try
             {
-                var query = (from a in _context.Stock
-                             join c in _context.OrderJob on a.Departament equals c.Department
-                             join b in _context.StockAdjustment on c.Id equals b.SKU
-                             select new StockAndStockAdjust
-                             {
-                                 SKU = a.SKU,
-                                 Description = a.Description,
-                                 SOH = a.SOH,
-                                 PrecVtaNorm = a.PrecVtaNorm,
-                                 Quantity = (int)b.Quantity,
-                                 Barcode = b.Barcode,
-                                 Tag = (int)b.Tag,
-                                 Id = b.Rec
+                if (department != null)
+                {
+                    var query = (from a in _context.Stock
+                                 join c in _context.OrderJob on a.Departament equals c.Department
+                                 join b in _context.StockAdjustment on c.Id equals b.SKU
+                                 where a.Departament == department
+                                 select new StockAndStockAdjust
+                                 {
+                                     SKU = a.SKU,
+                                     Description = a.Description,
+                                     SOH = a.SOH,
+                                     PrecVtaNorm = a.PrecVtaNorm,
+                                     Quantity = (int)b.Quantity,
+                                     Barcode = b.Barcode,
+                                     Tag = (int)b.Tag,
+                                     Id = b.Id
 
-                             }).Take(20).ToList();
 
-                return query;
+
+                                 }).Take(20).ToList();
+
+
+
+                    return query;
+                }
+                else
+                {
+                    var query = (from a in _context.Stock
+                                 join c in _context.OrderJob on a.Departament equals c.Department
+                                 join b in _context.StockAdjustment on c.Id equals b.SKU
+                                 select new StockAndStockAdjust
+                                 {
+                                     SKU = a.SKU,
+                                     Description = a.Description,
+                                     SOH = a.SOH,
+                                     PrecVtaNorm = a.PrecVtaNorm,
+                                     Quantity = (int)b.Quantity,
+                                     Barcode = b.Barcode,
+                                     Tag = (int)b.Tag,
+                                     Id = b.Id
+                                 }).Take(20).ToList();
+                    return query;
+                }
             }
             catch (Exception ex)
             {
-
                 throw new Exception(ex.ToString());
             }
         }
         public async Task<List<StockAdjustment>> GetCorrectionsReportAsync()
         {
             return await _context.StockAdjustment.Include(x => x.OrderJob).OrderBy(x => x.Tag).Take(500).ToListAsync();
-
         }
-
         public List<DeptAndStockAdjust> GetBreakDownReportAsync()
         {
             try
@@ -128,9 +184,6 @@ namespace TOMI.Services.Repository
                                  SalePrice = c.SalePrice,
                                  PriceWithoutTaxes = c.PriceWithoutTaxes
                              }).Take(20).ToList();
-
-
-
                 return query;
             }
             catch (Exception ex)
@@ -138,7 +191,6 @@ namespace TOMI.Services.Repository
                 throw new Exception(ex.ToString());
             }
         }
-
         public async Task<List<StockAdjustment>> GetDateTimeCheckReport()
         {
             return await _context.StockAdjustment.Include(x => x.OrderJob).OrderBy(x => x.Tag).Take(500).ToListAsync();
