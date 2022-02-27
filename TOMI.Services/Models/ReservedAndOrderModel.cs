@@ -18,6 +18,7 @@ namespace TOMI.Services.Models
 
         public bool Isdeleted { get; set; }
         public bool Isactive { get; set; }
+        public string Department { get; set; }
 
         public DateTimeOffset? Date { get; set; }
     }

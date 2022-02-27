@@ -235,6 +235,7 @@ namespace TOMI.Services.Repository
             List<OrderJob> orderJobList = new();
             //for file header
             List<FileStore> fileStores = new();
+            List<FileStore> trailerRecords = new();
             //for file name
             List<UploadFileName> uploadFileNames = new();
             var stopwatch = new Stopwatch();
@@ -384,7 +385,28 @@ namespace TOMI.Services.Repository
                                     }
                                     }).ToList();
                                     logger.Info($"orderJobList data : {orderJobList}");
-                                 
+
+                                    //for TRAILER Records
+
+                                    trailerRecords = orderJobFile.TakeLast(1).SelectMany(y => new List<FileStore>
+                                        {
+                                        new()
+                                        {
+                                            RecordCount=y.Substring(29,6),
+                                        }}).ToList();  
+
+                                            // Replaces the matched
+                                            string str = Regex.Replace(trailerRecords[0].RecordCount, regex, "");
+                                            if (str == orderJobList.Count.ToString())
+                                            { }
+                                            else
+                                            {
+                                                return new FileUplaodRespone
+                                                {
+                                                    Success = false,
+                                                    Error = "TRAILER record not match."
+                                                };
+                                            }
                                         await _context.BulkInsertAsync(orderJobList);
                                         stopwatch.Stop();
                                         timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
@@ -476,6 +498,13 @@ namespace TOMI.Services.Repository
                             };
                         }
                         var zipOrderJobFile = File.ReadAllLines(destinationPath);
+                        //get the trailer records
+                        trailerRecords = zipOrderJobFile.TakeLast(1).SelectMany(y => new List<FileStore>
+                                        {
+                                        new()
+                                        {
+                                            RecordCount=y.Substring(29,6),
+                                        }}).ToList();
                         string regex = "^0+(?!$)";
                         string jobOrderInnerFileHeader = zipOrderJobFile[0].Substring(0, 6).Trim();
                         string jobOrderInnerFileName = zipOrderJobFile[0].Substring(7, 11).Trim();
@@ -504,7 +533,21 @@ namespace TOMI.Services.Repository
                                         }
                                         }).ToList();
                                 }
-                                await _context.BulkInsertAsync(orderJobList);
+
+                            // Replaces the matched
+                            string str = Regex.Replace(trailerRecords[0].RecordCount, regex, "");
+                            if (str == orderJobList.Count.ToString())
+                            { }
+                            else
+                            {
+                                return new FileUplaodRespone
+                                {
+                                    Success = false,
+                                    Error = "TRAILER record not match."
+                                };
+                            }
+
+                            await _context.BulkInsertAsync(orderJobList);
                                 stopwatch.Stop();
                                 timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
 
@@ -574,12 +617,12 @@ namespace TOMI.Services.Repository
             logger.Info("DepartmentsData method started");
             bool isSaveSuccess = false;
             string fileName;
-            var innerDataError = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
+            var innerDataError = model.StockDate.Value.Date.Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
                 model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
             logger.Info("innerDataError for check error");
 
             var finaldeptartmentDate = model.StockDate.Value.Date.Month.ToString("#00") +
-              model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
+              model.StockDate.Value.Date.Day.ToString("#00");
 
             var departmentPreviousDate = model.StockDate.Value.Date.Month.ToString("#00") +
                    model.StockDate.Value.Date.AddDays(-2).Day.ToString("#00");
@@ -589,6 +632,7 @@ namespace TOMI.Services.Repository
             List<Departments> departmentsList = new();
             //for file header
             List<FileStore> fileDepartment = new();
+            List<FileStore> trailerRecords = new();
             //for file name
             List<UploadFileName> uploadFileNames = new();
             var stopwatch = new Stopwatch();
@@ -612,7 +656,6 @@ namespace TOMI.Services.Repository
                 var deptartmentStore = model.StoreId.ToString();
                 var deptartmentStoreName = model.StoreName.ToString().Substring(0, 4);
 
-               
                 //  var forInnerStockDates = Convert.ToDateTime("35-13-2029");
                 logger.Info($"Get finaldeptartmentDate : {finaldeptartmentDate}");
 
@@ -620,7 +663,7 @@ namespace TOMI.Services.Repository
                 {
                     forInnerdeptartmentDate = model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString()
                          + model.StockDate.Value.Date.Month.ToString("#00")
-                         + model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
+                         + model.StockDate.Value.Date.Day.ToString("#00");
                     logger.Info($"Get forInnerdeptartmentDate : {forInnerdeptartmentDate}");
                 }
                 catch (Exception ex)
@@ -687,8 +730,15 @@ namespace TOMI.Services.Repository
                                 logger.Info($"stream");
                                 await model.File.CopyToAsync(stream);
                             }
-
                             var deptFileData = File.ReadAllLines(path);
+
+                            // for TRAILER
+                            trailerRecords = deptFileData.TakeLast(1).SelectMany(y => new List<FileStore>
+                                    {
+                                    new()
+                                    {
+                                        RecordCount=y.Substring(29,6),
+                                    }}).ToList();
 
                             //for the trailor
                             logger.Info($"After stream"); 
@@ -715,18 +765,20 @@ namespace TOMI.Services.Repository
                                         StockDate = model.StockDate,
                                         }
                                         }).ToList();
-
                                 }
-                                    //var trailorFileExist = _context.FileStore.FirstOrDefaultAsync(x => x.StoreNumber == deptartmentStoreName && x.Category == "DPTO" && x.Header == "TRAILER" && x.RecordCount != departmentsList.Count.ToString());
-                                    //if (trailorFileExist.Result != null)
-                                    //{
-                                    //    return new FileUplaodRespone
-                                    //    {
-                                    //        Success = false,
-                                    //        Error = "TRAILER master file count records not match."
-                                    //    };
-                                    //}
 
+                                //check the trailer validation
+                                        string records = Regex.Replace(trailerRecords[0].RecordCount, regex, "");
+                                        if (records == departmentsList.Count.ToString())
+                                        { }
+                                        else
+                                        {
+                                            return new FileUplaodRespone
+                                            {
+                                                Success = false,
+                                                Error = "TRAILER record not match."
+                                            };
+                                        }
                                     await _context.BulkInsertAsync(departmentsList);
                                     stopwatch.Stop();
                                     timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
@@ -805,7 +857,14 @@ namespace TOMI.Services.Repository
                                 Error = "Department zip file is already uploaded."
                             };
                         }
-                        var zipDepartmentFile = File.ReadAllLines(destinationPath); 
+                        var zipDepartmentFile = File.ReadAllLines(destinationPath);
+                        // get trailer records
+                        trailerRecords = zipDepartmentFile.TakeLast(1).SelectMany(y => new List<FileStore>
+                                    {
+                                    new()
+                                    {
+                                        RecordCount=y.Substring(29,6),
+                                    }}).ToList();
 
                         await _context.BulkInsertAsync(fileDepartment);
                         string deptInnerFileHeader = zipDepartmentFile[0].Substring(0, 6).Trim();
@@ -831,8 +890,19 @@ namespace TOMI.Services.Repository
                                     }
                                     }).ToList();
                             }
-                            
-                                await _context.BulkInsertAsync(departmentsList);
+                            //check the trailer validation
+                            string records = Regex.Replace(trailerRecords[0].RecordCount, regex, "");
+                            if (records == departmentsList.Count.ToString())
+                            { }
+                            else
+                            {
+                                return new FileUplaodRespone
+                                {
+                                    Success = false,
+                                    Error = "TRAILER record not match."
+                                };
+                            }
+                            await _context.BulkInsertAsync(departmentsList);
                                 stopwatch.Stop();
                                 timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
                                 uploadFileNames = new List<UploadFileName> { new() { FileName = tempfileName.Substring(0, 4), StoreNumber = tempfileName.Substring(4, 4), FileDate = tempfileName.Substring(9, 4), Category = "DPTO" } };
@@ -900,6 +970,7 @@ namespace TOMI.Services.Repository
             List<StockAdjustment> stockAdjustmentList = new();
             //for file header
             List<FileStore> fileStores = new();
+            List<FileStore> trailerRecords = new();
             //for file name
             List<UploadFileName> uploadFileNames = new();
             var stopwatch = new Stopwatch();
@@ -988,8 +1059,18 @@ namespace TOMI.Services.Repository
                             {
                                 await model.File.CopyToAsync(stream);
                             }
-                            var ReservedFile = File.ReadAllLines(path); 
-                                                                         
+                            var ReservedFile = File.ReadAllLines(path);
+
+
+                            // get the trailer records 
+                            trailerRecords = ReservedFile.TakeLast(1).SelectMany(y => new List<FileStore>
+                            {
+                            new()
+                            {
+                            RecordCount=y.Substring(29,6),
+                            }}).ToList();
+
+
                             //await _context.BulkInsertAsync(fileStores);
 
                             // for inner header
@@ -1007,8 +1088,8 @@ namespace TOMI.Services.Repository
                                     {
                                     new()
                                     {
-                                        Store=Regex.Replace(x.Substring(0,4),regex,""),
-                                        Code=Regex.Replace(x.Substring(4,14),regex,""),
+                                        Store=x.Substring(0,4),
+                                        Code=x.Substring(4,14),
                                         Quantity=Regex.Replace(x.Substring(18,9),regex,""),
                                         Filler=Regex.Replace(x.Substring(27,1),regex,""),
                                         CustomerId = model.CustomerId,
@@ -1016,10 +1097,25 @@ namespace TOMI.Services.Repository
                                         StockDate = model.StockDate,
                                     }
                                     }).ToList();
-                                      // await _context.BulkInsertAsync(reservedList);
+
+                                    // Replaces the matched
+                                    string str = Regex.Replace(trailerRecords[0].RecordCount, regex, "");
+                                    if (str == reservedList.Count.ToString())
+                                    { }
+                                    else
+                                    {
+                                        return new FileUplaodRespone
+                                        {
+                                            Success = false,
+                                            Error = "TRAILER record not match."
+                                        };
+                                    }
+
+
+                                    await _context.BulkInsertAsync(reservedList);
                                      //   var customerId = new SqlParameter("@customerId", model.CustomerId);
                                      //   await _context.StockAdjustment.FromSqlRaw("EXECUTE dbo.AutoAppendReservedRecords {0}", customerId).ToListAsync();
-                                    var query = (from b in _context.OrderJob
+                                        var query = (from b in _context.OrderJob
                                                  join a in _context.Reserved on b.Code equals a.Code
                                                  select new ReservedAndOrderModel
                                                  {
@@ -1032,12 +1128,24 @@ namespace TOMI.Services.Repository
                                                      Qty=Convert.ToDouble(a.Quantity),
                                                      Shelf="01",
                                                      Date= a.CreatedAt,
+                                                     Department=b.Department,
                                                  }).ToList();
 
+
+                                    int maxLength = _context.StockAdjustment.Select(x => x.Rec).Count();
+                                    if(maxLength==0)
+                                    {
+                                        maxLength = 1;
+                                    }
+                                    else
+                                    {
+                                        maxLength = _context.StockAdjustment.Select(x => x.Rec).Count() + 1;
+                                    }
                                     stockAdjustmentList = query.SelectMany(x => new List<StockAdjustment>
                                     {
                                     new()
                                     {
+                                        Rec=maxLength,
                                         SKU=x.SKU,
                                         Barcode=x.barCode,
                                         NOF=0,
@@ -1046,6 +1154,9 @@ namespace TOMI.Services.Repository
                                         Shelf=Convert.ToInt32(x.Shelf),
                                         Quantity=(int?)x.Qty,
                                         CreatedAt=x.Date,
+                                        Dload=1,
+                                        Term="99999", 
+                                        Department=Convert.ToInt32(x.Department),
                                     }
                                     }).ToList();
                                     await _context.BulkInsertAsync(stockAdjustmentList);
@@ -1135,8 +1246,14 @@ namespace TOMI.Services.Repository
                                 Error = "Reserved zip file is already uploaded."
                             };
                         }
-                        var zipReservedFile = File.ReadAllLines(destinationPath); 
-
+                        var zipReservedFile = File.ReadAllLines(destinationPath);
+                        // get the trailer records 
+                        trailerRecords = zipReservedFile.TakeLast(1).SelectMany(y => new List<FileStore>
+                            {
+                            new()
+                            {
+                            RecordCount=y.Substring(29,6),
+                            }}).ToList();
                         await _context.BulkInsertAsync(fileStores);
                         string jobOrderInnerFileHeader = zipReservedFile[0].Substring(0, 6).Trim();
                         string jobOrderInnerFileName = zipReservedFile[0].Substring(7, 11).Trim();
@@ -1161,7 +1278,20 @@ namespace TOMI.Services.Repository
                                     }
                                     }).ToList();
                             }
-                                await _context.BulkInsertAsync(reservedList);
+
+                            // Replaces the matched
+                            string str = Regex.Replace(trailerRecords[0].RecordCount, regex, "");
+                            if (str == reservedList.Count.ToString())
+                            { }
+                            else
+                            {
+                                return new FileUplaodRespone
+                                {
+                                    Success = false,
+                                    Error = "TRAILER record not match."
+                                };
+                            }
+                            await _context.BulkInsertAsync(reservedList);
                                 stopwatch.Stop();
                                 timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
 
@@ -1230,11 +1360,12 @@ namespace TOMI.Services.Repository
             string regex = "^0+(?!$)";
             bool isSaveSuccess = false;
             string fileName;
-            var innerDataError = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
+            var innerDataError = model.StockDate.Value.Date.Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
                 model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
             List<Stock> stockList = new();
             //for file header
             List<FileStore> fileStores = new();
+            List<FileStore> trailerRecords = new();
             //for file name
             List<UploadFileName> uploadFileNames = new();
             var stopwatch = new Stopwatch();
@@ -1261,7 +1392,7 @@ namespace TOMI.Services.Repository
                 var stockStoreName = model.StoreName.ToString().Substring(0, 4);
 
                 var finalStockDate = model.StockDate.Value.Date.Month.ToString("#00") +
-                   model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
+                   model.StockDate.Value.Date.Day.ToString("#00");
                 //  var forInnerStockDates = Convert.ToDateTime("35-13-2029");
 
                 logger.Info($"Get StockData : {finalStockDate}");
@@ -1271,7 +1402,7 @@ namespace TOMI.Services.Repository
                 {
                     forInnerStockDate = model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString()
                          + model.StockDate.Value.Date.Month.ToString("#00")
-                         + model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
+                         + model.StockDate.Value.Date.Day.ToString("#00");
 
                 }
                 catch (Exception ex)
@@ -1330,9 +1461,15 @@ namespace TOMI.Services.Repository
                             {
                                 await model.File.CopyToAsync(stream);
                             }
-                            var stockFileData = File.ReadAllLines(path); 
-
-                           // await _context.BulkInsertAsync(fileStores);
+                            var stockFileData = File.ReadAllLines(path);
+                            // get the trailer records 
+                            trailerRecords = stockFileData.TakeLast(1).SelectMany(y => new List<FileStore>
+                            {
+                            new()
+                            {
+                            RecordCount=y.Substring(29,6),
+                            }}).ToList();
+                            // await _context.BulkInsertAsync(fileStores);
                             // for inner header
                             string stockInnerFileHeader = stockFileData[0].Substring(0, 6).Trim();
                             string stockInnerFileName = stockFileData[0].Substring(7, 11).Trim();
@@ -1361,7 +1498,20 @@ namespace TOMI.Services.Repository
                                         StockDate = model.StockDate,
                                     }
                                     }).ToList();
-                                        await _context.BulkInsertAsync(stockList);
+
+                                    // Replaces the matched
+                                    string str = Regex.Replace(trailerRecords[0].RecordCount, regex, "");
+                                    if (str == stockList.Count.ToString())
+                                    { }
+                                    else
+                                    {
+                                        return new FileUplaodRespone
+                                        {
+                                            Success = false,
+                                            Error = "TRAILER record not match."
+                                        };
+                                    }
+                                    await _context.BulkInsertAsync(stockList);
                                         stopwatch.Stop();
                                         timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
                                         uploadFileNames = new List<UploadFileName> { new() { FileName = tempfileName.Substring(0, 4), StoreNumber = tempfileName.Substring(4, 4), FileDate = tempfileName.Substring(9, 4), Category = "Stock" } };
@@ -1444,8 +1594,14 @@ namespace TOMI.Services.Repository
                                 Error = "Stock zip file is already uploaded."
                             };
                         }
-                        var zipStockFile = File.ReadAllLines(destinationPath); 
-
+                        var zipStockFile = File.ReadAllLines(destinationPath);
+                        // get the trailer records 
+                        trailerRecords = zipStockFile.TakeLast(1).SelectMany(y => new List<FileStore>
+                            {
+                            new()
+                            {
+                            RecordCount=y.Substring(29,6),
+                            }}).ToList();
                         string stockInnerFileHeader = zipStockFile[0].Substring(0, 6).Trim();
                         string stockInnerFileName = zipStockFile[0].Substring(7, 11).Trim();
                         string stockInnerStoreNumber = zipStockFile[0].Substring(18, 4).Trim();
@@ -1473,7 +1629,20 @@ namespace TOMI.Services.Repository
                                     }
                                     }).ToList();
                             }
-                                await _context.BulkInsertAsync(stockList);
+
+                            // Replaces the matched
+                            string str = Regex.Replace(trailerRecords[0].RecordCount, regex, "");
+                            if (str == stockList.Count.ToString())
+                            { }
+                            else
+                            {
+                                return new FileUplaodRespone
+                                {
+                                    Success = false,
+                                    Error = "TRAILER record not match."
+                                };
+                            }
+                            await _context.BulkInsertAsync(stockList);
                                 stopwatch.Stop();
                                 timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
 
@@ -1541,12 +1710,13 @@ namespace TOMI.Services.Repository
             string regex = "^0+(?!$)";
             bool isSaveSuccess = false;
             string fileName;
-            var innerDataError = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
+            var innerDataError = model.StockDate.Value.Date.Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
                 model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
 
             List<Categories> categoryList = new();
             //for file header
             List<FileStore> fileStores = new();
+            List<FileStore> trailerRecords = new();
             //for file name
             List<UploadFileName> uploadFileNames = new();
             var stopwatch = new Stopwatch();
@@ -1571,7 +1741,7 @@ namespace TOMI.Services.Repository
                 var categoryStoreName = model.StoreName.ToString().Substring(0, 4);
 
                 var finalCategoryDate = model.StockDate.Value.Date.Month.ToString("#00") +
-                   model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00"); ;
+                   model.StockDate.Value.Date.Day.ToString("#00"); ;
                 //  var forInnerStockDates = Convert.ToDateTime("35-13-2029");
 
                 var categoryPreviousDate = model.StockDate.Value.Date.Month.ToString("#00") +
@@ -1582,7 +1752,7 @@ namespace TOMI.Services.Repository
                 {
                     forInnerCategoryDate = model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString()
                          + model.StockDate.Value.Date.Month.ToString("#00")
-                         + model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
+                         + model.StockDate.Value.Date.Day.ToString("#00");
                 }
                 catch (Exception ex)
                 {
@@ -1644,7 +1814,13 @@ namespace TOMI.Services.Repository
                                 await model.File.CopyToAsync(stream);
                             }
                             var CategoryFileData = File.ReadAllLines(path);
-                            
+                            //get the trailerRecords
+                            trailerRecords = CategoryFileData.TakeLast(1).SelectMany(y => new List<FileStore>
+                                        {
+                                          new()
+                                        {
+                                        RecordCount=y.Substring(30,6),
+                                        }}).ToList();
                             // for inner header
                             string categoryInnerFileHeader = CategoryFileData[0].Substring(0, 6).Trim();
                             string categoryInnerFileName = CategoryFileData[0].Substring(7, 11).Trim();
@@ -1670,8 +1846,19 @@ namespace TOMI.Services.Repository
                                     }
                                     }).ToList();
 
-                                   
-                                       await _context.BulkInsertAsync(categoryList);
+                                    // Replaces the matched
+                                    string str = Regex.Replace(trailerRecords[0].RecordCount, regex, "");
+                                    if (str == categoryList.Count.ToString())
+                                    { }
+                                    else
+                                    {
+                                        return new FileUplaodRespone
+                                        {
+                                            Success = false,
+                                            Error = "TRAILER record not match."
+                                        };
+                                    }
+                                    await _context.BulkInsertAsync(categoryList);
                                         stopwatch.Stop();
                                         timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
                                         uploadFileNames = new List<UploadFileName> { new() { FileName = tempfileName.Substring(0, 4), StoreNumber = tempfileName.Substring(4, 4), FileDate = tempfileName.Substring(9, 4), Category = "Category" } };
@@ -1756,7 +1943,13 @@ namespace TOMI.Services.Repository
                             };
                         }
                         var categoryFileData = File.ReadAllLines(destinationPath);
-                       
+                        //get the trailerRecords
+                        trailerRecords = categoryFileData.TakeLast(1).SelectMany(y => new List<FileStore>
+                                        {
+                                        new()
+                                        {
+                                            RecordCount=y.Substring(29,6),
+                                        }}).ToList();
                         string categoryInnerFileHeader = categoryFileData[0].Substring(0, 6).Trim();
                         string categoryInnerFileName = categoryFileData[0].Substring(7, 11).Trim();
                         string categoryInnerStoreNumber = categoryFileData[0].Substring(18, 4).Trim();
@@ -1780,7 +1973,19 @@ namespace TOMI.Services.Repository
                                     }
                                     }).ToList();
                             }
-                           
+
+                            // Replaces the matched
+                            string str = Regex.Replace(trailerRecords[0].RecordCount, regex, "");
+                            if (str == categoryList.Count.ToString())
+                            { }
+                            else
+                            {
+                                return new FileUplaodRespone
+                                {
+                                    Success = false,
+                                    Error = "TRAILER record not match."
+                                };
+                            }
                             await _context.BulkInsertAsync(categoryList);
                             stopwatch.Stop();
                             timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
