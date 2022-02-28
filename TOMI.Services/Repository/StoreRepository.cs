@@ -994,7 +994,7 @@ namespace TOMI.Services.Repository
                 var reservedStoreName = model.StoreName.ToString().Substring(0, 4);
 
                 var finalReservedDate = model.StockDate.Value.Date.Month.ToString("#00") +
-                   model.StockDate.Value.Date.ToString("#00");
+                   model.StockDate.Value.Date.Day.ToString("#00");
 
                 var ReservedPreviousDate = model.StockDate.Value.Date.Month.ToString("#00") +
                 model.StockDate.Value.Date.AddDays(-2).Day.ToString("#00");
@@ -1128,22 +1128,21 @@ namespace TOMI.Services.Repository
                                                      Date = a.CreatedAt,
                                                      Department = b.Department,
                                                  }).ToList();
+                                    //int maxLength = _context.StockAdjustment.Select(x => x.Rec).Count();
+                                    //if (maxLength == 0)
+                                    //{
+                                    //    maxLength = 1;
+                                    //}
+                                    //else
+                                    //{
+                                    //    maxLength = _context.StockAdjustment.Select(x => x.Rec).Count() + 1;
+                                    //}
 
-
-                                    int maxLength = _context.StockAdjustment.Select(x => x.Rec).Count();
-                                    if (maxLength == 0)
-                                    {
-                                        maxLength = 1;
-                                    }
-                                    else
-                                    {
-                                        maxLength = _context.StockAdjustment.Select(x => x.Rec).Count() + 1;
-                                    }
                                     stockAdjustmentList = query.SelectMany(x => new List<StockAdjustment>
                                     {
                                     new()
-                                    {
-                                        Rec=maxLength,
+                                    { 
+                                        Rec=0,
                                         SKU=x.SKU,
                                         Barcode=x.barCode,
                                         NOF=0,
@@ -1157,7 +1156,18 @@ namespace TOMI.Services.Repository
                                         Department=Convert.ToInt32(x.Department),
                                     }
                                     }).ToList();
+
                                     await _context.BulkInsertAsync(stockAdjustmentList);
+
+                                    stockAdjustmentList = new List<StockAdjustment>();
+
+                                    stockAdjustmentList = await _context.StockAdjustment.ToListAsync();
+
+                                    foreach (var item in stockAdjustmentList)
+                                    {
+                                        item.Rec = SetRecNumber();
+                                        await _context.SingleUpdateAsync(item);
+                                    } 
 
                                     //  await _context.Reserved.FromSqlRaw(@"exec AutoAppendReservedRecords").ToListAsync();
                                     // var results = _context.Reserved.FromSqlRaw("INSERT INTO StockAdjustment (Id, Barcode, IsActive, SKU, NOF, Isdeleted, Tag, Shelf, Quantity, CreatedAt) SELECT  NEWID() AS Id, Reserved.Code, Reserved.IsActive, OrderJob.Id AS JobOrderId, 0 AS nof, 0 AS isDeleted, 3001 AS Tag, 01 AS shelf, CAST(CAST(Reserved.Quantity AS NUMERIC) AS INT) AS Qty, { fn NOW() } AS Date FROM Reserved INNER JOIN OrderJob ON Reserved.Code = OrderJob.Code");
@@ -1351,7 +1361,18 @@ namespace TOMI.Services.Repository
                 Success = false,
                 Error = "Some errors occurred!"
             };
-
+        }
+        private int SetRecNumber()
+        {
+            int maxLength = (int)_context.StockAdjustment.Select(x => x.Rec).Max();
+            if (maxLength == 0)
+            {
+              return 1;
+            }
+            else
+            {
+                return maxLength + 1;
+            }
         }
         public async Task<FileUplaodRespone> StockData(FilterDataModel model)
         {
@@ -2049,5 +2070,7 @@ namespace TOMI.Services.Repository
             };
 
         }
+
+       
     }
 }

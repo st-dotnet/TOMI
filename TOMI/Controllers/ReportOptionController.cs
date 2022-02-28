@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TOMI.Services.Interfaces;
+using TOMI.Services.Models;
 using TOMI.Services.Repository;
 
 namespace TOMI.Web.Controllers
@@ -167,7 +168,6 @@ namespace TOMI.Web.Controllers
         [Route("GetBreakDownReportAsync")]
         public IActionResult GetBreakDownReportAsync()
         {
-
             try
             {
                 var response = _reportOptionRepository.GetBreakDownReportAsync();
@@ -178,7 +178,6 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
-
         /// <summary>
         /// GetDateTimeCheckReport
         /// </summary>
@@ -191,6 +190,19 @@ namespace TOMI.Web.Controllers
             {
                 var response = await _reportOptionRepository.GetDateTimeCheckReport();
                 return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        [HttpPost("GetInventoryFigureReport")]
+        public async Task<IActionResult> GetInventoryFigureReport([FromForm] FilterCustomerReportDataModel model)
+        {
+            try
+            {
+                return Ok(await _reportOptionRepository.InventoryFigure(model));
             }
             catch (Exception ex)
             {
