@@ -25,19 +25,17 @@ namespace TOMI.Web.Controllers
             _logger.LogDebug(1, "NLog injected into reportOptionController");
         }
         #region Public methods
-
         /// <summary>
         /// GetLabelDetailsAsync
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("GetLabelDetailsAsync")]
-        public async Task<IActionResult> GetLabelDetailsAsync()
+        [Route(("GetLabelDetailsAsyncTest"))]
+        public async Task<IActionResult> GetLabelDetailsAsyncTest()
         {
-
             try
             {
-                var response = await _reportOptionRepository.GetLabelDetailsAsync();
+                var response = await _reportOptionRepository.GetLabelDetailsAsyncTest();
                 return Ok(response);
             }
             catch (Exception ex)
@@ -45,7 +43,24 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
-
+        /// <summary>
+        /// GetLabelDetailsAsync
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route(("GetLabelDetailsAsync/{tagFrom}/{tagTo}"))]
+        public async Task<IActionResult> GetLabelDetailsAsync(int? tagFrom, int? tagTo)
+        {
+            try
+            {
+                var response = await _reportOptionRepository.GetLabelDetailsAsync(tagFrom, tagTo);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
         /// <summary>
         /// GetCodeNotFoundAsync
         /// </summary>
@@ -93,13 +108,12 @@ namespace TOMI.Web.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("GetUncountedItemsAsync")]
+        [Route(("GetUncountedItemsAsync"))]
         public IActionResult GetUncountedItemsAsync()
         {
-
             try
             {
-                var response =  _reportOptionRepository.GetUncountedItemsAsync();
+                var response = _reportOptionRepository.GetUncountedItemsAsync();
                 return Ok(response);
             }
             catch (Exception ex)
@@ -107,7 +121,6 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
-
         /// <summary>
         /// GetVariationBySKUAsync
         /// </summary>
@@ -116,7 +129,6 @@ namespace TOMI.Web.Controllers
         [Route("GetVariationBySKUAsync")]
         public IActionResult GetVariationBySKUAsync()
         {
-
             try
             {
                 var response = _reportOptionRepository.GetVariationBySKUAsync();
@@ -127,9 +139,6 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
-
-        
-
         /// <summary>
         /// GetCorrectionsReportAsync
         /// </summary>

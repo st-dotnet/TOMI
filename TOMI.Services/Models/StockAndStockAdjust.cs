@@ -16,5 +16,6 @@ namespace TOMI.Services.Models
         public string Barcode { get; set; }
         public int Tag { get; set; }
         public Guid? Id { get; set; }
+        public string  Department { get; set; }
     }
 }
