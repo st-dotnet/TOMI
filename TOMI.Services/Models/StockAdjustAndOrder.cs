@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace TOMI.Services.Models
 {
-   public class StockAdjustAndOrder
+  public  class StockAdjustAndOrder
     {
         public string Store { get; set; }
         public string SalePrice { get; set; }
@@ -15,7 +15,5 @@ namespace TOMI.Services.Models
         public int? Department { get; set; }
         public int? Quantity { get; set; }
         public DateTimeOffset? CreatedAt { get; set; }
-
-
     }
 }

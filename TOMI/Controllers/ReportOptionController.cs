@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TOMI.Services.Interfaces;
+using TOMI.Services.Models;
 using TOMI.Services.Repository;
 
 namespace TOMI.Web.Controllers
@@ -61,8 +62,6 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
-
-
         /// <summary>
         /// GetCodeNotFoundAsync
         /// </summary>
@@ -162,26 +161,6 @@ namespace TOMI.Web.Controllers
         }
 
         /// <summary>
-        /// GetAdjustmentReport
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("GetAdjustmentReport")]
-        public async Task<IActionResult> GetAdjustmentReport()
-        {
-
-            try
-            {
-                var response = await _reportOptionRepository.GetAdjustmentReport();
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.ToString());
-            }
-        }
-
-        /// <summary>
         /// GetBreakDownReportAsync
         /// </summary>
         /// <returns></returns>
@@ -189,7 +168,6 @@ namespace TOMI.Web.Controllers
         [Route("GetBreakDownReportAsync")]
         public IActionResult GetBreakDownReportAsync()
         {
-
             try
             {
                 var response = _reportOptionRepository.GetBreakDownReportAsync();
@@ -200,7 +178,6 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
-
         /// <summary>
         /// GetDateTimeCheckReport
         /// </summary>
@@ -220,37 +197,12 @@ namespace TOMI.Web.Controllers
             }
         }
 
-        /// <summary>
-        /// InventoryNumberFile
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("InventoryNumberFile")]
-        public IActionResult InventoryNumberFile()
+        [HttpPost("GetInventoryFigureReport")]
+        public async Task<IActionResult> GetInventoryFigureReport([FromForm] FilterCustomerReportDataModel model)
         {
             try
             {
-                var response = _reportOptionRepository.InventoryNumberFile();
-                return Ok(response);
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.ToString());
-            }
-        }
-
-        /// <summary>
-        /// DetailOfInventoriesFile
-        /// </summary>
-        /// <returns></returns>
-        [HttpGet]
-        [Route("DetailOfInventoriesFile")]
-        public IActionResult DetailOfInventoriesFile()
-        {
-            try
-            {
-                var response = _reportOptionRepository.DetailOfInventoriesFile();
-                return Ok(response);
+                return Ok(await _reportOptionRepository.InventoryFigure(model));
             }
             catch (Exception ex)
             {

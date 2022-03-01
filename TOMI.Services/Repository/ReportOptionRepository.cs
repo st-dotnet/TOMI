@@ -1,11 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using NLog;
 using TOMI.Data.Database;
 using TOMI.Data.Database.Entities;
 using TOMI.Services.Interfaces;
@@ -16,11 +20,12 @@ namespace TOMI.Services.Repository
     public class ReportOptionRepository : IReportOptionService
     {
         private readonly IMapper _mapper;
-        private readonly ILogger<ReportOptionRepository> _logger;
+        private readonly Logger logger;
         private readonly TOMIDataContext _context;
-        public ReportOptionRepository(ILogger<ReportOptionRepository> logger, TOMIDataContext context, IMapper mapper)
+   
+        public ReportOptionRepository(TOMIDataContext context, IMapper mapper)
         {
-            _logger = logger;
+            logger = LogManager.GetCurrentClassLogger();
             _context = context;
             _mapper = mapper;
         }
@@ -28,11 +33,11 @@ namespace TOMI.Services.Repository
         {
             return await _context.StockAdjustment.Include(x => x.OrderJob).ToListAsync();
         }
-        public async Task<List<StockAdjustment>> GetLabelDetailsAsync(int? tagFrom,int? tagTo )
+        public async Task<List<StockAdjustment>> GetLabelDetailsAsync(int? tagFrom, int? tagTo)
         {
-            if (tagFrom != 0 && tagTo!=0)
+            if (tagFrom != 0 && tagTo != 0)
             {
-                return await _context.StockAdjustment.Include(x => x.OrderJob).Where(x=>x.Tag >= tagFrom && x.Tag <= tagTo).OrderBy(x => x.Rec).ToListAsync();
+                return await _context.StockAdjustment.Include(x => x.OrderJob).Where(x => x.Tag >= tagFrom && x.Tag <= tagTo).OrderBy(x => x.Rec).ToListAsync();
             }
             else
             {
@@ -53,17 +58,17 @@ namespace TOMI.Services.Repository
         {
             try
             {
-                    var query = (from b in _context.OrderJob
-                                 join a in _context.Stock on b.Department equals a.Departament
-                                 select new stockandorder
-                                 {
-                                     SKU = a.SKU,
-                                     Description = a.Description,
-                                     SOH = a.SOH,
-                                     PrecVtaNorm = a.PrecVtaNorm,
-                                     Code = b.Code
-                                 }).Take(500).ToList();
-                    return query;
+                var query = (from b in _context.OrderJob
+                             join a in _context.Stock on b.Department equals a.Departament
+                             select new stockandorder
+                             {
+                                 SKU = a.SKU,
+                                 Description = a.Description,
+                                 SOH = a.SOH,
+                                 PrecVtaNorm = a.PrecVtaNorm,
+                                 Code = b.Code
+                             }).Take(500).ToList();
+                return query;
             }
             catch (Exception ex)
             {
@@ -74,27 +79,27 @@ namespace TOMI.Services.Repository
         {
             try
             {
-                    var query = (from a in _context.Stock
-                                 join c in _context.OrderJob on a.Departament equals c.Department
-                                 join b in _context.StockAdjustment on c.Id equals b.SKU
+                var query = (from a in _context.Stock
+                             join c in _context.OrderJob on a.Departament equals c.Department
+                             join b in _context.StockAdjustment on c.Id equals b.SKU
 
-                                 select new StockAndStockAdjust
-                                 {
-                                     SKU = a.SKU,
-                                     Description = a.Description,
-                                     SOH = a.SOH,
-                                     PrecVtaNorm = a.PrecVtaNorm,
-                                     Quantity = (int)b.Quantity,
-                                     Barcode = b.Barcode,
-                                     Tag = (int)b.Tag,
-                                     Id = b.Id,
-                                     Department=a.Departament
-                                 }).Take(20).ToList();
+                             select new StockAndStockAdjust
+                             {
+                                 SKU = a.SKU,
+                                 Description = a.Description,
+                                 SOH = a.SOH,
+                                 PrecVtaNorm = a.PrecVtaNorm,
+                                 Quantity = (int)b.Quantity,
+                                 Barcode = b.Barcode,
+                                 Tag = (int)b.Tag,
+                                 Id = b.Id,
+                                 Department = a.Departament
+                             }).Take(20).ToList();
 
 
 
-                    return query;
-                }
+                return query;
+            }
             catch (Exception ex)
             {
                 throw new Exception(ex.ToString());
@@ -130,7 +135,7 @@ namespace TOMI.Services.Repository
         public async Task<List<StockAdjustment>> GetDateTimeCheckReport()
         {
             return await _context.StockAdjustment.Include(x => x.OrderJob).OrderBy(x => x.Tag).Take(500).ToListAsync();
-           // return await _context.StockAdjustment.Include(x => x.OrderJob).Where(x => x.CreatedAt >= fromDate && x.CreatedAt <= toDate).OrderBy(x => x.Rec).ToListAsync();
+            // return await _context.StockAdjustment.Include(x => x.OrderJob).Where(x => x.CreatedAt >= fromDate && x.CreatedAt <= toDate).OrderBy(x => x.Rec).ToListAsync();
         }
         public async Task<List<Departments>> GetDepartments()
         {
@@ -146,59 +151,135 @@ namespace TOMI.Services.Repository
         {
             throw new NotImplementedException();
         }
-
-        public async Task<List<StockAdjustment>> GetAdjustmentReport()
+        public async Task<FileUplaodRespone> InventoryFigure(FilterCustomerReportDataModel model)
         {
-            return await _context.StockAdjustment.Where(x => x.Isdeleted == true).ToListAsync();
+            string fileName=string.Empty;
+            string InnerHeaderName=string.Empty;
+            string innerFooter=string.Empty;
+            var innerDataError =  model.StockDate.Value.Date.Month.ToString("#00")+ model.StockDate.Value.Date.Day.ToString("#00");
+            var figureStoreDate = model.StoreName.ToString().Substring(0, 4);
+            var InnerContentDate= model.StockDate.Value.Date.Day.ToString("#00")+ model.StockDate.Value.Date.Month.ToString("#00")+model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
+            string numberOfRecords = "000000.";
+            fileName = "CTLR"+innerDataError+"_"+ figureStoreDate + ".txt";
+            InnerHeaderName = "HEADER" + " " + "CIFRAS INV" +figureStoreDate+InnerContentDate + " "+ numberOfRecords;
+
+            innerFooter = "TRAILER" + " " + "CIFRAS INV" + figureStoreDate + InnerContentDate;
+
+            var query = (from b in _context.OrderJob
+                         join a in _context.StockAdjustment on b.Code equals a.Barcode
+                         select new InventoryFigure
+                         {
+                             StoreNumber = b.Store,
+                             FigureDate = b.StockDate,
+                             Unit = (int)a.Quantity,
+                             Amount = b.SalePrice,
+                         }).ToList();
+            
+            if (File.Exists(fileName))
+            {
+                File.Delete(fileName);
+            }
+            File.Create(fileName).Close();
+            string line = string.Join(",", InnerHeaderName) + System.Environment.NewLine;
+            foreach (var item in query)
+            {
+                var currentUnits = item.Unit.ToString();
+                var currentAmount = item.Amount.ToString();
+                for (int i = 0; i < 12; i++)
+                {
+                    if (currentUnits.Length < 12)
+                        currentUnits = "0" + currentUnits;
+                }
+                for (int i = 0; i < 12; i++)
+                {
+                    if (currentAmount.Length < 12)
+                        currentAmount = "0" + currentAmount;
+                }
+                var date= item.FigureDate.Value.Date.Year.ToString().Substring(0, 4).ToString()
+                         + item.FigureDate.Value.Date.Month.ToString("#00")
+                         + item.FigureDate.Value.Date.Day.ToString("#00");
+                line = line + string.Join(",", item.StoreNumber+ date + currentUnits + currentAmount) + System.Environment.NewLine;
+            }
+
+            var currentCountRec = query.Count.ToString();
+            
+            for (int i = 0; i < 6; i++)
+            {
+                if (currentCountRec.Length < 6)
+                    currentCountRec = "0" + currentCountRec;
+            }
+
+            line = line + string.Join(",", innerFooter +" "+ currentCountRec) + System.Environment.NewLine;
+
+            File.AppendAllText(fileName, line);
+
+            return null;
         }
 
-        public List<OrderAndStockAdjust> InventoryNumberFile()
+        public Task<FileUplaodRespone> InventoryDetail(FilterCustomerReportDataModel model)
         {
-            try
+            string fileName = string.Empty;
+            string InnerHeaderName = string.Empty;
+            string innerFooter = string.Empty;
+            var innerDataError = model.StockDate.Value.Date.Month.ToString("#00") + model.StockDate.Value.Date.Day.ToString("#00");
+            var figureStoreDate = model.StoreName.ToString().Substring(0, 4);
+            var InnerContentDate = model.StockDate.Value.Date.Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") + model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
+            string numberOfRecords = "000000.";
+            fileName = "INVR" + innerDataError + "_" + figureStoreDate + ".txt";
+            InnerHeaderName = "HEADER" + " " + "INVENTARIO" + figureStoreDate + InnerContentDate + " " + numberOfRecords;
+
+            innerFooter = "TRAILER" + " " + "INVENTARIO" + figureStoreDate + InnerContentDate;
+
+            var query = (from b in _context.OrderJob
+                         join a in _context.StockAdjustment on b.Code equals a.Barcode
+                         select new InventoryFigure
+                         {
+                             StoreNumber = b.Store,
+                             FigureDate = b.StockDate,
+                             Unit = (int)a.Quantity,
+                             Amount = b.SalePrice,
+                         }).ToList();
+
+            if (File.Exists(fileName))
             {
-                var query = (from a in _context.OrderJob
-                             join b in _context.StockAdjustment on a.Code equals b.Barcode
-                             select new OrderAndStockAdjust
-                             {
-                                 Store = a.Store,
-                                 InventoryDate = a.StockDate,
-                                 SalePrice = a.SalePrice,
-                                 Quantity = b.Quantity
-                             }).Take(20).ToList();
-                return query;
+                File.Delete(fileName);
             }
-            catch (Exception ex)
+            File.Create(fileName).Close();
+            string line = string.Join(",", InnerHeaderName) + System.Environment.NewLine;
+            foreach (var item in query)
             {
-                throw new Exception(ex.ToString());
+                var currentUnits = item.Unit.ToString();
+                var currentAmount = item.Amount.ToString();
+                for (int i = 0; i < 12; i++)
+                {
+                    if (currentUnits.Length < 12)
+                        currentUnits = "0" + currentUnits;
+                }
+                for (int i = 0; i < 12; i++)
+                {
+                    if (currentAmount.Length < 12)
+                        currentAmount = "0" + currentAmount;
+                }
+                var date = item.FigureDate.Value.Date.Year.ToString().Substring(0, 4).ToString()
+                         + item.FigureDate.Value.Date.Month.ToString("#00")
+                         + item.FigureDate.Value.Date.Day.ToString("#00");
+                line = line + string.Join(",", item.StoreNumber + date + currentUnits + currentAmount) + System.Environment.NewLine;
             }
+
+            var currentCountRec = query.Count.ToString();
+
+            for (int i = 0; i < 6; i++)
+            {
+                if (currentCountRec.Length < 6)
+                    currentCountRec = "0" + currentCountRec;
+            }
+
+            line = line + string.Join(",", innerFooter + " " + currentCountRec) + System.Environment.NewLine;
+
+            File.AppendAllText(fileName, line);
+
+            return null;
         }
-
-        public List<StockAdjustAndOrder> DetailOfInventoriesFile()
-        {
-            try
-            {
-                var query = (from a in _context.OrderJob
-                             join b in _context.StockAdjustment on a.Code equals b.Barcode
-                             orderby b.Tag
-                             select new StockAdjustAndOrder
-                             {
-                                 Store = a.Store,
-                                 Tag=b.Tag,
-                                 Barcode=b.Barcode,
-                                 Department=b.Department,
-                                 Quantity = b.Quantity,
-                                 SalePrice=a.SalePrice,
-                                 CreatedAt=b.CreatedAt
-                             }).Take(20).ToList();
-                return query;
-
-            }
-            catch (Exception ex)
-            {
-                throw new Exception(ex.ToString());
-            }
-        }
-
     }
 }
 

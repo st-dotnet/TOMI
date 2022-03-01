@@ -29,6 +29,7 @@ namespace TOMI.Services.Repository
         {
             try
             {
+                StockAdjustmentlog stockAdjustmentlog = new StockAdjustmentlog();
                 StockAdjustment stockAdjustment = await _context.StockAdjustment.FirstOrDefaultAsync(c => c.Id == model.Id);
                 int record = 1;
                 if (stockAdjustment == null)
@@ -46,6 +47,17 @@ namespace TOMI.Services.Repository
                 }
                 else
                 {
+                    //Log
+                    stockAdjustmentlog.Term = model.Term;
+                    stockAdjustmentlog.Rec = model.Rec;
+                    stockAdjustmentlog.Dload = model.Dload;
+                    stockAdjustmentlog.Tag = model.Tag;
+                    stockAdjustmentlog.Shelf = model.Shelf;
+                    stockAdjustmentlog.Barcode = model.Barcode;
+                    stockAdjustmentlog.Quantity = model.Quantity;
+                    StockAdjustmentlog resultlog = _context.StockAdjustmentlog.Add(stockAdjustmentlog).Entity;
+                    await _context.SaveChangesAsync();
+
                     //var res = _mapper.Map<StockAdjustment>(model);
                     stockAdjustment.Term = model.Term;
                     stockAdjustment.Rec = model.Rec;
@@ -54,6 +66,7 @@ namespace TOMI.Services.Repository
                     stockAdjustment.Shelf = model.Shelf;
                     stockAdjustment.Barcode = model.Barcode;
                     stockAdjustment.Quantity = model.Quantity;
+                    stockAdjustmentlog.Status = "Edit";
                     _context.StockAdjustment.Update(stockAdjustment);
                     await _context.SaveChangesAsync();
                     return new StockAdjustmentResponse { Adjustment = stockAdjustment, Success = true };

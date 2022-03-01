@@ -21,5 +21,8 @@ namespace TOMI.Services.Interfaces
         Task<List<ParametersByDepartment>> GetParametersByDepartmentData(FilterDataRequest request);
         Task<FileUplaodRespone> OrderJobData(FilterDataModel model);
         Task<List<OrderJob>> GetOrderJob(FilterDataRequest request);
+      
+
     }
+
 }

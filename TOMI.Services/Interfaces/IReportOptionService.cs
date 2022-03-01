@@ -22,8 +22,8 @@ namespace TOMI.Services.Interfaces
         Task<List<StockAdjustment>> GetDateTimeCheckReport();
         Task<List<Departments>> GetDepartments();
         Task<List<Ranges>> GetRangesforReport();
-         Task<List<StockAdjustment>> GetAdjustmentReport();
-        List<OrderAndStockAdjust> InventoryNumberFile();
-        List<StockAdjustAndOrder> DetailOfInventoriesFile();
+
+        Task<FileUplaodRespone> InventoryFigure(FilterCustomerReportDataModel model);
+        Task<FileUplaodRespone> InventoryDetail(FilterCustomerReportDataModel model);
     }
 }
