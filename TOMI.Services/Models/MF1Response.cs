@@ -20,15 +20,19 @@ namespace TOMI.Services.Models
         public string Department { get; set; }
         public string Code { get; set; }
         public decimal SalePrice { get; set; }
-        public int Tag { get; set; }
-        public int Shelf { get; set; }
+        public string Tag { get; set; }
+        public string Shelf { get; set; }
         public int Operation { get; set; }
         public string InventoryKey { get; set; }
         public int CountType { get; set; }
         public int TotalCounted { get; set; }
         public DateTime CountTime { get; set; }
+
+        public string Description { get; set; }
         public bool Nof { get; set; }
         public bool CountedStatus { get; set; }
+
+
     }
 
     public class Empdata
@@ -41,6 +45,15 @@ namespace TOMI.Services.Models
 
     }
 
+    //public class Ids
+    //{
+    //    public Guid CustomerId { get; set; }
+    //    public Guid StoreId { get; set; }
+
+    //    public string Description { get; set; }
+
+
+    //}
 
     public class EmpdataDataResponse
     {
@@ -50,7 +63,10 @@ namespace TOMI.Services.Models
     public class MF1AndEmp
     {
         public List<TerminalSmf> TerminalSmf { get; set; }
-        public List<Empdata> Empdata { get; set; }
+        public List<Empdata> Employees { get; set; }
+        public Guid CustomerId { get; set; }
+        public Guid StoreId { get; set; }
+
     }
 
 

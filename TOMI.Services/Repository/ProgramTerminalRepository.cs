@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -30,21 +31,62 @@ namespace TOMI.Services.Repository
             _mapper = mapper;
         }
 
-        public async Task<TerminalResponse> GenerateMF1(TerminalModel model)
+        public async Task<TerminalResponse> GenerateMF1(TermModel model)
         {
             try
             {
-                List<MF1> mf1 = new();
-                List<MF2> mf2 = new();
-                var masterdata = _context.OrderJob.Where(x => x.CustomerId == model.CustomerId && x.StoreId == model.StoreId && x.StockDate == model.Date).ToList();
+                List<Terminal_Smf> mf1 = new();
+                List<Terminal_Smf> updatemf1 = new();
+                List<Terminal_Department> mf2 = new();
+
+                var masterdata = await _context.OrderJob.ToListAsync();
+
+                var existingData = from a in _context.Terminal_Smf from b in _context.OrderJob where a.Code == b.Code && a.Department == b.Department select a;
+
                 foreach (var item in masterdata)
                 {
-                    MF2 data2 = new MF2();
-                    MF1 data = new MF1();
-                    MF2 checkMF = new MF2();
+                    var data1 = existingData.FirstOrDefault(x => x.Code == item.Code && x.Department == item.Department);
+                    if (data1 != null)
+                    {
+                        data1.Code = item.Code;
+                        data1.Department = item.Department;
+                        data1.Inventory_Date = item.StockDate;
+                        data1.Sale_Price = Convert.ToDecimal(item.SalePrice);
+                        data1.operation = model.Operation;
+                        data1.inventory_key = model.InventoryKey;
+                        updatemf1.Add(data1);
+                    }
+                    else
+                    {
+                        Terminal_Smf data = new()
+                        {
+                            Code = item.Code,
+                            Department = item.Department,
+                            Inventory_Date = item.StockDate,
+                            Sale_Price = Convert.ToDecimal(item.SalePrice),
+                            operation = model.Operation,
+                            creation_time = DateTime.Now,
+                            sync_to_terminal_status = false,
+                            sync_to_terminal_time = DateTime.Now,
+                            sync_back_from_terminal_status = false,
+                            sync_back_from_terminal_time = DateTime.Now,
+                            count_time = DateTime.Now,
+                            counted_status = false,
+                            CustomerId = (Guid)item.CustomerId,
+                            StoreId = (Guid)item.StoreId,
+                            Id = new Guid(),
+                            inventory_key = model.InventoryKey
+                        };
+
+                        mf1.Add(data);
+                    }
+
+                    Terminal_Department data2 = new Terminal_Department();
+                    Terminal_Department checkMF = new Terminal_Department();
+                    data2.Id = new Guid();
                     data2.Department = item.Department;
                     data2.creation_time = DateTime.Now;
-                    var exist = _context.MF2.FirstOrDefault(x => x.Department == item.Department);
+                    var exist = _context.Terminal_Department.FirstOrDefault(x => x.Department == item.Department);
                     if (exist == null)
                     {
                         checkMF = mf2.FirstOrDefault(x => x.Department == item.Department);
@@ -53,38 +95,18 @@ namespace TOMI.Services.Repository
                     {
                         mf2.Add(data2);
                     }
-                    data.Code = item.Code;
-                    data.CustomerId = (Guid)model.CustomerId;
-                    data.Department = item.Department;
-                    data.inventory_key = model.InventaryKey;
-                    data.counted_status = true;
-                    data.Employee_Number = "432434234";
-                    data.count_time = DateTime.Now;
-                    data.Terminal = "ds";
-                    data.StoreId = (Guid)model.StoreId;
-                    data.Inventory_Date = DateTime.Now;
-                    data.Sale_Price = 0;
-                    data.tag = 1;
-                    data.shelf = 1;
-                    data.operation = 1;
-                    data.creation_time = DateTime.Now;
-                    data.sync_to_terminal_status = false;
-                    data.sync_to_terminal_time = DateTime.Now;
-                    data.sync_back_from_terminal_status = false;
-                    data.sync_back_from_terminal_time = DateTime.Now;
-                    data.count_type = model.CountType;
-                    data.total_counted = 1;
-                    data.count_time = DateTime.Now;
-                    data.nof = false;
-                    data.counted_status = false;
-                    mf1.Add(data);
+
+
                 }
-                await _context.BulkInsertAsync(mf2);
+                if (mf2 != null)
+                    await _context.BulkInsertAsync(mf2);
 
+                if (updatemf1 != null)
+                    await _context.BulkUpdateAsync(updatemf1);
 
-
-                await _context.BulkInsertAsync(mf1);
-
+                if (mf1 != null)
+                    await _context.BulkInsertAsync(mf1);
+                return new TerminalResponse { Success = true };
 
 
                 return new TerminalResponse { Success = true };
@@ -94,8 +116,6 @@ namespace TOMI.Services.Repository
                 throw new Exception(ex.ToString());
             }
         }
-
-
 
         public async Task<EmpDataResponse> AddEmployeeData()
         {
@@ -124,38 +144,47 @@ namespace TOMI.Services.Repository
             MF1AndEmp mF1AndEmp = new();
             try
             {
-                mF1AndEmp.TerminalSmf = await _context.MF1.Include(c => c.MF2)
-                .Where(x => x.count_type == terminal.CountType && x.inventory_key == x.inventory_key)
-                .Select(x => new TerminalSmf
-                {
-                    Code = x.Code,
-                    CountedStatus = x.counted_status,
-                    Department = x.MF2.Department,
-                    Customer = x.CustomerId,
-                    Terminal = x.Terminal,
-                    Store = x.Store.Name,
-                    EmployeeNumber = x.Employee_Number,
-                    InventoryDate = (DateTimeOffset)x.Inventory_Date,
-                    SalePrice = x.Sale_Price,
-                    Tag = x.tag,
-                    Shelf = x.shelf,
-                    Operation = x.operation,
-                    InventoryKey = x.inventory_key,
-                    CountType = x.count_type,
-                    TotalCounted = x.total_counted,
-                    CountTime = x.count_time,
-                    Nof = x.nof
-                })
+
+                mF1AndEmp.TerminalSmf = await (from a in _context.Terminal_Smf
+                                               join c in _context.Terminal_Department on a.Department equals c.Department
+                                               join b in _context.OrderJob on c.Department equals b.Department
+                                               select new TerminalSmf
+                                               {
+                                                   Code = a.Code,
+                                                   CountedStatus = a.counted_status,
+                                                   Department = a.MF2.Department,
+                                                   Customer = a.CustomerId,
+                                                   Terminal = a.Terminal,
+                                                   Store = a.Store.Name,
+                                                   EmployeeNumber = a.Employee_Number,
+                                                   InventoryDate = (DateTimeOffset)a.Inventory_Date,
+                                                   SalePrice = a.Sale_Price,
+                                                   Tag = a.tag.ToString(),
+                                                   Shelf = a.shelf.ToString(),
+                                                   Operation = terminal.operation,
+                                                   InventoryKey = a.inventory_key,
+                                                   CountType = a.count_type,
+                                                   TotalCounted = a.total_counted,
+                                                   CountTime = a.count_time,
+                                                   Nof = a.nof,
+                                                   Description = b.Description,
+
+                                               })
+                                            .ToListAsync();
+
+                mF1AndEmp.Employees = await (from a in _context.Employee
+                                             select new Empdata
+                                             {
+                                                 EmpNumber = a.EmpNumber,
+                                                 EmpName = a.EmpName,
+                                                 LastName = a.LastName
+                                             })
                 .ToListAsync();
 
-                mF1AndEmp.Empdata = await (from a in _context.Employee
-                                           select new Empdata
-                                           {
-                                               EmpNumber = a.EmpNumber,
-                                               EmpName = a.EmpName,
-                                               LastName = a.LastName
-                                           })
-                .ToListAsync();
+                var terminaldata = _context.Terminal_Smf.Include(c => c.MF2)
+                    .FirstOrDefault(x => x.operation == terminal.operation && x.inventory_key == x.inventory_key);
+                mF1AndEmp.CustomerId = terminaldata.CustomerId;
+                mF1AndEmp.StoreId = terminaldata.StoreId;
 
                 return new JsonResult(mF1AndEmp);
             }
@@ -164,49 +193,81 @@ namespace TOMI.Services.Repository
                 throw new Exception(ex.ToString());
             }
         }
-        public async Task<TerminalDataModels> PostTerminal(TerminalDataModels post)
+
+        public async Task<TerminalDataModelsResponse> PostTerminal(TerminalDataModels post)
         {
             try
             {
-                List<MF1> mf1 = new();
-                MF1 existingRanges = await _context.MF1.FirstOrDefaultAsync(c => c.tag == post.Tag);
-                MF1 mF = new MF1();
+                List<Terminal_Smf> mf1 = new();
+                List<Terminal_Smf> updatEmf1 = new();
+
+                var existingRecords = await _context.Terminal_Smf.Where(x => x.tag.ToString() == post.Tag).ToListAsync();
+
                 var posts = post.Shelves;
-
-
-
                 foreach (var item in posts)
                 {
-                    mF = new MF1();
-                    mF.Id = new Guid();
-                    mF.tag = post.Tag;
-                    mF.shelf = (int)item.Shelf;
-                    mF.CustomerId = post.CustomerId;
-                    mF.StoreId = post.StoreId;
-                    foreach (var item1 in item.products)
+                    var checkexistingRecords = existingRecords.FirstOrDefault(x => x.shelf.ToString() == item.Shelf);
+                    if (checkexistingRecords != null)
                     {
-                        mF.Code = item1.Code;
-                        mF.Department = item1.Department;
-                        mF.total_counted = item1.total_counted;
-                        mF.Inventory_Date = item1.Inventory_Date;
-                        mf1.Add(mF);
+                        checkexistingRecords.tag = Convert.ToInt32(post.Tag);
+                        checkexistingRecords.shelf = Convert.ToInt32(item.Shelf);
+                        foreach (var item1 in item.Products)
+                        {
+                            checkexistingRecords.Code = item1.Code;
+                            checkexistingRecords.Department = item1.Department;
+                            checkexistingRecords.total_counted = item1.TotalCounted;
+                            checkexistingRecords.Inventory_Date = item1.InventoryDate;
+                            updatEmf1.Add(checkexistingRecords);
+                        }
                     }
+                    else
+                    {
+
+                        foreach (var item1 in item.Products)
+                        {
+                            Terminal_Smf mF = new()
+                            {
+                                Id = new Guid(),
+                                tag = Convert.ToInt32(post.Tag),
+                                CustomerId = post.CustomerId,
+                                StoreId = post.StoreId,
+                                shelf = Convert.ToInt32(item.Shelf),
+                                Code = item1.Code,
+                                Department = item1.Department,
+                                total_counted = item1.TotalCounted,
+                                Inventory_Date = item1.InventoryDate,
+                            };
+                            mf1.Add(mF);
+                        }
+                    }
+
+                    if (updatEmf1 != null)
+                        await _context.BulkUpdateAsync(updatEmf1);
+
+                    if (mf1 != null)
+                        await _context.BulkInsertAsync(mf1);
 
                 }
 
-                await _context.BulkInsertAsync(mf1);
-                // _context.SaveChangesAsync();
-
-
-
-                return post;
+                return new TerminalDataModelsResponse { Success = true, Message = "Data Saved Successfully", Status = HttpStatusCode.OK };
             }
+
             catch (Exception ex)
             {
-                throw new Exception(ex.ToString());
+                return new TerminalDataModelsResponse { Success = false, Message = ex.ToString(), Status = HttpStatusCode.InternalServerError };
             }
         }
-
-
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+

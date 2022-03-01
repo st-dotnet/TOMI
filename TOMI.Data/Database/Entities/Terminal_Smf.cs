@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TOMI.Data.Database.Entities
 {
-   public class MF1:EntityBase
+   public class Terminal_Smf:EntityBase
     {
         [Key]
         public Guid Id { get; set; }
@@ -39,6 +39,6 @@ namespace TOMI.Data.Database.Entities
 
 
 
-        public virtual MF2 MF2 { get; set; }
+        public virtual Terminal_Department MF2 { get; set; }
     }
 }

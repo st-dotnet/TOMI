@@ -191,12 +191,12 @@ namespace TOMI.Web.Controllers
         /// </summary>
         /// <param name="barcode"></param>
         /// <returns></returns>
-        [HttpGet("MasterDataByBarCode/{barcode}")]
-        public async Task<IActionResult> MasterBarCodeData(string barcode)
+        [HttpGet("MasterDataByBarCode")]
+        public async Task<IActionResult> MasterBarCodeData()
         {
             try
             {
-                var response = await _stockAdjustmentService.MasterDataByBarCode(barcode);
+                var response = await _stockAdjustmentService.MasterDataByBarCode();
                 return Ok(response);
             }
             catch (Exception ex)

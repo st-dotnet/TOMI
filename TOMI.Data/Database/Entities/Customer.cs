@@ -11,6 +11,6 @@ namespace TOMI.Data.Database.Entities
         public string Name { get; set; } 
         public virtual ICollection<User> Users { get; set; } 
         public virtual ICollection<Store> Stores { get; set; }
-        public virtual ICollection<MF1> MF1 { get; set; }
+        public virtual ICollection<Terminal_Smf> MF1 { get; set; }
     }
 }

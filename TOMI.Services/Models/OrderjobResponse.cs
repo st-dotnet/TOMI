@@ -12,5 +12,16 @@ namespace TOMI.Services.Models
         {
             public OrderJob orderJob { get; set; }
         }
-    
+
+    public class OrderResponse : BaseResponse
+    {
+        public List<OrderJob> orderJob { get; set; }
+    }
+
+
+
+
+
+
+
 }

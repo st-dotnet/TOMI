@@ -8,6 +8,32 @@ namespace TOMI.Data.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
+                name: "Categories",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Division = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DivisionName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Category = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CategoryName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    StoreId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    StockDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Deletedby = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Categories", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Customers",
                 columns: table => new
                 {
@@ -24,6 +50,31 @@ namespace TOMI.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Customers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Departments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Division = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DivisionName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Department = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DepartmentName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    StoreId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    StockDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Deletedby = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Departments", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -50,6 +101,47 @@ namespace TOMI.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_DwnErrors", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Employee",
+                columns: table => new
+                {
+                    EmpNumber = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    EmpName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Postion = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    inventory_key = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Employee", x => x.EmpNumber);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "FileStore",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Header = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FileDate = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StoreNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Category = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RecordCount = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Deletedby = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_FileStore", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -99,18 +191,18 @@ namespace TOMI.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Master",
+                name: "OrderJob",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     SKU = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Barcode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RetailPrice = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Department = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Blank = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OHQuantity = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Unity = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SalePrice = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PriceWithoutTaxes = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Store = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Category = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     StoreId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     StockDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
@@ -124,29 +216,43 @@ namespace TOMI.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Master", x => x.Id);
+                    table.PrimaryKey("PK_OrderJob", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Sales",
+                name: "ParametersByDepartment",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Department = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Quantity = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Pesos = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PercentageInPieces = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    StoreId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    StockDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Deletedby = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ParametersByDepartment", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Reserved",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Store = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Date = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Time = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SKU = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Quantity = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Price = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Total = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    HUA = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Area = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Family = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Lineal = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Metro = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Department = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Departmentname = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Filler = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     StoreId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     StockDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
@@ -160,22 +266,22 @@ namespace TOMI.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Sales", x => x.Id);
+                    table.PrimaryKey("PK_Reserved", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Stocks",
+                name: "Stock",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Store = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     SKU = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Barcode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RetailPrice = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Departament = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Department = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Blank = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OHQuantity = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Unity = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PrecVtaNorm = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    PrecVtaNorm_SImpto = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    SOH = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Category = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     StoreId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     StockDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
@@ -189,7 +295,45 @@ namespace TOMI.Data.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Stocks", x => x.Id);
+                    table.PrimaryKey("PK_Stock", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Terminal_Department",
+                columns: table => new
+                {
+                    Department = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    creation_time = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Deletedby = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Terminal_Department", x => x.Department);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UploadFileName",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Header = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FileDate = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StoreNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Category = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RecordCount = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UploadFileName", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -225,8 +369,8 @@ namespace TOMI.Data.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     GroupId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    TagFrom = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TagTo = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    TagFrom = table.Column<int>(type: "int", nullable: true),
+                    TagTo = table.Column<int>(type: "int", nullable: true),
                     CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     StoreId = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
                     StockDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
@@ -279,11 +423,67 @@ namespace TOMI.Data.Migrations
                 {
                     table.PrimaryKey("PK_StockAdjustment", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_StockAdjustment_Master_SKU",
+                        name: "FK_StockAdjustment_OrderJob_SKU",
                         column: x => x.SKU,
-                        principalTable: "Master",
+                        principalTable: "OrderJob",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Terminal_Smf",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    CustomerId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Terminal = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    StoreId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Employee_Number = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Inventory_Date = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    Department = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Sale_Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    tag = table.Column<int>(type: "int", nullable: false),
+                    shelf = table.Column<int>(type: "int", nullable: false),
+                    operation = table.Column<int>(type: "int", nullable: false),
+                    creation_time = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    inventory_key = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    sync_to_terminal_status = table.Column<bool>(type: "bit", nullable: false),
+                    sync_to_terminal_time = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    sync_back_from_terminal_status = table.Column<bool>(type: "bit", nullable: false),
+                    sync_back_from_terminal_time = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    count_type = table.Column<int>(type: "int", nullable: false),
+                    total_counted = table.Column<int>(type: "int", nullable: false),
+                    count_time = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    nof = table.Column<bool>(type: "bit", nullable: false),
+                    counted_status = table.Column<bool>(type: "bit", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Deletedby = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Terminal_Smf", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Terminal_Smf_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Terminal_Smf_Stores_StoreId",
+                        column: x => x.StoreId,
+                        principalTable: "Stores",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Terminal_Smf_Terminal_Department_Department",
+                        column: x => x.Department,
+                        principalTable: "Terminal_Department",
+                        principalColumn: "Department",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -299,6 +499,7 @@ namespace TOMI.Data.Migrations
                     LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    EmployeeNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
                     DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
@@ -330,8 +531,8 @@ namespace TOMI.Data.Migrations
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "CreatedAt", "CreatedBy", "CustomerId", "DeletedAt", "Deletedby", "Email", "FirstName", "IsActive", "LastName", "Password", "PhoneNumber", "Role", "StoreId", "UpdatedAt", "UpdatedBy" },
-                values: new object[] { new Guid("b74ddd14-6340-4840-95c2-db12554843e5"), null, null, new Guid("b74ddd14-6340-4840-95c2-db12554843e5"), null, null, "admin@gmail.com", "Admin", false, "Admin", "AQAAAAEAACcQAAAAEN/hsWHI2wU5ppGvmWJVUaFoS8Jgp5DFwTPMlQs9oH3NpC9zZds2APVVxzVN1nft6Q==", "1234567890", "SuperAdmin", null, null, null });
+                columns: new[] { "Id", "CreatedAt", "CreatedBy", "CustomerId", "DeletedAt", "Deletedby", "Email", "EmployeeNumber", "FirstName", "IsActive", "LastName", "Password", "PhoneNumber", "Role", "StoreId", "UpdatedAt", "UpdatedBy" },
+                values: new object[] { new Guid("b74ddd14-6340-4840-95c2-db12554843e5"), null, null, new Guid("b74ddd14-6340-4840-95c2-db12554843e5"), null, null, "admin@gmail.com", "987654", "Admin", false, "Admin", "AQAAAAEAACcQAAAAEHmcwblzqU9M5/HrmASzqKJuJqpHItVsQxWGNFbF76hov4CKCLDrhkQ75g7kgLU72g==", "1234567890", "SuperAdmin", null, null, null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Ranges_GroupId",
@@ -349,6 +550,21 @@ namespace TOMI.Data.Migrations
                 column: "CustomerId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Terminal_Smf_CustomerId",
+                table: "Terminal_Smf",
+                column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Terminal_Smf_Department",
+                table: "Terminal_Smf",
+                column: "Department");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Terminal_Smf_StoreId",
+                table: "Terminal_Smf",
+                column: "StoreId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_CustomerId",
                 table: "Users",
                 column: "CustomerId");
@@ -364,22 +580,43 @@ namespace TOMI.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Categories");
+
+            migrationBuilder.DropTable(
+                name: "Departments");
+
+            migrationBuilder.DropTable(
                 name: "DwnErrors");
+
+            migrationBuilder.DropTable(
+                name: "Employee");
+
+            migrationBuilder.DropTable(
+                name: "FileStore");
 
             migrationBuilder.DropTable(
                 name: "InfoLoad");
 
             migrationBuilder.DropTable(
+                name: "ParametersByDepartment");
+
+            migrationBuilder.DropTable(
                 name: "Ranges");
 
             migrationBuilder.DropTable(
-                name: "Sales");
+                name: "Reserved");
+
+            migrationBuilder.DropTable(
+                name: "Stock");
 
             migrationBuilder.DropTable(
                 name: "StockAdjustment");
 
             migrationBuilder.DropTable(
-                name: "Stocks");
+                name: "Terminal_Smf");
+
+            migrationBuilder.DropTable(
+                name: "UploadFileName");
 
             migrationBuilder.DropTable(
                 name: "Users");
@@ -388,7 +625,10 @@ namespace TOMI.Data.Migrations
                 name: "Group");
 
             migrationBuilder.DropTable(
-                name: "Master");
+                name: "OrderJob");
+
+            migrationBuilder.DropTable(
+                name: "Terminal_Department");
 
             migrationBuilder.DropTable(
                 name: "Stores");

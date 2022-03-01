@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace TOMI.Data.Database.Entities
 {
-    public class MF2 : EntityBase
+    public class Terminal_Department : EntityBase
     {
         
         public Guid Id { get; set; }
@@ -15,7 +15,7 @@ namespace TOMI.Data.Database.Entities
         public string Department { get; set; }
         public DateTimeOffset creation_time { get; set; }
 
-       public virtual ICollection<MF1> MF1 { get; set; }
+       public virtual ICollection<Terminal_Smf> MF1 { get; set; }
 
       
 

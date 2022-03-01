@@ -11,15 +11,19 @@ namespace TOMI.Services.Interfaces
     public interface IReportOptionService
     {
 
-       Task<List<StockAdjustment>> GetLabelDetailsAsync(int tag);
-       Task<List<StockAdjustment>> GetCodeNotFoundAsync();
-       Task<List<StockAdjustment>> GetExtendedPricesAsync();
-        List<stockandorder> GetUncountedItemsAsync(string department);
-        List<StockAndStockAdjust> GetVariationBySKUAsync(string department);
+        Task<List<StockAdjustment>> GetLabelDetailsAsyncTest();
+        Task<List<StockAdjustment>> GetLabelDetailsAsync(int? tagFrom,int? tagTo);
+        Task<List<StockAdjustment>> GetCodeNotFoundAsync();
+        Task<List<StockAdjustment>> GetExtendedPricesAsync();
+        List<stockandorder> GetUncountedItemsAsync();
+        List<StockAndStockAdjust> GetVariationBySKUAsync();
         Task<List<StockAdjustment>> GetCorrectionsReportAsync();
         List<DeptAndStockAdjust> GetBreakDownReportAsync();
         Task<List<StockAdjustment>> GetDateTimeCheckReport();
         Task<List<Departments>> GetDepartments();
         Task<List<Ranges>> GetRangesforReport();
+         Task<List<StockAdjustment>> GetAdjustmentReport();
+        List<OrderAndStockAdjust> InventoryNumberFile();
+        List<StockAdjustAndOrder> DetailOfInventoriesFile();
     }
 }

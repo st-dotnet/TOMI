@@ -21,8 +21,8 @@ namespace TOMI.Data.Database
         public DbSet<Stock> Stock { get; set; }
         public DbSet<Categories> Categories { get; set; }
         public DbSet<ParametersByDepartment> ParametersByDepartment { get; set; }
-        public DbSet<MF1> MF1 { get; set; }
-        public DbSet<MF2> MF2 { get; set; }
+        public DbSet<Terminal_Smf> Terminal_Smf { get; set; }
+        public DbSet<Terminal_Department> Terminal_Department { get; set; }
         public DbSet<FileStore> FileStore { get; set; }
         public DbSet<UploadFileName> UploadFileName { get; set; }
 
@@ -60,7 +60,7 @@ namespace TOMI.Data.Database
              .WithOne(s => s.Store)
              .HasForeignKey<User>(x => x.StoreId)
              .OnDelete(DeleteBehavior.NoAction);
-            modelBuilder.Entity<MF2>()
+            modelBuilder.Entity<Terminal_Department>()
              .HasMany(c => c.MF1)
              .WithOne(c => c.MF2)
              .HasForeignKey(x => x.Department);

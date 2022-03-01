@@ -33,7 +33,7 @@ namespace TOMI.Web.Controllers
         /// <returns></returns>
         [HttpPost]
         [Route("GenerateMF1")]
-        public async Task<IActionResult> GenerateMF1(TerminalModel model)
+        public async Task<IActionResult> GenerateMF1(TermModel model)
         {
             try
             {

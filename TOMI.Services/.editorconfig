@@ -28,3 +28,6 @@ dotnet_style_predefined_type_for_locals_parameters_members = true:suggestion
 
 #do not prefer accessibility modifiers to be specified
 dotnet_style_require_accessibility_modifiers = never:suggestion
+
+# CS0472: The result of the expression is always the same since a value of this type is never equal to 'null'
+dotnet_diagnostic.CS0472.severity = none

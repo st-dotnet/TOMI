@@ -181,19 +181,14 @@ namespace TOMI.Services.Repository
             }
         }
 
-        public async Task<OrderjobResponse> MasterDataByBarCode(string barcode)
+        public async Task<OrderResponse> MasterDataByBarCode()
         {
             try
             {
-                var stock = await _context.OrderJob.FirstOrDefaultAsync(x => x.Code == barcode);
-                if (stock == null)
-                {
-                    return new OrderjobResponse { Error = "Barcode id doesn't exist", Success = false };
-                }
-                else
-                {
-                    return new OrderjobResponse { orderJob = stock, Success = true };
-                }
+                var stock = await _context.OrderJob.ToListAsync();
+             
+                    return new OrderResponse { orderJob = stock, Success = true };
+               
             }
             catch (Exception ex)
             {
@@ -201,6 +196,25 @@ namespace TOMI.Services.Repository
             }
         }
 
+        //public async Task<OrderResponse> MasterDataByBarCode(string barcode)
+        //{
+        //    try
+        //    {
+        //        var stock = await _context.OrderJob.Where(x => x.Code == barcode).ToListAsync(); 
+        //        if (stock == null)
+        //        {
+        //            return new OrderResponse { Error = "Barcode id doesn't exist", Success = false };
+        //        }
+        //        else
+        //        {
+        //            return new OrderResponse { orderJob = stock, Success = true };
+        //        }
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        throw new Exception(ex.ToString());
+        //    }
+        //}
         public async Task<List<StockAdjustment>> FilterStock(StockAdjustmentFilterModel model)
         {
             try

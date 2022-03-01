@@ -10,7 +10,7 @@ namespace TOMI.Services.Helpers
             AllowNullCollections = true;
             CreateMap<CustomerModel, Customer>();
             CreateMap<UserModel, User>();
-            CreateMap<MF2Model, MF2>();
+            CreateMap<MF2Model, Terminal_Department>();
             CreateMap<StoreModel, Store>();
             CreateMap<InfoDataResponse, InfoLoad>();
             CreateMap<RangesModel, Ranges>();

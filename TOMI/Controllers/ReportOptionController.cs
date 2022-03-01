@@ -25,19 +25,17 @@ namespace TOMI.Web.Controllers
             _logger.LogDebug(1, "NLog injected into reportOptionController");
         }
         #region Public methods
-
         /// <summary>
         /// GetLabelDetailsAsync
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("GetLabelDetailsAsync")]
-        public async Task<IActionResult> GetLabelDetailsAsync()
+        [Route(("GetLabelDetailsAsyncTest"))]
+        public async Task<IActionResult> GetLabelDetailsAsyncTest()
         {
-
             try
             {
-                var response = await _reportOptionRepository.GetLabelDetailsAsync();
+                var response = await _reportOptionRepository.GetLabelDetailsAsyncTest();
                 return Ok(response);
             }
             catch (Exception ex)
@@ -45,6 +43,25 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
+        /// <summary>
+        /// GetLabelDetailsAsync
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route(("GetLabelDetailsAsync/{tagFrom}/{tagTo}"))]
+        public async Task<IActionResult> GetLabelDetailsAsync(int? tagFrom, int? tagTo)
+        {
+            try
+            {
+                var response = await _reportOptionRepository.GetLabelDetailsAsync(tagFrom, tagTo);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
 
         /// <summary>
         /// GetCodeNotFoundAsync
@@ -93,13 +110,12 @@ namespace TOMI.Web.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        [Route("GetUncountedItemsAsync")]
+        [Route(("GetUncountedItemsAsync"))]
         public IActionResult GetUncountedItemsAsync()
         {
-
             try
             {
-                var response =  _reportOptionRepository.GetUncountedItemsAsync();
+                var response = _reportOptionRepository.GetUncountedItemsAsync();
                 return Ok(response);
             }
             catch (Exception ex)
@@ -107,7 +123,6 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
-
         /// <summary>
         /// GetVariationBySKUAsync
         /// </summary>
@@ -116,7 +131,6 @@ namespace TOMI.Web.Controllers
         [Route("GetVariationBySKUAsync")]
         public IActionResult GetVariationBySKUAsync()
         {
-
             try
             {
                 var response = _reportOptionRepository.GetVariationBySKUAsync();
@@ -127,9 +141,6 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
-
-        
-
         /// <summary>
         /// GetCorrectionsReportAsync
         /// </summary>
@@ -142,6 +153,26 @@ namespace TOMI.Web.Controllers
             try
             {
                 var response = await _reportOptionRepository.GetCorrectionsReportAsync();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        /// <summary>
+        /// GetAdjustmentReport
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("GetAdjustmentReport")]
+        public async Task<IActionResult> GetAdjustmentReport()
+        {
+
+            try
+            {
+                var response = await _reportOptionRepository.GetAdjustmentReport();
                 return Ok(response);
             }
             catch (Exception ex)
@@ -181,6 +212,44 @@ namespace TOMI.Web.Controllers
             try
             {
                 var response = await _reportOptionRepository.GetDateTimeCheckReport();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        /// <summary>
+        /// InventoryNumberFile
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("InventoryNumberFile")]
+        public IActionResult InventoryNumberFile()
+        {
+            try
+            {
+                var response = _reportOptionRepository.InventoryNumberFile();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        /// <summary>
+        /// DetailOfInventoriesFile
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet]
+        [Route("DetailOfInventoriesFile")]
+        public IActionResult DetailOfInventoriesFile()
+        {
+            try
+            {
+                var response = _reportOptionRepository.DetailOfInventoriesFile();
                 return Ok(response);
             }
             catch (Exception ex)

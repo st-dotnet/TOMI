@@ -223,6 +223,82 @@ namespace TOMI.Data.Migrations
                     b.ToTable("DwnErrors");
                 });
 
+            modelBuilder.Entity("TOMI.Data.Database.Entities.Employee", b =>
+                {
+                    b.Property<string>("EmpNumber")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("EmpName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("LastName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Postion")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("inventory_key")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("EmpNumber");
+
+                    b.ToTable("Employee");
+                });
+
+            modelBuilder.Entity("TOMI.Data.Database.Entities.FileStore", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Category")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("Deletedby")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("FileDate")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Header")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("RecordCount")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StoreNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("FileStore");
+                });
+
             modelBuilder.Entity("TOMI.Data.Database.Entities.Group", b =>
                 {
                     b.Property<Guid?>("Id")
@@ -313,216 +389,6 @@ namespace TOMI.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("InfoLoad");
-                });
-
-            modelBuilder.Entity("TOMI.Data.Database.Entities.MF1", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Code")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CustomerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("CustomerId1")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("Deletedby")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Department")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Employee_Number")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("Inventory_Date")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<decimal>("Sale_Price")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<Guid>("StoreId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Terminal")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("count_time")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("count_type")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("counted_status")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("creation_time")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("inventory_key")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("nof")
-                        .HasColumnType("bit");
-
-                    b.Property<int>("operation")
-                        .HasColumnType("int");
-
-                    b.Property<int>("shelf")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("sync_back_from_terminal_status")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("sync_back_from_terminal_time")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("sync_to_terminal_status")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("sync_to_terminal_time")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("tag")
-                        .HasColumnType("int");
-
-                    b.Property<int>("total_counted")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("CustomerId1");
-
-                    b.HasIndex("StoreId");
-
-                    b.ToTable("MF1");
-                });
-
-            modelBuilder.Entity("TOMI.Data.Database.Entities.MF2", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset?>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("Deletedby")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Department")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTime>("creation_time")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("MF2");
-                });
-
-            modelBuilder.Entity("TOMI.Data.Database.Entities.Master", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Barcode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Blank")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CustomerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("Deletedby")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Department")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("OHQuantity")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RetailPrice")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SKU")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("StockDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("StoreId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Unity")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Master");
                 });
 
             modelBuilder.Entity("TOMI.Data.Database.Entities.OrderJob", b =>
@@ -754,92 +620,6 @@ namespace TOMI.Data.Migrations
                     b.ToTable("Reserved");
                 });
 
-            modelBuilder.Entity("TOMI.Data.Database.Entities.Sales", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Area")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CustomerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Date")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("Deletedby")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Department")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Departmentname")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Family")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("HUA")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Lineal")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Metro")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Price")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Quantity")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SKU")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("StockDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Store")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<Guid?>("StoreId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Time")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Total")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Sales");
-                });
-
             modelBuilder.Entity("TOMI.Data.Database.Entities.Stock", b =>
                 {
                     b.Property<Guid>("Id")
@@ -907,7 +687,7 @@ namespace TOMI.Data.Migrations
 
             modelBuilder.Entity("TOMI.Data.Database.Entities.StockAdjustment", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<Guid?>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
@@ -975,71 +755,6 @@ namespace TOMI.Data.Migrations
                     b.ToTable("StockAdjustment");
                 });
 
-            modelBuilder.Entity("TOMI.Data.Database.Entities.Stocks", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Barcode")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Blank")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("CreatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("CreatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid?>("CustomerId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<DateTimeOffset?>("DeletedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("Deletedby")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Department")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("OHQuantity")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("RetailPrice")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("SKU")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("StockDate")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("StoreId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Unity")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset?>("UpdatedAt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<Guid?>("UpdatedBy")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Stocks");
-                });
-
             modelBuilder.Entity("TOMI.Data.Database.Entities.Store", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1080,6 +795,177 @@ namespace TOMI.Data.Migrations
                     b.ToTable("Stores");
                 });
 
+            modelBuilder.Entity("TOMI.Data.Database.Entities.Terminal_Department", b =>
+                {
+                    b.Property<string>("Department")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("Deletedby")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("creation_time")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Department");
+
+                    b.ToTable("Terminal_Department");
+                });
+
+            modelBuilder.Entity("TOMI.Data.Database.Entities.Terminal_Smf", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Code")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CustomerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("Deletedby")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Department")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Employee_Number")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("Inventory_Date")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("Sale_Price")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<Guid>("StoreId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Terminal")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("count_time")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("count_type")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("counted_status")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("creation_time")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("inventory_key")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("nof")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("operation")
+                        .HasColumnType("int");
+
+                    b.Property<int>("shelf")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("sync_back_from_terminal_status")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("sync_back_from_terminal_time")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("sync_to_terminal_status")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("sync_to_terminal_time")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("tag")
+                        .HasColumnType("int");
+
+                    b.Property<int>("total_counted")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("Department");
+
+                    b.HasIndex("StoreId");
+
+                    b.ToTable("Terminal_Smf");
+                });
+
+            modelBuilder.Entity("TOMI.Data.Database.Entities.UploadFileName", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Category")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileDate")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Header")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RecordCount")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("StoreNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UploadFileName");
+                });
+
             modelBuilder.Entity("TOMI.Data.Database.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1102,6 +988,9 @@ namespace TOMI.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Email")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EmployeeNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
@@ -1147,38 +1036,14 @@ namespace TOMI.Data.Migrations
                             Id = new Guid("b74ddd14-6340-4840-95c2-db12554843e5"),
                             CustomerId = new Guid("b74ddd14-6340-4840-95c2-db12554843e5"),
                             Email = "admin@gmail.com",
+                            EmployeeNumber = "987654",
                             FirstName = "Admin",
                             IsActive = false,
                             LastName = "Admin",
-                            Password = "AQAAAAEAACcQAAAAENN1Gpr6WXcSbMRfgNSH9Fi+owtYDa0C9SIagNoyOdw/c48yL0XeGLysS7xWyNmXhg==",
+                            Password = "AQAAAAEAACcQAAAAEHmcwblzqU9M5/HrmASzqKJuJqpHItVsQxWGNFbF76hov4CKCLDrhkQ75g7kgLU72g==",
                             PhoneNumber = "1234567890",
                             Role = "SuperAdmin"
                         });
-                });
-
-            modelBuilder.Entity("TOMI.Data.Database.Entities.MF1", b =>
-                {
-                    b.HasOne("TOMI.Data.Database.Entities.OrderJob", "OrderJob")
-                        .WithMany("MF1")
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TOMI.Data.Database.Entities.Customer", null)
-                        .WithMany("MF1")
-                        .HasForeignKey("CustomerId1")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("TOMI.Data.Database.Entities.Store", "Store")
-                        .WithMany("MF1")
-                        .HasForeignKey("StoreId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("OrderJob");
-
-                    b.Navigation("Store");
                 });
 
             modelBuilder.Entity("TOMI.Data.Database.Entities.Ranges", b =>
@@ -1210,6 +1075,31 @@ namespace TOMI.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("Customer");
+                });
+
+            modelBuilder.Entity("TOMI.Data.Database.Entities.Terminal_Smf", b =>
+                {
+                    b.HasOne("TOMI.Data.Database.Entities.Customer", "customer")
+                        .WithMany("MF1")
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("TOMI.Data.Database.Entities.Terminal_Department", "MF2")
+                        .WithMany("MF1")
+                        .HasForeignKey("Department");
+
+                    b.HasOne("TOMI.Data.Database.Entities.Store", "Store")
+                        .WithMany("MF1")
+                        .HasForeignKey("StoreId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("customer");
+
+                    b.Navigation("MF2");
+
+                    b.Navigation("Store");
                 });
 
             modelBuilder.Entity("TOMI.Data.Database.Entities.User", b =>
@@ -1246,8 +1136,6 @@ namespace TOMI.Data.Migrations
 
             modelBuilder.Entity("TOMI.Data.Database.Entities.OrderJob", b =>
                 {
-                    b.Navigation("MF1");
-
                     b.Navigation("StockAdjustment");
                 });
 
@@ -1256,6 +1144,11 @@ namespace TOMI.Data.Migrations
                     b.Navigation("MF1");
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("TOMI.Data.Database.Entities.Terminal_Department", b =>
+                {
+                    b.Navigation("MF1");
                 });
 #pragma warning restore 612, 618
         }
