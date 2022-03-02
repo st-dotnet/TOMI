@@ -1,6 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using TOMI.Data.Database.Entities;
 
 namespace TOMI.Data.Database
@@ -27,6 +29,8 @@ namespace TOMI.Data.Database
         public DbSet<UploadFileName> UploadFileName { get; set; }
 
         public DbSet<Employee> Employee { get; set; }
+        public DbSet<StockAdjustmentlog> StockAdjustmentlog { get; set; }
+        public DbSet<InventoryFigure> InventoryFigure { get; set; }
         public TOMIDataContext(DbContextOptions<TOMIDataContext> options)
             : base(options)
         {
@@ -113,5 +117,7 @@ namespace TOMI.Data.Database
             user.Password = passwordHasher.HashPassword(user, "Sss1234!");
             builder.Entity<User>().HasData(user);
         }
+
+       
     }
 }

@@ -204,7 +204,6 @@ namespace TOMI.Services.Repository
             {
                 throw new Exception(ex.ToString());
             }
-
         }
         public async Task<List<OrderJob>> GetOrderJob(FilterDataRequest request)
         {
@@ -223,7 +222,7 @@ namespace TOMI.Services.Repository
             logger.Info("OrderJobData method started");
             bool isSaveSuccess = false;
             string fileName;
-            var innerDataError = model.StockDate.Value.Date.Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
+            var innerDataError = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
                 model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
             //var innerDataError = model.StockDate.Value.Date.Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
             //   model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
@@ -266,13 +265,13 @@ namespace TOMI.Services.Repository
                    model.StockDate.Value.Date.AddDays(-2).Day.ToString("#00");
 
                 var jobOrderDate = model.StockDate.Value.Date.Month.ToString("#00") +
-                   model.StockDate.Value.Date.Day.ToString("#00");
+                   model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
                 logger.Info($"Get jobOrderDate : {jobOrderDate}");
                 try
                 {
                     forInnerStockDate = model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString()
                          + model.StockDate.Value.Date.Month.ToString("#00")
-                         + model.StockDate.Value.Date.Day.ToString("#00");
+                         + model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
 
                     logger.Info($"Get jobOrforInnerStockDatederDate : {forInnerStockDate}");
                 }
@@ -617,15 +616,15 @@ namespace TOMI.Services.Repository
             logger.Info("DepartmentsData method started");
             bool isSaveSuccess = false;
             string fileName;
-            var innerDataError = model.StockDate.Value.Date.Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
+            var innerDataError = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
                 model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
             logger.Info("innerDataError for check error");
 
             var finaldeptartmentDate = model.StockDate.Value.Date.Month.ToString("#00") +
-              model.StockDate.Value.Date.Day.ToString("#00");
+              model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
 
             var departmentPreviousDate = model.StockDate.Value.Date.Month.ToString("#00") +
-                   model.StockDate.Value.Date.Day.ToString("#00");
+                   model.StockDate.Value.Date.AddDays(-2).Day.ToString("#00");
             var forInnerdeptartmentDate = string.Empty;
 
 
@@ -663,7 +662,7 @@ namespace TOMI.Services.Repository
                 {
                     forInnerdeptartmentDate = model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString()
                          + model.StockDate.Value.Date.Month.ToString("#00")
-                         + model.StockDate.Value.Date.Day.ToString("#00");
+                         + model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
                     logger.Info($"Get forInnerdeptartmentDate : {forInnerdeptartmentDate}");
                 }
                 catch (Exception ex)
@@ -994,7 +993,7 @@ namespace TOMI.Services.Repository
                 var reservedStoreName = model.StoreName.ToString().Substring(0, 4);
 
                 var finalReservedDate = model.StockDate.Value.Date.Month.ToString("#00") +
-                   model.StockDate.Value.Date.Day.ToString("#00");
+                   model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
 
                 var ReservedPreviousDate = model.StockDate.Value.Date.Month.ToString("#00") +
                 model.StockDate.Value.Date.AddDays(-2).Day.ToString("#00");
@@ -1004,7 +1003,7 @@ namespace TOMI.Services.Repository
                 {
                     finalInnerreservedDate = model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString()
                          + model.StockDate.Value.Date.Month.ToString("#00")
-                         + model.StockDate.Value.Date.Day.ToString("#00");
+                         + model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
                 }
                 catch (Exception ex)
                 {
@@ -1070,9 +1069,6 @@ namespace TOMI.Services.Repository
                             RecordCount=y.Substring(29,6),
                             }}).ToList();
 
-
-                            //await _context.BulkInsertAsync(fileStores);
-
                             // for inner header
                             string reservedInnerFileHeader = ReservedFile[0].Substring(0, 6).Trim();
                             string reservedInnerFileName = ReservedFile[0].Substring(7, 5).Trim();
@@ -1110,7 +1106,7 @@ namespace TOMI.Services.Repository
                                             Error = "TRAILER record not match."
                                         };
                                     }
-                                    await _context.BulkInsertAsync(reservedList);
+                                   await _context.BulkInsertAsync(reservedList);
                                     //   var customerId = new SqlParameter("@customerId", model.CustomerId);
                                     //   await _context.StockAdjustment.FromSqlRaw("EXECUTE dbo.AutoAppendReservedRecords {0}", customerId).ToListAsync();
                                     var query = (from b in _context.OrderJob
@@ -1128,16 +1124,7 @@ namespace TOMI.Services.Repository
                                                      Date = a.CreatedAt,
                                                      Department = b.Department,
                                                  }).ToList();
-                                    //int maxLength = _context.StockAdjustment.Select(x => x.Rec).Count();
-                                    //if (maxLength == 0)
-                                    //{
-                                    //    maxLength = 1;
-                                    //}
-                                    //else
-                                    //{
-                                    //    maxLength = _context.StockAdjustment.Select(x => x.Rec).Count() + 1;
-                                    //}
-
+                                   
                                     stockAdjustmentList = query.SelectMany(x => new List<StockAdjustment>
                                     {
                                     new()
@@ -1379,7 +1366,7 @@ namespace TOMI.Services.Repository
             string regex = "^0+(?!$)";
             bool isSaveSuccess = false;
             string fileName;
-            var innerDataError = model.StockDate.Value.Date.Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
+            var innerDataError = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
                 model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
             List<Stock> stockList = new();
             //for file header
@@ -1411,7 +1398,7 @@ namespace TOMI.Services.Repository
                 var stockStoreName = model.StoreName.ToString().Substring(0, 4);
 
                 var finalStockDate = model.StockDate.Value.Date.Month.ToString("#00") +
-                   model.StockDate.Value.Date.Day.ToString("#00");
+                   model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
                 //  var forInnerStockDates = Convert.ToDateTime("35-13-2029");
 
                 logger.Info($"Get StockData : {finalStockDate}");
@@ -1421,7 +1408,7 @@ namespace TOMI.Services.Repository
                 {
                     forInnerStockDate = model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString()
                          + model.StockDate.Value.Date.Month.ToString("#00")
-                         + model.StockDate.Value.Date.Day.ToString("#00");
+                         + model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
 
                 }
                 catch (Exception ex)
@@ -1488,7 +1475,7 @@ namespace TOMI.Services.Repository
                             {
                             RecordCount=y.Substring(29,6),
                             }}).ToList();
-                            // await _context.BulkInsertAsync(fileStores);
+                            
                             // for inner header
                             string stockInnerFileHeader = stockFileData[0].Substring(0, 6).Trim();
                             string stockInnerFileName = stockFileData[0].Substring(7, 11).Trim();
@@ -1666,7 +1653,7 @@ namespace TOMI.Services.Repository
                             timeElapsed = Math.Ceiling(stopwatch.Elapsed.TotalSeconds);
 
                             uploadFileNames = new List<UploadFileName> { new() { FileName = tempfileName.Substring(0, 4), StoreNumber = tempfileName.Substring(4, 4), FileDate = tempfileName.Substring(9, 4), Category = "Stock" } };
-                            await _context.BulkInsertAsync(uploadFileNames);
+                           await _context.BulkInsertAsync(uploadFileNames);
 
                             //for file header
                             fileStores = zipStockFile.Take(1).SelectMany(y => new List<FileStore>
@@ -1729,7 +1716,7 @@ namespace TOMI.Services.Repository
             string regex = "^0+(?!$)";
             bool isSaveSuccess = false;
             string fileName;
-            var innerDataError = model.StockDate.Value.Date.Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
+            var innerDataError = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
                 model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
 
             List<Categories> categoryList = new();
@@ -1760,7 +1747,7 @@ namespace TOMI.Services.Repository
                 var categoryStoreName = model.StoreName.ToString().Substring(0, 4);
 
                 var finalCategoryDate = model.StockDate.Value.Date.Month.ToString("#00") +
-                   model.StockDate.Value.Date.Day.ToString("#00"); ;
+                   model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00"); ;
                 //  var forInnerStockDates = Convert.ToDateTime("35-13-2029");
 
                 var categoryPreviousDate = model.StockDate.Value.Date.Month.ToString("#00") +
@@ -1771,7 +1758,7 @@ namespace TOMI.Services.Repository
                 {
                     forInnerCategoryDate = model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString()
                          + model.StockDate.Value.Date.Month.ToString("#00")
-                         + model.StockDate.Value.Date.Day.ToString("#00");
+                         + model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
                 }
                 catch (Exception ex)
                 {

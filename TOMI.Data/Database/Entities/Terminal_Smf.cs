@@ -21,7 +21,7 @@ namespace TOMI.Data.Database.Entities
         public decimal Sale_Price { get; set; }
         public int tag { get; set; }
         public int shelf { get; set; }
-        public int operation { get; set; }
+        public OperationType operation { get; set; }
         public DateTime creation_time { get; set; }
         public string inventory_key { get; set; }
         public bool sync_to_terminal_status { get; set; }

@@ -68,7 +68,8 @@ namespace TOMI.Web.Controllers
             try
             {
                 if (model != null)
-                    return Ok(await _storeService.StockData(model));
+                   
+                return Ok(await _storeService.StockData(model));
                 else
                     return BadRequest(new { message = "please at least upload one file " });
             }

@@ -62,7 +62,7 @@ namespace TOMI.Services.Models
     public class GetTerminalModel
     {
 
-        public int operation { get; set; }
+        public OperationType operation { get; set; }
         public string InventoryKey { get; set; }
 
     }

@@ -41,7 +41,7 @@ namespace TOMI.Services.Repository
 
                 var masterdata = await _context.OrderJob.ToListAsync();
 
-                var existingData = from a in _context.Terminal_Smf from b in _context.OrderJob where a.Code == b.Code && a.Department == b.Department select a;
+                var existingData = from a in _context.Terminal_Smf from b in _context.OrderJob where a.Code == b.Code && a.Department == b.Department && a.inventory_key == model.InventoryKey && a.operation == model.Operation select a;
 
                 foreach (var item in masterdata)
                 {
@@ -148,6 +148,7 @@ namespace TOMI.Services.Repository
                 mF1AndEmp.TerminalSmf = await (from a in _context.Terminal_Smf
                                                join c in _context.Terminal_Department on a.Department equals c.Department
                                                join b in _context.OrderJob on c.Department equals b.Department
+                                               where a.operation == terminal.operation
                                                select new TerminalSmf
                                                {
                                                    Code = a.Code,
@@ -161,7 +162,7 @@ namespace TOMI.Services.Repository
                                                    SalePrice = a.Sale_Price,
                                                    Tag = a.tag.ToString(),
                                                    Shelf = a.shelf.ToString(),
-                                                   Operation = terminal.operation,
+                                                   Operation = a.operation,
                                                    InventoryKey = a.inventory_key,
                                                    CountType = a.count_type,
                                                    TotalCounted = a.total_counted,

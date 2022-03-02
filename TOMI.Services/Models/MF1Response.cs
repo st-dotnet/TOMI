@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TOMI.Data.Database.Entities;
 
 namespace TOMI.Services.Models
 {
@@ -22,7 +23,7 @@ namespace TOMI.Services.Models
         public decimal SalePrice { get; set; }
         public string Tag { get; set; }
         public string Shelf { get; set; }
-        public int Operation { get; set; }
+        public OperationType Operation { get; set; }
         public string InventoryKey { get; set; }
         public int CountType { get; set; }
         public int TotalCounted { get; set; }

@@ -202,7 +202,45 @@ namespace TOMI.Web.Controllers
         {
             try
             {
-                return Ok(await _reportOptionRepository.InventoryFigure(model));
+                //return Ok(await _reportOptionRepository.InventoryFigure(model));
+                
+                var invFigure = await _reportOptionRepository.InventoryFigure(model);
+                var stream = System.IO.File.OpenRead(invFigure);
+                var fileName = System.IO.Path.GetFileName(invFigure);
+                return new FileStreamResult(stream, $"application/text|{fileName}");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+        [HttpPost("InventoryDetailReport")]
+        public async Task<IActionResult> InventoryDetailReport([FromForm] FilterCustomerReportDataModel model)
+        {
+            try
+            {
+                //  return Ok(await _reportOptionRepository.InventoryDetail(model));
+                var invResult = await _reportOptionRepository.InventoryDetail(model);
+                var stream = System.IO.File.OpenRead(invResult);
+                var fileName = System.IO.Path.GetFileName(invResult);
+                return new FileStreamResult(stream, $"application/text|{fileName}");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        [HttpPost("MarbeteDetailReport")]
+        public async Task<IActionResult> MarbeteDetailReport([FromForm] FilterCustomerReportDataModel model)
+        {
+            try
+            {
+                // return Ok(await _reportOptionRepository.MarbeteDetail(model));
+                var result = await _reportOptionRepository.MarbeteDetail(model);
+                var stream = System.IO.File.OpenRead(result);
+                var fileName = System.IO.Path.GetFileName(result);
+                return new FileStreamResult(stream, $"application/text|{fileName}");
             }
             catch (Exception ex)
             {

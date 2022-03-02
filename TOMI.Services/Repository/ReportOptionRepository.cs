@@ -3,10 +3,14 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using AutoMapper;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NLog;
@@ -22,16 +26,21 @@ namespace TOMI.Services.Repository
         private readonly IMapper _mapper;
         private readonly Logger logger;
         private readonly TOMIDataContext _context;
-   
-        public ReportOptionRepository(TOMIDataContext context, IMapper mapper)
+        private readonly IWebHostEnvironment _webHostEnvironment;
+
+        public ReportOptionRepository(
+            TOMIDataContext context,
+            IMapper mapper,
+            IWebHostEnvironment webHostEnvironment)
         {
             logger = LogManager.GetCurrentClassLogger();
             _context = context;
             _mapper = mapper;
+            _webHostEnvironment = webHostEnvironment;
         }
         public async Task<List<StockAdjustment>> GetCodeNotFoundAsync()
         {
-            return await _context.StockAdjustment.Include(x => x.OrderJob).ToListAsync();
+            return await _context.StockAdjustment.Include(x => x.OrderJob).Where(c => c.NOF == 1).ToListAsync();
         }
         public async Task<List<StockAdjustment>> GetLabelDetailsAsync(int? tagFrom, int? tagTo)
         {
@@ -151,72 +160,7 @@ namespace TOMI.Services.Repository
         {
             throw new NotImplementedException();
         }
-        public async Task<FileUplaodRespone> InventoryFigure(FilterCustomerReportDataModel model)
-        {
-            string fileName=string.Empty;
-            string InnerHeaderName=string.Empty;
-            string innerFooter=string.Empty;
-            var innerDataError =  model.StockDate.Value.Date.Month.ToString("#00")+ model.StockDate.Value.Date.Day.ToString("#00");
-            var figureStoreDate = model.StoreName.ToString().Substring(0, 4);
-            var InnerContentDate= model.StockDate.Value.Date.Day.ToString("#00")+ model.StockDate.Value.Date.Month.ToString("#00")+model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
-            string numberOfRecords = "000000.";
-            fileName = "CTLR"+innerDataError+"_"+ figureStoreDate + ".txt";
-            InnerHeaderName = "HEADER" + " " + "CIFRAS INV" +figureStoreDate+InnerContentDate + " "+ numberOfRecords;
-
-            innerFooter = "TRAILER" + " " + "CIFRAS INV" + figureStoreDate + InnerContentDate;
-
-            var query = (from b in _context.OrderJob
-                         join a in _context.StockAdjustment on b.Code equals a.Barcode
-                         select new InventoryFigure
-                         {
-                             StoreNumber = b.Store,
-                             FigureDate = b.StockDate,
-                             Unit = (int)a.Quantity,
-                             Amount = b.SalePrice,
-                         }).ToList();
-            
-            if (File.Exists(fileName))
-            {
-                File.Delete(fileName);
-            }
-            File.Create(fileName).Close();
-            string line = string.Join(",", InnerHeaderName) + System.Environment.NewLine;
-            foreach (var item in query)
-            {
-                var currentUnits = item.Unit.ToString();
-                var currentAmount = item.Amount.ToString();
-                for (int i = 0; i < 12; i++)
-                {
-                    if (currentUnits.Length < 12)
-                        currentUnits = "0" + currentUnits;
-                }
-                for (int i = 0; i < 12; i++)
-                {
-                    if (currentAmount.Length < 12)
-                        currentAmount = "0" + currentAmount;
-                }
-                var date= item.FigureDate.Value.Date.Year.ToString().Substring(0, 4).ToString()
-                         + item.FigureDate.Value.Date.Month.ToString("#00")
-                         + item.FigureDate.Value.Date.Day.ToString("#00");
-                line = line + string.Join(",", item.StoreNumber+ date + currentUnits + currentAmount) + System.Environment.NewLine;
-            }
-
-            var currentCountRec = query.Count.ToString();
-            
-            for (int i = 0; i < 6; i++)
-            {
-                if (currentCountRec.Length < 6)
-                    currentCountRec = "0" + currentCountRec;
-            }
-
-            line = line + string.Join(",", innerFooter +" "+ currentCountRec) + System.Environment.NewLine;
-
-            File.AppendAllText(fileName, line);
-
-            return null;
-        }
-
-        public Task<FileUplaodRespone> InventoryDetail(FilterCustomerReportDataModel model)
+        public async Task<string> InventoryFigure(FilterCustomerReportDataModel model)
         {
             string fileName = string.Empty;
             string InnerHeaderName = string.Empty;
@@ -225,14 +169,15 @@ namespace TOMI.Services.Repository
             var figureStoreDate = model.StoreName.ToString().Substring(0, 4);
             var InnerContentDate = model.StockDate.Value.Date.Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") + model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
             string numberOfRecords = "000000.";
-            fileName = "INVR" + innerDataError + "_" + figureStoreDate + ".txt";
-            InnerHeaderName = "HEADER" + " " + "INVENTARIO" + figureStoreDate + InnerContentDate + " " + numberOfRecords;
+            fileName = "CTLR" + innerDataError + "_" + figureStoreDate + ".txt";
+            InnerHeaderName = "HEADER" + "  " + "CIFRAS INV" + figureStoreDate + InnerContentDate + " " + numberOfRecords;
 
-            innerFooter = "TRAILER" + " " + "INVENTARIO" + figureStoreDate + InnerContentDate;
+            innerFooter = "TRAILER" + " " + "CIFRAS INV" + figureStoreDate + InnerContentDate;
 
             var query = (from b in _context.OrderJob
                          join a in _context.StockAdjustment on b.Code equals a.Barcode
-                         select new InventoryFigure
+                      
+                        select new InventoryFigure
                          {
                              StoreNumber = b.Store,
                              FigureDate = b.StockDate,
@@ -240,11 +185,18 @@ namespace TOMI.Services.Repository
                              Amount = b.SalePrice,
                          }).ToList();
 
-            if (File.Exists(fileName))
+            //int QSTotal = (from b in _context.StockAdjustment
+
+            //               select b.Quantity).Sum();
+
+            string webRootPath = _webHostEnvironment.WebRootPath;
+            var path = Path.Combine($"{webRootPath}\\Upload", fileName);
+            if (File.Exists(path))
             {
-                File.Delete(fileName);
+                File.Delete(path);
             }
-            File.Create(fileName).Close();
+            File.Create(path).Close();
+
             string line = string.Join(",", InnerHeaderName) + System.Environment.NewLine;
             foreach (var item in query)
             {
@@ -276,9 +228,190 @@ namespace TOMI.Services.Repository
 
             line = line + string.Join(",", innerFooter + " " + currentCountRec) + System.Environment.NewLine;
 
-            File.AppendAllText(fileName, line);
+            File.AppendAllText(path, line);
 
-            return null;
+            return path;
+        }
+
+        public async Task<string> InventoryDetail(FilterCustomerReportDataModel model)
+        {
+            string fileName = string.Empty;
+            string InnerHeaderName = string.Empty;
+            string innerFooter = string.Empty;
+            string InnerTime = string.Empty;
+
+
+            InnerTime = model.StockDate.Value.TimeOfDay.Hours.ToString("#00") + model.StockDate.Value.TimeOfDay.Minutes.ToString("#00") + model.StockDate.Value.TimeOfDay.Seconds.ToString("#00");
+
+            //       + model.StockDate.Value.TimeOfDay.Minutes.ToString("#00") + model.StockDate.Value.Date.TimeOfDay.Seconds.ToString("#00");
+            var innerDataError = model.StockDate.Value.Date.Month.ToString("#00") + model.StockDate.Value.Date.Day.ToString("#00");
+            var InventoryStoreDate = model.StoreName.ToString().Substring(0, 4);
+            var InnerContentDate = model.StockDate.Value.Date.Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") + model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
+            string numberOfRecords = "000000.";
+
+            fileName = "INVR" + innerDataError + "_" + InventoryStoreDate + ".txt";
+            InnerHeaderName = "HEADER" + " " + "INVENTARIO" + InventoryStoreDate + InnerContentDate + " " + numberOfRecords;
+            innerFooter = "TRAILER" + " " + "INVENTARIO" + InventoryStoreDate + InnerContentDate;
+
+
+            var query = (from b in _context.OrderJob
+                         join a in _context.StockAdjustment on b.Code equals a.Barcode
+                         select new Inventario
+                         {
+                             Store = b.Store,
+                             //Zona=0,
+                             Tag = (int)a.Tag,
+                             Code = a.Barcode,
+                             Department = (int)a.Department,
+                             Qty = (int)a.Quantity,
+                             Price = b.SalePrice,
+                             Date = DateTimeOffset.Now,
+                             Time = DateTimeOffset.Now,
+                             Consecutive = 1,
+                             Price_Indicator = 1,
+                             NOF = a.NOF,
+                         }).ToList();
+
+            string webRootPath = _webHostEnvironment.WebRootPath;
+            var path = Path.Combine($"{webRootPath}\\Upload", fileName);
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+            File.Create(path).Close();
+
+            string line = string.Join(",", InnerHeaderName) + System.Environment.NewLine;
+            foreach (var item in query)
+            {
+
+                var currentZone = "";
+                if (item.Tag > 3000)
+                { currentZone = 1.ToString(); }
+                if (item.Tag > 2001 && item.Tag < 2500)
+                { currentZone = 2.ToString(); }
+                if (item.Tag > 2501 && item.Tag < 3000)
+                { currentZone = 3.ToString(); }
+                if (item.Tag > 1 && item.Tag < 2000)
+                { currentZone = 4.ToString(); }
+                var currentTag = item.Tag.ToString();
+                var currentConsecutive = item.Consecutive.ToString();
+                var currentCode = item.Code.ToString();
+                var currentQty = item.Qty.ToString();
+                var currentPrice = item.Price.ToString();
+                for (int i = 0; i < 9; i++)
+                {
+                    if (currentQty.Length < 9)
+                        currentQty = "0" + currentQty;
+                }
+                for (int i = 0; i < 9; i++)
+                {
+                    if (currentQty.Length < 14)
+                        currentQty = "0" + currentQty;
+                }
+                for (int i = 0; i < 14; i++)
+                {
+                    if (currentCode.Length < 14)
+                        currentCode = "0" + currentCode;
+                }
+                for (int i = 0; i < 4; i++)
+                {
+                    if (currentConsecutive.Length < 4)
+                        currentConsecutive = "0" + currentConsecutive;
+                }
+
+
+                for (int i = 0; i < 6; i++)
+                {
+                    if (currentTag.Length < 6)
+                        currentTag = "0" + currentTag;
+                }
+                line = line + string.Join(",", item.Store + currentZone + currentTag + currentConsecutive + currentCode + item.Department + currentQty + currentPrice + "N" + InnerContentDate + InnerTime + ".") + System.Environment.NewLine;
+            }
+
+            var currentCountRec = query.Count.ToString();
+
+            for (int i = 0; i < 6; i++)
+            {
+                if (currentCountRec.Length < 6)
+                    currentCountRec = "0" + currentCountRec;
+            }
+
+            line = line + string.Join(",", innerFooter + " " + currentCountRec) + System.Environment.NewLine;
+
+            File.AppendAllText(path, line);
+            
+            return path;
+        }
+        public async Task<string> MarbeteDetail(FilterCustomerReportDataModel model)
+        {
+            string fileName = string.Empty;
+            string InnerHeaderName = string.Empty;
+            string innerFooter = string.Empty;
+            string InnerTime = string.Empty;
+
+
+            InnerTime = model.StockDate.Value.TimeOfDay.Hours.ToString("#00") + model.StockDate.Value.TimeOfDay.Minutes.ToString("#00") + model.StockDate.Value.TimeOfDay.Seconds.ToString("#00");
+
+            //       + model.StockDate.Value.TimeOfDay.Minutes.ToString("#00") + model.StockDate.Value.Date.TimeOfDay.Seconds.ToString("#00");
+            var innerDataError = model.StockDate.Value.Date.Month.ToString("#00") + model.StockDate.Value.Date.Day.ToString("#00");
+            var InventoryStoreDate = model.StoreName.ToString().Substring(0, 4);
+            var InnerContentDate = model.StockDate.Value.Date.Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") + model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
+            string numberOfRecords = "000000.";
+            fileName = "MARB" + innerDataError + "_" + InventoryStoreDate + ".txt";
+            InnerHeaderName = "HEADER" + "  " + "MARBETE" + InventoryStoreDate + InnerContentDate + " " + numberOfRecords;
+            innerFooter = "TRAILER" + " " + "MARBETE" + InventoryStoreDate + InnerContentDate;
+            var query = (from b in _context.OrderJob
+                         join a in _context.StockAdjustment on b.Code equals a.Barcode
+                         select new Marbete
+                         {
+                             Tag = (int)a.Tag,
+                             Department = (int)a.Department,
+                         }).ToList();
+
+            string webRootPath = _webHostEnvironment.WebRootPath;
+            var path = Path.Combine($"{webRootPath}\\Upload", fileName);
+            if (File.Exists(path))
+            {
+                File.Delete(path);
+            }
+            File.Create(path).Close();            
+
+            string line = string.Join(",", InnerHeaderName) + System.Environment.NewLine;
+            foreach (var item in query)
+            {
+
+                var currentZone = "";
+                if (item.Tag > 3000)
+                { currentZone = 1.ToString(); }
+                if (item.Tag > 2001 && item.Tag < 2500)
+                { currentZone = 2.ToString(); }
+                if (item.Tag > 2501 && item.Tag < 3000)
+                { currentZone = 3.ToString(); }
+                if (item.Tag > 1 && item.Tag < 2000)
+                { currentZone = 4.ToString(); }
+                var currentTag = item.Tag.ToString();
+                for (int i = 0; i < 6; i++)
+                {
+                    if (currentTag.Length < 6)
+                        currentTag = "0" + currentTag;
+                }
+                line = line + string.Join(",", currentZone + currentTag + item.Department + "......................") + System.Environment.NewLine;
+            }
+
+            var currentCountRec = query.Count.ToString();
+
+            for (int i = 0; i < 6; i++)
+            {
+                if (currentCountRec.Length < 6)
+                    currentCountRec = "0" + currentCountRec;
+            }
+            line = line + string.Join(",", innerFooter + " " + currentCountRec) + System.Environment.NewLine;
+
+            File.AppendAllText(path, line);
+
+            return path;
+
+
         }
     }
 }
