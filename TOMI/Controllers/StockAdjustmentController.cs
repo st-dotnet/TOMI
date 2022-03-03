@@ -96,6 +96,23 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
+        /// <summary>
+        /// VoidTag
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("VoidTag")]
+        public async Task<IActionResult> VoidTag(int[] tag)
+        {
+            try
+            {
+                var response = await _stockAdjustmentService.VoidTag(tag);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
 
         /// <summary>
         /// GoToRecord
@@ -137,8 +154,8 @@ namespace TOMI.Web.Controllers
         /// ChangeDeletedRecStatus
         /// </summary>
         /// <returns></returns>
-        [HttpPost("ChangeDeletedRecStatus")]
-        public async Task<IActionResult> ChangeDeletedRecStatus(int recid)
+        [HttpGet("ChangeDeletedRecStatus/{recid}")]
+        public async Task<IActionResult> ChangeDeletedRecStatus(Guid recid)
         {
             try
             {
@@ -169,7 +186,24 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
-
+        /// <summary>
+        /// MasterData
+        /// </summary>
+        /// <param name="barcode"></param>
+        /// <returns></returns>
+        [HttpGet("MasterDataByBarCode")]
+        public async Task<IActionResult> MasterBarCodeData()
+        {
+            try
+            {
+                var response = await _stockAdjustmentService.MasterDataByBarCode();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
         [HttpPost]
         [Route("SearchStockAdjustment")]
         public async Task<IActionResult> SearchStockAdjustment(StockAdjustmentFilterModel model)
@@ -183,6 +217,20 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
-        #endregion
+
+        [HttpGet]
+        [Route("GetMasterByCustomerId/{custid}")]
+        public async Task<IActionResult> GetMasterByCustomerId(Guid custid)
+        {
+            try
+            {
+                return Ok(await _stockAdjustmentService.GetMasterDataByCustomerId(custid));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+            #endregion
+        }
     }
 }

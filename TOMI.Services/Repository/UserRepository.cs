@@ -58,11 +58,9 @@ namespace TOMI.Services.Repository
             }
             catch (Exception ex)
             {
-                return new UserModelResponse { Error = "Invalid UserName and Password " };
+                return new UserModelResponse { Error = ex.ToString() };
+              
             }
-
-
-
         }
         //public UserModelResponse Authenticate(string email, string password)
         //{
@@ -153,11 +151,22 @@ namespace TOMI.Services.Repository
                         Success = true
                     };
                 }
-                return new UserModelResponse { Error = " UserName already Exist" };
+                else
+                {
+                    //var res = _mapper.Map<User>(user);
+                    _context.Users.Update(user);
+                    await _context.SaveChangesAsync();
+                    return new UserModelResponse
+                    {
+                        User = user,
+                        Success = true
+                    };
+                }
+                //return new UserModelResponse { Error = " UserName already Exist" };
             }
             catch (Exception ex)
             {
-                return new UserModelResponse { Error = ex.Message };
+                throw new Exception(ex.ToString());
             }
 
         }
@@ -196,7 +205,7 @@ namespace TOMI.Services.Repository
             }
             catch (Exception ex)
             {
-                return new UserModelResponse { Error = ex.Message };
+                throw new Exception(ex.ToString());
             }
 
         }

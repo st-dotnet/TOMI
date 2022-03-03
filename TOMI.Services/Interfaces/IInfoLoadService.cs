@@ -14,5 +14,6 @@ namespace TOMI.Services.Interfaces
         Task<InfoLoad> DeleteInfoLoad(int id);
         Task<InfoLoad> GetInfoLoadAsync(int id);
         Task<List<InfoLoad>> GetInfoLoadListAsync();
+        Task<FileInfoDataResponse> InfoData(FilterInfoDataModel infodata);
     }
 }

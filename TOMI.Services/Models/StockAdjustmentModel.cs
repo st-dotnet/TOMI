@@ -11,6 +11,7 @@ namespace TOMI.Services.Models
     {
         
         public Guid? Id { get; set; }
+        public int? Empno { get; set; }
         public int? Rec { get; set; }
         public string Term { get; set; }
         public int? Dload { get; set; }
@@ -21,7 +22,7 @@ namespace TOMI.Services.Models
         public byte NOF { get; set; }
         public int? Department { get; set; }
         public int? Quantity { get; set; }
-        public bool? Isdeleted { get; set; }
+      
     }
 
     public class StockAdjustmentResponse:BaseResponse
@@ -33,6 +34,7 @@ namespace TOMI.Services.Models
     {
  
         public string Term { get; set; }
+        public int? Empno { get; set; }
         public int? Dload { get; set; }
         public int? Tag { get; set; }
         public int? Shelf { get; set; }

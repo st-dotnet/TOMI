@@ -1,10 +1,7 @@
 ﻿using AutoMapper;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using TOMI.Services.Interfaces;
 using TOMI.Services.Models;
@@ -90,6 +87,22 @@ namespace TOMI.Web.Controllers
             {
                 var response = await _infoLoadService.GetInfoLoadListAsync();
                 return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        [HttpPost("ImportInfoFile")]
+        public async Task<IActionResult> ImportInfoFile([FromForm] FilterInfoDataModel infodata)
+        {
+            try
+            {
+                if (infodata != null)
+                    return Ok(await _infoLoadService.InfoData(infodata));
+                else
+                    return BadRequest(new { message = "please at least upload one file " });
             }
             catch (Exception ex)
             {

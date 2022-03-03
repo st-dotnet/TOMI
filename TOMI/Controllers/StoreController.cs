@@ -32,7 +32,6 @@ namespace TOMI.Web.Controllers
             }
         }
 
-
         [HttpGet("GetStore/{customerId}")]
         public async Task<IActionResult> GetUsersByIdAsync(string customerId)
         {
@@ -46,114 +45,177 @@ namespace TOMI.Web.Controllers
             }
         }
 
-        [HttpPost("ImportSalesFile")]
-        public async Task<IActionResult> UploadFile([FromForm] FilterDataModel stockModel )
+        [HttpPost("ImportDepartmentFile")]
+        public async Task<IActionResult> DepartmentFile([FromForm] FilterDataModel model)
         {
             try
             {
-                if (stockModel != null)
-                    return Ok(await _storeService.SalesData(stockModel));
+                if (model != null)
+                    return Ok(await _storeService.DepartmentsData(model));
                 else
                     return BadRequest(new { message = "please at least upload one file " });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest(new { message = "Invalid file extension" });
-                throw;
-            }  
+                throw new Exception(ex.ToString());
+            }
         }
+ 
 
-        [HttpPost("ImportMasterFile")]
-        public async Task<IActionResult> MasterFile([FromForm] FilterDataModel masterData)
+        [HttpPost("ImportNewStockFile")]
+        public async Task<IActionResult> NewStockFile([FromForm] FilterDataModel model)
         {
             try
             {
-                if (masterData != null)
-                    return Ok(await _storeService.MasterData(masterData));
+                if (model != null)
+                   
+                return Ok(await _storeService.StockData(model));
                 else
                     return BadRequest(new { message = "please at least upload one file " });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest(new { message = "Invalid file extension" });
-                throw;
+                throw new Exception(ex.ToString());
             }
         }
 
-        [HttpPost("ImportStockFile")]
-        public async Task<IActionResult> StockFile([FromForm] FilterDataModel stockData)
+        [HttpPost("ImportReservedFile")]
+        public async Task<IActionResult> ReservedFile([FromForm] FilterDataModel model)
         {
             try
             {
-                if (stockData != null)
-                    return Ok(await _storeService.StocksData(stockData));
+                if (model != null)
+                    return Ok(await _storeService.ReservedData(model));
                 else
                     return BadRequest(new { message = "please at least upload one file " });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest(new { message = "Invalid file extension" });
-                throw;
+                throw new Exception(ex.ToString());
             }
         }
-
-
-        /// <summary>
-        ///  this is used for get Sales data by customerid, storeId and date
-        /// </summary>
-        /// <param name="request">SalesModelRequest</param>
-        /// <returns></returns>
-        [HttpPost("GetSalesData")]
-        public async Task<IActionResult> GetSalesData(FilterDataRequest request)
+        [HttpPost("ImportCategoriesFile")]
+        public async Task<IActionResult> CategoriesFile([FromForm] FilterDataModel model)
         {
             try
             {
-                return Ok(await _storeService.GetSalesData(request));
+                if (model != null)
+                    return Ok(await _storeService.CatergoriesData(model));
+                else
+                    return BadRequest(new { message = "please at least upload one file " });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest(new { message = "Invalid Id" });
-                throw;
+                throw new Exception(ex.ToString());
             }
         }
-
-        /// <summary>
-        ///  this is used for get Master data by customerid, storeId and date
-        /// </summary>
-        /// <param name="request">MasterModelRequest</param>
-        /// <returns></returns>
-        [HttpPost("GetMasterData")]
-        public async Task<IActionResult> GetMasterData(FilterDataRequest request)
+        [HttpPost("ImportOrderJobFile")]
+        public async Task<IActionResult> OrderJobFile([FromForm] FilterDataModel model)
         {
             try
             {
-                return Ok(await _storeService.GetMasterData(request));
+                if (model != null)
+                    return Ok(await _storeService.OrderJobData(model));
+                else
+                    return BadRequest(new { message = "please at least upload one file " });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest(new { message = "Invalid Id" });
-                throw;
+                throw new Exception(ex.ToString());
             }
         }
-        /// <summary>
-        ///  this is used for get Stocks data by customerid, storeId and date
-        /// </summary>
-        /// <param name="request">StocksModelRequest</param>
-        /// <returns></returns>
-        [HttpPost("GetStocksData")]
-        public async Task<IActionResult> GetStocksData(FilterDataRequest request)
+        [HttpPost("ImportParametersByDepartmentFile")]
+        public async Task<IActionResult> ParametersByDepartmentFile([FromForm] FilterDataModel model)
         {
             try
             {
-                return Ok(await _storeService.GetStocksData(request));
+                if (model != null)
+                    return Ok(await _storeService.ParametersByDepartmentData(model));
+                else
+                    return BadRequest(new { message = "please at least upload one file " });
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                return BadRequest(new { message = "Invalid Id" });
-                throw;
+                throw new Exception(ex.ToString());
             }
         }
 
+        [HttpPost("GetNewStockData")]
+        public async Task<IActionResult> GetNewStockData(FilterDataRequest request)
+        {
+            try
+            {
+                return Ok(await _storeService.GetNewStockData(request));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
 
+        [HttpPost("GetOrderJob")]
+        public async Task<IActionResult> GetOrderJob(FilterDataRequest request)
+        {
+            try
+            {
+                return Ok(await _storeService.GetOrderJob(request));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        [HttpPost("GetReservedData")]
+        public async Task<IActionResult> GetReservedData(FilterDataRequest request)
+        {
+            try
+            {
+                return Ok(await _storeService.GetReservedData(request));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        [HttpPost("GetDepartmentsData")]
+        public async Task<IActionResult> GetDepartmentsData(FilterDataRequest request)
+        {
+            try
+            {
+                return Ok(await _storeService.GetDepartmentsData(request));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        [HttpPost("GetCategoriesData")]
+        public async Task<IActionResult> GetCategoriesData(FilterDataRequest request)
+        {
+            try
+            {
+                return Ok(await _storeService.GetCategoriesData(request));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        [HttpPost("GetParametersByDepartmentData")]
+        public async Task<IActionResult> GetParametersByDepartmentData(FilterDataRequest request)
+        {
+            try
+            {
+                return Ok(await _storeService.GetParametersByDepartmentData(request));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
     }
 }

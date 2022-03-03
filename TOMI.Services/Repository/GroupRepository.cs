@@ -28,62 +28,87 @@ namespace TOMI.Services.Repository
 
         public async Task<GroupResponse> AddGroup(GroupModel model)
         {
-            var isNameExist = await _context.Group.FirstOrDefaultAsync(c => c.Name == model.Name);
+            try
+            {
+                var isNameExist = await _context.Group.FirstOrDefaultAsync(c => c.Name == model.Name);
 
-            if (isNameExist != null)
-            {
-                return new GroupResponse { Error = "Group name already exist ", Success = false };
-            }
-            Group existingRanges = await _context.Group.FirstOrDefaultAsync(c => c.Id == model.Id);
-            
-            if (existingRanges != null)
-            {
-                
-                existingRanges.Name = model.Name;
-                _context.Group.Update(existingRanges);
-                _context.SaveChanges();
-                return new GroupResponse { group = existingRanges, Success = true };
-            }
-    
-            if (existingRanges == null)
-            {
-                var group = _mapper.Map<Group>(model);
-                Group result = _context.Group.Add(group).Entity;
-                _context.SaveChanges();
-                return new GroupResponse { group = result, Success = true };
-            }
+                if (isNameExist != null)
+                {
+                    return new GroupResponse { Error = "Group name already exist ", Success = false };
+                }
+                Group existingRanges = await _context.Group.FirstOrDefaultAsync(c => c.Id == model.Id);
 
-            throw new ValidationException("Group not found!");
+                if (existingRanges != null)
+                {
+
+                    existingRanges.Name = model.Name;
+                    _context.Group.Update(existingRanges);
+                    _context.SaveChanges();
+                    return new GroupResponse { group = existingRanges, Success = true };
+                }
+
+                if (existingRanges == null)
+                {
+                    var group = _mapper.Map<Group>(model);
+                    Group result = _context.Group.Add(group).Entity;
+                    _context.SaveChanges();
+                    return new GroupResponse { group = result, Success = true };
+                }
+
+                throw new ValidationException("Group not found!");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
 
-       
+
         public async Task<GroupResponse> DeleteGroup(Guid id)
         {
-            var existingGroup = await _context.Group.FirstOrDefaultAsync(x => x.Id == id);
-            if (existingGroup != null)
+            try
             {
-                var recordexist = await _context.Ranges
-                .FirstOrDefaultAsync(e => e.GroupId == id);
-                if (recordexist != null)
-                    return new GroupResponse { Error = "Mentioned group name is in used ", Success = false };
-                _context.Group.Remove(existingGroup);
-                 _context.SaveChanges();
-                return new GroupResponse { group = existingGroup, Success = true };
+                var existingGroup = await _context.Group.FirstOrDefaultAsync(x => x.Id == id);
+                if (existingGroup != null)
+                {
+                    var recordexist = await _context.Ranges
+                    .FirstOrDefaultAsync(e => e.GroupId == id);
+                    if (recordexist != null)
+                        return new GroupResponse { Error = "Mentioned group name is in used ", Success = false };
+                    _context.Group.Remove(existingGroup);
+                    _context.SaveChanges();
+                    return new GroupResponse { group = existingGroup, Success = true };
+                }
+                return new GroupResponse { Error = "GroupId not found! ", Success = false };
             }
-            return new GroupResponse { Error = "GroupId not found! ", Success = false };
-           
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
 
         public async Task<Group> GetGroup(Guid id)
         {
-            return await _context.Group.FirstOrDefaultAsync(x => x.Id == id);
+            try
+            {
+                return await _context.Group.FirstOrDefaultAsync(x => x.Id == id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
 
         public async Task<List<Group>> GetGroupAsync()
         {
-            return await _context.Group.Where(x=>x.IsActive==false).ToListAsync();
+            try
+            {
+                return await _context.Group.Where(x => x.IsActive == false).ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
-
-
     }
 }

@@ -27,44 +27,72 @@ namespace TOMI.Services.Repository
         }
         public async Task<DwnErrors> DeleteDwnErrors(int Id)
         {
-            var dwnerror = await _context.DwnErrors.FirstOrDefaultAsync(x => x.id == Id);
-            if (dwnerror != null)
+            try
             {
-                _context.DwnErrors.Remove(dwnerror);
-                await _context.SaveChangesAsync();
-                return dwnerror;
+                var dwnerror = await _context.DwnErrors.FirstOrDefaultAsync(x => x.id == Id);
+                if (dwnerror != null)
+                {
+                    _context.DwnErrors.Remove(dwnerror);
+                    await _context.SaveChangesAsync();
+                    return dwnerror;
+                }
+                throw new ValidationException("Id not found!");
             }
-            throw new ValidationException("Id not found!");
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
 
         public async Task<DwnErrors> GetDwnErrorsAsync(int id)
         {
-            return await _context.DwnErrors.FirstOrDefaultAsync(x => x.id == id);
+            try
+            {
+                return await _context.DwnErrors.FirstOrDefaultAsync(x => x.id == id);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
 
         public async Task<List<DwnErrors>> GetDwnErrorsListAsync()
         {
-            return await _context.DwnErrors.ToListAsync();
+            try
+            {
+                return await _context.DwnErrors.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
 
         public async Task<DwnErrorsResponse> SaveDwnErrors(DwnErrorsModel model)
         {
-            DwnErrors dwnError = await _context.DwnErrors.FirstOrDefaultAsync(c => c.id == model.id);
-            var dwnErrors = _mapper.Map<DwnErrors>(model);
-            if (dwnError == null)
+            try
             {
-                DwnErrors result = _context.DwnErrors.Add(dwnErrors).Entity;
-                await _context.SaveChangesAsync();
-                return new DwnErrorsResponse { dwnErrors = result, Success = true };
+                DwnErrors dwnError = await _context.DwnErrors.FirstOrDefaultAsync(c => c.id == model.id);
+                var dwnErrors = _mapper.Map<DwnErrors>(model);
+                if (dwnError == null)
+                {
+                    DwnErrors result = _context.DwnErrors.Add(dwnErrors).Entity;
+                    await _context.SaveChangesAsync();
+                    return new DwnErrorsResponse { dwnErrors = result, Success = true };
+                }
+                else
+                {
+                    var res = _mapper.Map<DwnErrors>(model);
+                    _context.DwnErrors.Update(res);
+                    await _context.SaveChangesAsync();
+                    return new DwnErrorsResponse { dwnErrors = res, Success = true };
+                }
+                throw new ValidationException("Id not found!");
             }
-            else
+            catch (Exception ex)
             {
-                var res = _mapper.Map<DwnErrors>(model);
-                _context.DwnErrors.Update(res);
-                await _context.SaveChangesAsync();
-                return new DwnErrorsResponse { dwnErrors = res, Success = true };
+                throw new Exception(ex.ToString());
             }
-            throw new ValidationException("Id not found!");
         }
     }
 }

@@ -42,22 +42,22 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
-        ///// <summary>
-        ///// Deleterange
-        ///// </summary>
-        ///// <returns></returns>
-        //[HttpDelete("DeleteRange/{rangeId}")]
-        //public async Task<IActionResult> DeleteRangeAsync(Guid rangeId)
-        //{
-        //    try
-        //    {
-        //        return Ok(await _rangeService.DeleteRange(rangeId));
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        throw new Exception(ex.ToString());
-        //    }
-        //}
+        /// <summary>
+        /// Deleterange
+        /// </summary>
+        /// <returns></returns>
+        [HttpDelete("DeleteRange/{id}")]
+        public async Task<IActionResult> DeleteRangeAsync(Guid id)
+        {
+            try
+            {
+                return Ok(await _rangeService.DeleteRange(id));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
         /// <summary>
         /// GetrangeList
         /// </summary>
@@ -122,6 +122,24 @@ namespace TOMI.Web.Controllers
             try
             {
                 var response = await _rangeService.GetMinMaxRange();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        /// <summary>
+        ///  GetTagValue
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetTagValue/{tag}")]
+        public async Task<IActionResult> GetTagValue(int tag)
+        {
+            try
+            {
+                var response = await _rangeService.GetTag(tag);
                 return Ok(response);
             }
             catch (Exception ex)

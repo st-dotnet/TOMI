@@ -16,9 +16,13 @@ namespace TOMI.Services.Interfaces
         Task<List<StockAdjustment>> GetStockAdjustmentListAsync();
         Task<List<StockAdjustment>> GoToRecord(int recid);
         Task<List<StockAdjustment>> GetDeletedRecord();
-        Task<List<StockAdjustment>> ChangeDeletedRecStatus(int recid);
-        Task<Master> MasterDataBySku(string sku);
+        Task<List<StockAdjustment>> ChangeDeletedRecStatus(Guid recid);
+        Task<OrderjobResponse> MasterDataBySku(string sku);
+        Task<OrderResponse> MasterDataByBarCode();
 
+        //Task<OrderResponse> MasterDataByBarCode(string barcode);
         Task<List<StockAdjustment>> FilterStock(StockAdjustmentFilterModel model);
+        Task<List<OrderJob>> GetMasterDataByCustomerId(Guid id);
+        Task<StockAdjustmentResponse> VoidTag(int[] tag);
     }
 }
