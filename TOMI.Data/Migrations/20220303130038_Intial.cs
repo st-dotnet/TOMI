@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace TOMI.Data.Migrations
 {
-    public partial class initial : Migration
+    public partial class Intial : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -191,6 +191,22 @@ namespace TOMI.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "InventoryFigure",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StoreNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    FigureDate = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    Unit = table.Column<int>(type: "int", nullable: false),
+                    Amount = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InventoryFigure", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "OrderJob",
                 columns: table => new
                 {
@@ -296,6 +312,35 @@ namespace TOMI.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Stock", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "StockAdjustmentlog",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Rec = table.Column<int>(type: "int", nullable: true),
+                    Term = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Dload = table.Column<int>(type: "int", nullable: true),
+                    Tag = table.Column<int>(type: "int", nullable: true),
+                    Shelf = table.Column<int>(type: "int", nullable: true),
+                    Barcode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Department = table.Column<int>(type: "int", nullable: true),
+                    Quantity = table.Column<int>(type: "int", nullable: true),
+                    Description = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Status = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
+                    CreatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    UpdatedBy = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    Deletedby = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_StockAdjustmentlog", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -532,7 +577,7 @@ namespace TOMI.Data.Migrations
             migrationBuilder.InsertData(
                 table: "Users",
                 columns: new[] { "Id", "CreatedAt", "CreatedBy", "CustomerId", "DeletedAt", "Deletedby", "Email", "EmployeeNumber", "FirstName", "IsActive", "LastName", "Password", "PhoneNumber", "Role", "StoreId", "UpdatedAt", "UpdatedBy" },
-                values: new object[] { new Guid("b74ddd14-6340-4840-95c2-db12554843e5"), null, null, new Guid("b74ddd14-6340-4840-95c2-db12554843e5"), null, null, "admin@gmail.com", "987654", "Admin", false, "Admin", "AQAAAAEAACcQAAAAEHmcwblzqU9M5/HrmASzqKJuJqpHItVsQxWGNFbF76hov4CKCLDrhkQ75g7kgLU72g==", "1234567890", "SuperAdmin", null, null, null });
+                values: new object[] { new Guid("b74ddd14-6340-4840-95c2-db12554843e5"), null, null, new Guid("b74ddd14-6340-4840-95c2-db12554843e5"), null, null, "admin@gmail.com", "987654", "Admin", false, "Admin", "AQAAAAEAACcQAAAAEIxfLQSjs5/qVof4qPKxscU5OMkNKzw8FGLSlJWIaGB9Jid6vtXvelnUwyGpxGVZtw==", "1234567890", "SuperAdmin", null, null, null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Ranges_GroupId",
@@ -598,6 +643,9 @@ namespace TOMI.Data.Migrations
                 name: "InfoLoad");
 
             migrationBuilder.DropTable(
+                name: "InventoryFigure");
+
+            migrationBuilder.DropTable(
                 name: "ParametersByDepartment");
 
             migrationBuilder.DropTable(
@@ -611,6 +659,9 @@ namespace TOMI.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "StockAdjustment");
+
+            migrationBuilder.DropTable(
+                name: "StockAdjustmentlog");
 
             migrationBuilder.DropTable(
                 name: "Terminal_Smf");

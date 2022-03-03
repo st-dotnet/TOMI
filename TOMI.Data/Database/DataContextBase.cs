@@ -12,6 +12,7 @@ namespace TOMI.Data.Database
         public DataContextBase(DbContextOptions<TContext> options)
                : base(options)
         {
+          
         }
         public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = new CancellationToken())
         {

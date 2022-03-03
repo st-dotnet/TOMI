@@ -391,6 +391,30 @@ namespace TOMI.Data.Migrations
                     b.ToTable("InfoLoad");
                 });
 
+            modelBuilder.Entity("TOMI.Data.Database.Entities.InventoryFigure", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Amount")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("FigureDate")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("StoreNumber")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Unit")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("InventoryFigure");
+                });
+
             modelBuilder.Entity("TOMI.Data.Database.Entities.OrderJob", b =>
                 {
                     b.Property<Guid>("Id")
@@ -755,6 +779,69 @@ namespace TOMI.Data.Migrations
                     b.ToTable("StockAdjustment");
                 });
 
+            modelBuilder.Entity("TOMI.Data.Database.Entities.StockAdjustmentlog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("Barcode")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("CreatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("CreatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("Deletedby")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<int?>("Department")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Dload")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<int?>("Quantity")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Rec")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Shelf")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("Tag")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Term")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid?>("UpdatedBy")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("StockAdjustmentlog");
+                });
+
             modelBuilder.Entity("TOMI.Data.Database.Entities.Store", b =>
                 {
                     b.Property<Guid>("Id")
@@ -1040,7 +1127,7 @@ namespace TOMI.Data.Migrations
                             FirstName = "Admin",
                             IsActive = false,
                             LastName = "Admin",
-                            Password = "AQAAAAEAACcQAAAAEHmcwblzqU9M5/HrmASzqKJuJqpHItVsQxWGNFbF76hov4CKCLDrhkQ75g7kgLU72g==",
+                            Password = "AQAAAAEAACcQAAAAEIxfLQSjs5/qVof4qPKxscU5OMkNKzw8FGLSlJWIaGB9Jid6vtXvelnUwyGpxGVZtw==",
                             PhoneNumber = "1234567890",
                             Role = "SuperAdmin"
                         });

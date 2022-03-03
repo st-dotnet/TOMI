@@ -150,18 +150,13 @@ CREATE TABLE [InfoLoad] (
 );
 GO
 
-CREATE TABLE [MF2] (
-    [Department] nvarchar(450) NOT NULL,
-    [Id] uniqueidentifier NOT NULL,
-    [creation_time] datetimeoffset NOT NULL,
-    [CreatedAt] datetimeoffset NULL,
-    [UpdatedAt] datetimeoffset NULL,
-    [DeletedAt] datetimeoffset NULL,
-    [CreatedBy] uniqueidentifier NULL,
-    [UpdatedBy] uniqueidentifier NULL,
-    [Deletedby] uniqueidentifier NULL,
-    [IsActive] bit NOT NULL,
-    CONSTRAINT [PK_MF2] PRIMARY KEY ([Department])
+CREATE TABLE [InventoryFigure] (
+    [Id] int NOT NULL IDENTITY,
+    [StoreNumber] nvarchar(max) NULL,
+    [FigureDate] datetimeoffset NULL,
+    [Unit] int NOT NULL,
+    [Amount] nvarchar(max) NULL,
+    CONSTRAINT [PK_InventoryFigure] PRIMARY KEY ([Id])
 );
 GO
 
@@ -253,6 +248,44 @@ CREATE TABLE [Stock] (
 );
 GO
 
+CREATE TABLE [StockAdjustmentlog] (
+    [Id] int NOT NULL IDENTITY,
+    [Rec] int NULL,
+    [Term] nvarchar(max) NULL,
+    [Dload] int NULL,
+    [Tag] int NULL,
+    [Shelf] int NULL,
+    [Barcode] nvarchar(max) NULL,
+    [Department] int NULL,
+    [Quantity] int NULL,
+    [Description] nvarchar(max) NULL,
+    [Status] nvarchar(max) NULL,
+    [CreatedAt] datetimeoffset NULL,
+    [UpdatedAt] datetimeoffset NULL,
+    [DeletedAt] datetimeoffset NULL,
+    [CreatedBy] uniqueidentifier NULL,
+    [UpdatedBy] uniqueidentifier NULL,
+    [Deletedby] uniqueidentifier NULL,
+    [IsActive] bit NOT NULL,
+    CONSTRAINT [PK_StockAdjustmentlog] PRIMARY KEY ([Id])
+);
+GO
+
+CREATE TABLE [Terminal_Department] (
+    [Department] nvarchar(450) NOT NULL,
+    [Id] uniqueidentifier NOT NULL,
+    [creation_time] datetimeoffset NOT NULL,
+    [CreatedAt] datetimeoffset NULL,
+    [UpdatedAt] datetimeoffset NULL,
+    [DeletedAt] datetimeoffset NULL,
+    [CreatedBy] uniqueidentifier NULL,
+    [UpdatedBy] uniqueidentifier NULL,
+    [Deletedby] uniqueidentifier NULL,
+    [IsActive] bit NOT NULL,
+    CONSTRAINT [PK_Terminal_Department] PRIMARY KEY ([Department])
+);
+GO
+
 CREATE TABLE [UploadFileName] (
     [Id] int NOT NULL IDENTITY,
     [Header] nvarchar(max) NULL,
@@ -329,7 +362,7 @@ CREATE TABLE [StockAdjustment] (
 );
 GO
 
-CREATE TABLE [MF1] (
+CREATE TABLE [Terminal_Smf] (
     [Id] uniqueidentifier NOT NULL,
     [CustomerId] uniqueidentifier NOT NULL,
     [Terminal] nvarchar(max) NULL,
@@ -360,10 +393,10 @@ CREATE TABLE [MF1] (
     [UpdatedBy] uniqueidentifier NULL,
     [Deletedby] uniqueidentifier NULL,
     [IsActive] bit NOT NULL,
-    CONSTRAINT [PK_MF1] PRIMARY KEY ([Id]),
-    CONSTRAINT [FK_MF1_Customers_CustomerId] FOREIGN KEY ([CustomerId]) REFERENCES [Customers] ([Id]),
-    CONSTRAINT [FK_MF1_MF2_Department] FOREIGN KEY ([Department]) REFERENCES [MF2] ([Department]) ON DELETE NO ACTION,
-    CONSTRAINT [FK_MF1_Stores_StoreId] FOREIGN KEY ([StoreId]) REFERENCES [Stores] ([Id])
+    CONSTRAINT [PK_Terminal_Smf] PRIMARY KEY ([Id]),
+    CONSTRAINT [FK_Terminal_Smf_Customers_CustomerId] FOREIGN KEY ([CustomerId]) REFERENCES [Customers] ([Id]),
+    CONSTRAINT [FK_Terminal_Smf_Stores_StoreId] FOREIGN KEY ([StoreId]) REFERENCES [Stores] ([Id]),
+    CONSTRAINT [FK_Terminal_Smf_Terminal_Department_Department] FOREIGN KEY ([Department]) REFERENCES [Terminal_Department] ([Department]) ON DELETE NO ACTION
 );
 GO
 
@@ -402,18 +435,9 @@ GO
 IF EXISTS (SELECT * FROM [sys].[identity_columns] WHERE [name] IN (N'Id', N'CreatedAt', N'CreatedBy', N'CustomerId', N'DeletedAt', N'Deletedby', N'Email', N'EmployeeNumber', N'FirstName', N'IsActive', N'LastName', N'Password', N'PhoneNumber', N'Role', N'StoreId', N'UpdatedAt', N'UpdatedBy') AND [object_id] = OBJECT_ID(N'[Users]'))
     SET IDENTITY_INSERT [Users] ON;
 INSERT INTO [Users] ([Id], [CreatedAt], [CreatedBy], [CustomerId], [DeletedAt], [Deletedby], [Email], [EmployeeNumber], [FirstName], [IsActive], [LastName], [Password], [PhoneNumber], [Role], [StoreId], [UpdatedAt], [UpdatedBy])
-VALUES ('b74ddd14-6340-4840-95c2-db12554843e5', NULL, NULL, 'b74ddd14-6340-4840-95c2-db12554843e5', NULL, NULL, N'admin@gmail.com', N'987654', N'Admin', CAST(0 AS bit), N'Admin', N'AQAAAAEAACcQAAAAEP3bZixtlqGOACN9/SurGYIeDNtYPZrE3SWkNR330ll55rraHYPSEi0D7kfhE/k/lw==', N'1234567890', N'SuperAdmin', NULL, NULL, NULL);
+VALUES ('b74ddd14-6340-4840-95c2-db12554843e5', NULL, NULL, 'b74ddd14-6340-4840-95c2-db12554843e5', NULL, NULL, N'admin@gmail.com', N'987654', N'Admin', CAST(0 AS bit), N'Admin', N'AQAAAAEAACcQAAAAEIxfLQSjs5/qVof4qPKxscU5OMkNKzw8FGLSlJWIaGB9Jid6vtXvelnUwyGpxGVZtw==', N'1234567890', N'SuperAdmin', NULL, NULL, NULL);
 IF EXISTS (SELECT * FROM [sys].[identity_columns] WHERE [name] IN (N'Id', N'CreatedAt', N'CreatedBy', N'CustomerId', N'DeletedAt', N'Deletedby', N'Email', N'EmployeeNumber', N'FirstName', N'IsActive', N'LastName', N'Password', N'PhoneNumber', N'Role', N'StoreId', N'UpdatedAt', N'UpdatedBy') AND [object_id] = OBJECT_ID(N'[Users]'))
     SET IDENTITY_INSERT [Users] OFF;
-GO
-
-CREATE INDEX [IX_MF1_CustomerId] ON [MF1] ([CustomerId]);
-GO
-
-CREATE INDEX [IX_MF1_Department] ON [MF1] ([Department]);
-GO
-
-CREATE INDEX [IX_MF1_StoreId] ON [MF1] ([StoreId]);
 GO
 
 CREATE INDEX [IX_Ranges_GroupId] ON [Ranges] ([GroupId]);
@@ -425,6 +449,15 @@ GO
 CREATE INDEX [IX_Stores_CustomerId] ON [Stores] ([CustomerId]);
 GO
 
+CREATE INDEX [IX_Terminal_Smf_CustomerId] ON [Terminal_Smf] ([CustomerId]);
+GO
+
+CREATE INDEX [IX_Terminal_Smf_Department] ON [Terminal_Smf] ([Department]);
+GO
+
+CREATE INDEX [IX_Terminal_Smf_StoreId] ON [Terminal_Smf] ([StoreId]);
+GO
+
 CREATE INDEX [IX_Users_CustomerId] ON [Users] ([CustomerId]);
 GO
 
@@ -432,7 +465,7 @@ CREATE UNIQUE INDEX [IX_Users_StoreId] ON [Users] ([StoreId]) WHERE [StoreId] IS
 GO
 
 INSERT INTO [__EFMigrationsHistory] ([MigrationId], [ProductVersion])
-VALUES (N'20220227124442_Tomi_Intial', N'5.0.13');
+VALUES (N'20220303130038_Intial', N'5.0.13');
 GO
 
 COMMIT;

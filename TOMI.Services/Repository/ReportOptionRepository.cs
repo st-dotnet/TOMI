@@ -182,12 +182,20 @@ namespace TOMI.Services.Repository
                              StoreNumber = b.Store,
                              FigureDate = b.StockDate,
                              Unit = (int)a.Quantity,
-                             Amount = b.SalePrice,
+                             Amount =b.SalePrice,
                          }).ToList();
+
+            // var fd=(SELECT Code, Department, Qty * Quantity AS Amount  FROM(SELECT        OrderJob.Code, OrderJob.Department, CAST(CAST(OrderJob.SalePrice AS NUMERIC) AS INT) AS Qty, StockAdjustment.Quantity
+            //            FROM            OrderJob LEFT OUTER JOIN
+            //                                    StockAdjustment ON OrderJob.Code = StockAdjustment.Barcode) AS firstQuery).ToList();
+
+
 
             //int QSTotal = (from b in _context.StockAdjustment
 
             //               select b.Quantity).Sum();
+
+        //    var ads=await _context.InventoryFigure.FromSqlRaw("EXECUTE dbo.getInventoryFigureData").ToListAsync();
 
             string webRootPath = _webHostEnvironment.WebRootPath;
             var path = Path.Combine($"{webRootPath}\\Upload", fileName);

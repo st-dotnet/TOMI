@@ -7,9 +7,8 @@ using System.Threading.Tasks;
 
 namespace TOMI.Data.Database.Entities
 {
-    public class InventoryFigure : EntityBase
+    public class InventoryFigure
     {
-
         [Key]
         public int Id { get; set; }
         public string StoreNumber{ get; set; }

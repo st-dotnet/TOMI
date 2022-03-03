@@ -31,3 +31,6 @@ dotnet_style_require_accessibility_modifiers = never:suggestion
 
 # CS0472: The result of the expression is always the same since a value of this type is never equal to 'null'
 dotnet_diagnostic.CS0472.severity = none
+
+# IDE0059: Unnecessary assignment of a value
+dotnet_diagnostic.IDE0059.severity = none
