@@ -260,7 +260,6 @@ namespace TOMI.Services.Repository
                 var jobOrderStore = model.StoreId.ToString();
                 var jobOrderStoreName = model.StoreName.ToString().Substring(0, 4);
 
-
                 var jobOrderPreviousDate = model.StockDate.Value.Date.Month.ToString("#00") +
                    model.StockDate.Value.Date.AddDays(-2).Day.ToString("#00");
 

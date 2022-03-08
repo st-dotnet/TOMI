@@ -36,6 +36,7 @@ namespace TOMI.Data.Database.Entities
        // public virtual OrderJob OrderJob { get; set; }
         public virtual Store Store { get; set; }
         public virtual Customer customer { get; set; }
+        public string InOut { get; set; }
 
 
 

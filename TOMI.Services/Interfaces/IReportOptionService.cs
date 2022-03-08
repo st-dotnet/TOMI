@@ -13,7 +13,7 @@ namespace TOMI.Services.Interfaces
 
         Task<List<StockAdjustment>> GetLabelDetailsAsyncTest();
         Task<List<StockAdjustment>> GetLabelDetailsAsync(int? tagFrom,int? tagTo);
-        Task<List<StockAdjustment>> GetCodeNotFoundAsync();
+        Task<List<spCodeNotfoundReport>> GetCodeNotFoundAsync();
         Task<List<StockAdjustment>> GetExtendedPricesAsync();
         List<stockandorder> GetUncountedItemsAsync();
         List<StockAndStockAdjust> GetVariationBySKUAsync();

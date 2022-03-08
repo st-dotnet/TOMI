@@ -9,6 +9,8 @@ namespace TOMI.Data.Database
 {
     public class TOMIDataContext : DataContextBase<TOMIDataContext>
     {
+        public object test;
+
         public DbSet<Customer> Customers { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Store> Stores { get; set; }
@@ -30,7 +32,17 @@ namespace TOMI.Data.Database
 
         public DbSet<Employee> Employee { get; set; }
         public DbSet<StockAdjustmentlog> StockAdjustmentlog { get; set; }
-        public DbSet<InventoryFigure> InventoryFigure { get; set; }
+ 
+        public DbSet<getInventoryFigureData> getInventoryFigureData { get; set; }
+        public DbSet<getInventario> getInventarios { get; set; }
+        public DbSet<getMarbete> getMarbetes { get; set; }
+        public DbSet<spCodeNotfoundReport> spCodeNotfoundReport { get; set; }
+        public DbSet<Ttransmission_Summary> Ttransmission_Summary { get; set; }
+        public DbSet<spInformationLoading> spInformationLoading { get; set; }
+
+        public DbSet<spInformationTransmissionDetails> spInformationTransmissionDetails { get; set; }
+
+
         public TOMIDataContext(DbContextOptions<TOMIDataContext> options)
             : base(options)
         {

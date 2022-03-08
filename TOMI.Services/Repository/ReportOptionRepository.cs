@@ -38,9 +38,11 @@ namespace TOMI.Services.Repository
             _mapper = mapper;
             _webHostEnvironment = webHostEnvironment;
         }
-        public async Task<List<StockAdjustment>> GetCodeNotFoundAsync()
+        public async Task<List<spCodeNotfoundReport>> GetCodeNotFoundAsync()
         {
-            return await _context.StockAdjustment.Include(x => x.OrderJob).Where(c => c.NOF == 1).ToListAsync();
+            //  return await _context.StockAdjustment.Include(x => x.OrderJob).Where(c => c.NOF == 1).ToListAsync();
+           
+            return  await _context.spCodeNotfoundReport.FromSqlRaw("EXECUTE dbo.spgetCodeNotFoundInFile").ToListAsync();
         }
         public async Task<List<StockAdjustment>> GetLabelDetailsAsync(int? tagFrom, int? tagTo)
         {
@@ -104,8 +106,6 @@ namespace TOMI.Services.Repository
                                  Id = b.Id,
                                  Department = a.Departament
                              }).Take(20).ToList();
-
-
 
                 return query;
             }
@@ -174,28 +174,7 @@ namespace TOMI.Services.Repository
 
             innerFooter = "TRAILER" + " " + "CIFRAS INV" + figureStoreDate + InnerContentDate;
 
-            var query = (from b in _context.OrderJob
-                         join a in _context.StockAdjustment on b.Code equals a.Barcode
-                      
-                        select new InventoryFigure
-                         {
-                             StoreNumber = b.Store,
-                             FigureDate = b.StockDate,
-                             Unit = (int)a.Quantity,
-                             Amount =b.SalePrice,
-                         }).ToList();
-
-            // var fd=(SELECT Code, Department, Qty * Quantity AS Amount  FROM(SELECT        OrderJob.Code, OrderJob.Department, CAST(CAST(OrderJob.SalePrice AS NUMERIC) AS INT) AS Qty, StockAdjustment.Quantity
-            //            FROM            OrderJob LEFT OUTER JOIN
-            //                                    StockAdjustment ON OrderJob.Code = StockAdjustment.Barcode) AS firstQuery).ToList();
-
-
-
-            //int QSTotal = (from b in _context.StockAdjustment
-
-            //               select b.Quantity).Sum();
-
-        //    var ads=await _context.InventoryFigure.FromSqlRaw("EXECUTE dbo.getInventoryFigureData").ToListAsync();
+             var query = await _context.getInventoryFigureData.FromSqlRaw("EXECUTE dbo.spgetInventoryFigureData").ToListAsync();
 
             string webRootPath = _webHostEnvironment.WebRootPath;
             var path = Path.Combine($"{webRootPath}\\Upload", fileName);
@@ -208,7 +187,7 @@ namespace TOMI.Services.Repository
             string line = string.Join(",", InnerHeaderName) + System.Environment.NewLine;
             foreach (var item in query)
             {
-                var currentUnits = item.Unit.ToString();
+                var currentUnits = item.Qty.ToString();
                 var currentAmount = item.Amount.ToString();
                 for (int i = 0; i < 12; i++)
                 {
@@ -220,10 +199,10 @@ namespace TOMI.Services.Repository
                     if (currentAmount.Length < 12)
                         currentAmount = "0" + currentAmount;
                 }
-                var date = item.FigureDate.Value.Date.Year.ToString().Substring(0, 4).ToString()
-                         + item.FigureDate.Value.Date.Month.ToString("#00")
-                         + item.FigureDate.Value.Date.Day.ToString("#00");
-                line = line + string.Join(",", item.StoreNumber + date + currentUnits + currentAmount) + System.Environment.NewLine;
+                var date = item.Date.Date.Year.ToString().Substring(0, 4).ToString()
+                         + item.Date.Date.Month.ToString("#00")
+                         + item.Date.Date.Day.ToString("#00");
+                line = line + string.Join(",", item.StoreName + date + currentUnits + currentAmount) + System.Environment.NewLine;
             }
 
             var currentCountRec = query.Count.ToString();
@@ -261,24 +240,7 @@ namespace TOMI.Services.Repository
             InnerHeaderName = "HEADER" + " " + "INVENTARIO" + InventoryStoreDate + InnerContentDate + " " + numberOfRecords;
             innerFooter = "TRAILER" + " " + "INVENTARIO" + InventoryStoreDate + InnerContentDate;
 
-
-            var query = (from b in _context.OrderJob
-                         join a in _context.StockAdjustment on b.Code equals a.Barcode
-                         select new Inventario
-                         {
-                             Store = b.Store,
-                             //Zona=0,
-                             Tag = (int)a.Tag,
-                             Code = a.Barcode,
-                             Department = (int)a.Department,
-                             Qty = (int)a.Quantity,
-                             Price = b.SalePrice,
-                             Date = DateTimeOffset.Now,
-                             Time = DateTimeOffset.Now,
-                             Consecutive = 1,
-                             Price_Indicator = 1,
-                             NOF = a.NOF,
-                         }).ToList();
+            var query = await _context.getInventarios.FromSqlRaw("EXECUTE dbo.spgetInventarios").ToListAsync();
 
             string webRootPath = _webHostEnvironment.WebRootPath;
             var path = Path.Combine($"{webRootPath}\\Upload", fileName);
@@ -291,51 +253,9 @@ namespace TOMI.Services.Repository
             string line = string.Join(",", InnerHeaderName) + System.Environment.NewLine;
             foreach (var item in query)
             {
-
-                var currentZone = "";
-                if (item.Tag > 3000)
-                { currentZone = 1.ToString(); }
-                if (item.Tag > 2001 && item.Tag < 2500)
-                { currentZone = 2.ToString(); }
-                if (item.Tag > 2501 && item.Tag < 3000)
-                { currentZone = 3.ToString(); }
-                if (item.Tag > 1 && item.Tag < 2000)
-                { currentZone = 4.ToString(); }
-                var currentTag = item.Tag.ToString();
-                var currentConsecutive = item.Consecutive.ToString();
-                var currentCode = item.Code.ToString();
-                var currentQty = item.Qty.ToString();
-                var currentPrice = item.Price.ToString();
-                for (int i = 0; i < 9; i++)
-                {
-                    if (currentQty.Length < 9)
-                        currentQty = "0" + currentQty;
-                }
-                for (int i = 0; i < 9; i++)
-                {
-                    if (currentQty.Length < 14)
-                        currentQty = "0" + currentQty;
-                }
-                for (int i = 0; i < 14; i++)
-                {
-                    if (currentCode.Length < 14)
-                        currentCode = "0" + currentCode;
-                }
-                for (int i = 0; i < 4; i++)
-                {
-                    if (currentConsecutive.Length < 4)
-                        currentConsecutive = "0" + currentConsecutive;
-                }
-
-
-                for (int i = 0; i < 6; i++)
-                {
-                    if (currentTag.Length < 6)
-                        currentTag = "0" + currentTag;
-                }
-                line = line + string.Join(",", item.Store + currentZone + currentTag + currentConsecutive + currentCode + item.Department + currentQty + currentPrice + "N" + InnerContentDate + InnerTime + ".") + System.Environment.NewLine;
+               
+                line = line + string.Join(",", item.Store + item.Zona + item.Tag + item.Consecutive + item.Code + item.Department + item.Qty + item.Price + item.Price_Indicator+ InnerContentDate + InnerTime + ".") + System.Environment.NewLine;
             }
-
             var currentCountRec = query.Count.ToString();
 
             for (int i = 0; i < 6; i++)
@@ -343,7 +263,6 @@ namespace TOMI.Services.Repository
                 if (currentCountRec.Length < 6)
                     currentCountRec = "0" + currentCountRec;
             }
-
             line = line + string.Join(",", innerFooter + " " + currentCountRec) + System.Environment.NewLine;
 
             File.AppendAllText(path, line);
@@ -368,14 +287,8 @@ namespace TOMI.Services.Repository
             fileName = "MARB" + innerDataError + "_" + InventoryStoreDate + ".txt";
             InnerHeaderName = "HEADER" + "  " + "MARBETE" + InventoryStoreDate + InnerContentDate + " " + numberOfRecords;
             innerFooter = "TRAILER" + " " + "MARBETE" + InventoryStoreDate + InnerContentDate;
-            var query = (from b in _context.OrderJob
-                         join a in _context.StockAdjustment on b.Code equals a.Barcode
-                         select new Marbete
-                         {
-                             Tag = (int)a.Tag,
-                             Department = (int)a.Department,
-                         }).ToList();
 
+            var query = await _context.getMarbetes.FromSqlRaw("EXECUTE dbo.spgetMarbeteDetail").ToListAsync();
             string webRootPath = _webHostEnvironment.WebRootPath;
             var path = Path.Combine($"{webRootPath}\\Upload", fileName);
             if (File.Exists(path))
@@ -387,24 +300,9 @@ namespace TOMI.Services.Repository
             string line = string.Join(",", InnerHeaderName) + System.Environment.NewLine;
             foreach (var item in query)
             {
-
-                var currentZone = "";
-                if (item.Tag > 3000)
-                { currentZone = 1.ToString(); }
-                if (item.Tag > 2001 && item.Tag < 2500)
-                { currentZone = 2.ToString(); }
-                if (item.Tag > 2501 && item.Tag < 3000)
-                { currentZone = 3.ToString(); }
-                if (item.Tag > 1 && item.Tag < 2000)
-                { currentZone = 4.ToString(); }
-                var currentTag = item.Tag.ToString();
-                for (int i = 0; i < 6; i++)
-                {
-                    if (currentTag.Length < 6)
-                        currentTag = "0" + currentTag;
-                }
-                line = line + string.Join(",", currentZone + currentTag + item.Department + "......................") + System.Environment.NewLine;
+                line = line + string.Join(",", item.Zona + item.Tag + item.Department+"......................") + System.Environment.NewLine;
             }
+            
 
             var currentCountRec = query.Count.ToString();
 
