@@ -41,7 +41,6 @@ namespace TOMI.Services.Repository
         public async Task<List<spCodeNotfoundReport>> GetCodeNotFoundAsync()
         {
             //  return await _context.StockAdjustment.Include(x => x.OrderJob).Where(c => c.NOF == 1).ToListAsync();
-           
             return  await _context.spCodeNotfoundReport.FromSqlRaw("EXECUTE dbo.spgetCodeNotFoundInFile").ToListAsync();
         }
         public async Task<List<StockAdjustment>> GetLabelDetailsAsync(int? tagFrom, int? tagTo)
@@ -187,22 +186,7 @@ namespace TOMI.Services.Repository
             string line = string.Join(",", InnerHeaderName) + System.Environment.NewLine;
             foreach (var item in query)
             {
-                var currentUnits = item.Qty.ToString();
-                var currentAmount = item.Amount.ToString();
-                for (int i = 0; i < 12; i++)
-                {
-                    if (currentUnits.Length < 12)
-                        currentUnits = "0" + currentUnits;
-                }
-                for (int i = 0; i < 12; i++)
-                {
-                    if (currentAmount.Length < 12)
-                        currentAmount = "0" + currentAmount;
-                }
-                var date = item.Date.Date.Year.ToString().Substring(0, 4).ToString()
-                         + item.Date.Date.Month.ToString("#00")
-                         + item.Date.Date.Day.ToString("#00");
-                line = line + string.Join(",", item.StoreName + date + currentUnits + currentAmount) + System.Environment.NewLine;
+                line = line + string.Join(",", item.StoreName + InnerContentDate + item.Qty + item.Amount) + System.Environment.NewLine;
             }
 
             var currentCountRec = query.Count.ToString();

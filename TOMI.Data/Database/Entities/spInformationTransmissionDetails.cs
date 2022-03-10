@@ -18,5 +18,6 @@ namespace TOMI.Data.Database.Entities
         public string EmployeeNumber { get; set; }
         public string Term { get; set; }
         public int Dload { get; set; }
+       
     }
 }

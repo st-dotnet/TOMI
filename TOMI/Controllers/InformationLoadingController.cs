@@ -56,6 +56,41 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
+        /// <summary>
+        /// GetInformationforOriginalTag
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("ForOriginalTag/{tag}")]
+        public async Task<IActionResult> ForOriginalTag(int tag)
+        {
+            try
+            {
+                return Ok(await _infomrationLoadingService.GetInformationforOriginalTag(tag));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        /// <summary>
+        /// GetInformationdetails
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetInformationdetails/{tag}/{empnumber}/{terminal}")]
+        public async Task<IActionResult> GetInformationdetails(int tag, string empnumber, string terminal)
+        {
+            try
+            {
+                return Ok(await _infomrationLoadingService.GetInformationdetails(tag, empnumber, terminal));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        
         #endregion
     }
 }

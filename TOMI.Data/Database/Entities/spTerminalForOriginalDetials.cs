@@ -7,13 +7,14 @@ using System.Threading.Tasks;
 
 namespace TOMI.Data.Database.Entities
 {
-    public class getInventoryFigureData
+  public  class spTerminalForOriginalDetials
     {
         [Key]
         public Guid Id { get; set; }
-        public string StoreName { get; set; }
-        public string Amount { get; set; }
-        public string Qty { get; set; }
-       
+        public string Code { get; set; }
+        public string Description { get; set; }
+        public int Quantity { get; set; }
+        public int Shelf { get; set; }
+
     }
 }

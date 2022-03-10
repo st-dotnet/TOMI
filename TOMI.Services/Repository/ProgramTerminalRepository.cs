@@ -170,7 +170,7 @@ namespace TOMI.Services.Repository
                                                    Nof = a.nof,
                                                    Description = b.Description,
 
-                                               })
+                                               }).Take(500)
                                             .ToListAsync();
 
                 mF1AndEmp.Employees = await (from a in _context.Employee

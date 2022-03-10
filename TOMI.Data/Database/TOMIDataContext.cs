@@ -42,10 +42,13 @@ namespace TOMI.Data.Database
 
         public DbSet<spInformationTransmissionDetails> spInformationTransmissionDetails { get; set; }
 
+        public DbSet<spTerminalForOriginalDetials> spTerminalForOriginalDetials { get; set; }
+        public DbSet<spOriginalTag> spOriginalTag { get; set; }
 
         public TOMIDataContext(DbContextOptions<TOMIDataContext> options)
             : base(options)
         {
+            Database.SetCommandTimeout(150000);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

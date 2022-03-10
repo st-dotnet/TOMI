@@ -18,8 +18,6 @@ namespace TOMI.Data.Database.Entities
         public int QuantityCounted { get; set; }
         public int PriceCounted { get; set; }
         public DateTime CreationTime { get; set; }
-
-       
-
+        public int Tag { get; set; }
     }
 }

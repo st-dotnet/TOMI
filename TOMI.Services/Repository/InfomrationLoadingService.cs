@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -28,5 +29,21 @@ namespace TOMI.Services.Repository
             return await _context.spInformationTransmissionDetails.FromSqlRaw("EXECUTE dbo.spGetTerminalDetails").ToListAsync();
         
         }
+        public async Task<List<spOriginalTag>> GetInformationforOriginalTag(int tag)
+        {
+            string StoredProc = "exec spgetInformationforOriginalTag " + "@Tag = " + tag +""; 
+            return await _context.spOriginalTag.FromSqlRaw(StoredProc).ToListAsync(); 
+
+        }
+
+        public async Task<List<spTerminalForOriginalDetials>> GetInformationdetails(int tag, string empnumber, string terminal)
+        {
+            string StoredProc = "exec spgetTerminalForOriginalDetials " +
+                "@employee = '" + empnumber + "'," + " @tag = " + tag + ", " + "@terminal = '" + terminal + "'";
+
+            return await _context.spTerminalForOriginalDetials.FromSqlRaw(StoredProc).ToListAsync();
+
+        }
+
     }
 }

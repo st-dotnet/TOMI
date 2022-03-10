@@ -11,5 +11,8 @@ namespace TOMI.Services.Interfaces
     {
         Task<List<spInformationLoading>> GenerateTerminalSummary();
         Task<List<spInformationTransmissionDetails>> GetInformationTransmissionDetails();
+
+        Task<List<spOriginalTag>> GetInformationforOriginalTag(int tag);
+        Task<List<spTerminalForOriginalDetials>> GetInformationdetails(int tag, string empnumber, string terminal);
     }
 }

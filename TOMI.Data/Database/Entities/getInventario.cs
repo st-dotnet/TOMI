@@ -13,11 +13,11 @@ namespace TOMI.Data.Database.Entities
         public Guid Id { get; set; }
         public string Store { get; set; }
         public string Zona { get; set; }
-        public int Tag { get; set; }
+        public string Tag { get; set; }
         public string Consecutive { get; set; }
          public string Code { get; set; }
-          public int Department { get; set; }
-          public int Qty { get; set; }
+          public string Department { get; set; }
+          public string Qty { get; set; }
           public string Price { get; set; }
          public string Price_Indicator { get; set; }
          public string Date { get; set; }
