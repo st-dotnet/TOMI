@@ -13,7 +13,7 @@ namespace TOMI.Data.Database.Entities
         public Guid Id { get; set; }
         public string Store { get; set; }
         public string SKU { get; set; }
-        public string Departament { get; set; }
+        public string Department { get; set; }
         public string Description { get; set; }
         public string PrecVtaNorm { get; set; }
         public string PrecVtaNorm_SImpto { get; set; }

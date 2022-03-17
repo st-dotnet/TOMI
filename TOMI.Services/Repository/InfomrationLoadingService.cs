@@ -21,7 +21,9 @@ namespace TOMI.Services.Repository
         }
         public async Task<List<spInformationLoading>> GenerateTerminalSummary()
         {
-           return await _context.spInformationLoading.FromSqlRaw("EXECUTE dbo.spgetInformationLoading").ToListAsync();
+           // return await _context.spInformationLoading.FromSqlRaw("EXECUTE dbo.spMaketableQueryForTerminalSMF").ToListAsync();
+            return await _context.spInformationLoading.FromSqlRaw("EXECUTE dbo.spgetInformationLoading").ToListAsync();
+       
         }
         public async Task<List<spInformationTransmissionDetails>> GetInformationTransmissionDetails()
         {
@@ -42,6 +44,27 @@ namespace TOMI.Services.Repository
                 "@employee = '" + empnumber + "'," + " @tag = " + tag + ", " + "@terminal = '" + terminal + "'";
 
             return await _context.spTerminalForOriginalDetials.FromSqlRaw(StoredProc).ToListAsync();
+
+        }
+        public async Task<Terminal_Smf> DeleteOriginalRecord(OriginalRecordModel model)
+        {
+            try
+            {
+                var existingRanges = await _context.Terminal_Smf.FirstOrDefaultAsync(x => x.tag == model.tag && x.shelf == model.shelf && x.Employee_Number == model.Employee_Number && x.Terminal == model.Terminal);
+                if (existingRanges.Isdeleted == false)
+                {
+                    existingRanges.Isdeleted = true;
+
+
+
+                    _context.SaveChanges();
+                }
+                return existingRanges;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
 
         }
 

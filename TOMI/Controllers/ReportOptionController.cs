@@ -83,7 +83,21 @@ namespace TOMI.Web.Controllers
             }
         }
 
+        [HttpGet]
+        [Route("BillingReport")]
+        public async Task<IActionResult> BillingReport()
+        {
 
+            try
+            {
+                var response = await _reportOptionRepository.GetBillingReport();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
 
         /// <summary>
         /// GetExtendedPricesAsync

@@ -15,11 +15,11 @@ namespace TOMI.Services.Repository
     public class CustomerRepository : ICustomerService
     {
         private readonly IMapper _mapper;
-        private readonly ILogger<CustomerRepository> _logger;
+        //private readonly ILogger<CustomerRepository> _logger;
         private readonly TOMIDataContext _context;
-        public CustomerRepository(ILogger<CustomerRepository> logger, TOMIDataContext context, IMapper mapper)
+        public CustomerRepository(/*ILogger<CustomerRepository> logger,*/ TOMIDataContext context, IMapper mapper)
         {
-            _logger = logger;
+            //_logger = logger;
             _context = context;
             _mapper = mapper;
         }

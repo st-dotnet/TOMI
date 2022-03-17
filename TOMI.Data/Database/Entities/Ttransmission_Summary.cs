@@ -20,5 +20,6 @@ namespace TOMI.Data.Database.Entities
         public DateTime CreationTime { get; set; }
         public int Tag { get; set; }
         public string EmployeeName { get; set; }
+        public int DuplicateTag { get; set; }
     }
 }

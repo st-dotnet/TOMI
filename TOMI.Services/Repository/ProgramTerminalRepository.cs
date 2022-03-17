@@ -20,13 +20,13 @@ namespace TOMI.Services.Repository
     public class ProgramTerminalRepository : IProgramTerminalService
     {
         private readonly IMapper _mapper;
-        private readonly ILogger<ProgramTerminalRepository> _logger;
+        //private readonly ILogger<ProgramTerminalRepository> _logger;
         private readonly TOMIDataContext _context;
         private bool checkMF;
 
-        public ProgramTerminalRepository(ILogger<ProgramTerminalRepository> logger, TOMIDataContext context, IMapper mapper)
+        public ProgramTerminalRepository(/*ILogger<ProgramTerminalRepository> logger,*/ TOMIDataContext context, IMapper mapper)
         {
-            _logger = logger;
+            //_logger = logger;
             _context = context;
             _mapper = mapper;
         }

@@ -17,11 +17,11 @@ namespace TOMI.Services.Repository
     public class DwnErrorsRepository : IDwnErrorsService
     {
         private readonly IMapper _mapper;
-        private readonly ILogger<DwnErrorsRepository> _logger;
+        //private readonly ILogger<DwnErrorsRepository> _logger;
         private readonly TOMIDataContext _context;
-        public DwnErrorsRepository(ILogger<DwnErrorsRepository> logger, TOMIDataContext context, IMapper mapper)
+        public DwnErrorsRepository(/*ILogger<DwnErrorsRepository> logger,*/ TOMIDataContext context, IMapper mapper)
         {
-            _logger = logger;
+            //_logger = logger;
             _context = context;
             _mapper = mapper;
         }

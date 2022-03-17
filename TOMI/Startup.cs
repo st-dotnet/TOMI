@@ -9,6 +9,8 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using NLog;
+using System;
 using System.IO;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -28,6 +30,7 @@ namespace TOMI
         {
             Configuration = configuration;
             _webHostEnvironment = webHostEnvironment;
+            LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
         }
         public IConfiguration Configuration { get; }
         private readonly IWebHostEnvironment _webHostEnvironment;
@@ -35,6 +38,7 @@ namespace TOMI
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<ILoggerManager, LoggerManager>();
             string connectionString = Configuration.GetConnectionString("DefaultConnection");
             services.AddDbContextPool<TOMIDataContext>(options => options.UseSqlServer(connectionString));
 

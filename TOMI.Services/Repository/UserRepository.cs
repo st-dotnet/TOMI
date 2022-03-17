@@ -22,12 +22,12 @@ namespace TOMI.Services.Repository
     public class UserRepository : IUserService
     {
         private readonly IMapper _mapper;
-        private readonly ILogger<UserRepository> _logger;
+        //private readonly ILogger<UserRepository> _logger;
         private readonly TOMIDataContext _context;
         private readonly AppSettings _appSettings;
-        public UserRepository(ILogger<UserRepository> logger, TOMIDataContext context, IMapper mapper, IOptions<AppSettings> appSettings)
+        public UserRepository(/*ILogger<UserRepository> logger,*/ TOMIDataContext context, IMapper mapper, IOptions<AppSettings> appSettings)
         {
-            _logger = logger;
+            //_logger = logger;
             _context = context;
             _mapper = mapper;
             _appSettings = appSettings.Value;

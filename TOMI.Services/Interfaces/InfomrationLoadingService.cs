@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TOMI.Data.Database.Entities;
+using TOMI.Services.Models;
 
 namespace TOMI.Services.Interfaces
 {
@@ -14,5 +15,6 @@ namespace TOMI.Services.Interfaces
 
         Task<List<spOriginalTag>> GetInformationforOriginalTag(int tag);
         Task<List<spTerminalForOriginalDetials>> GetInformationdetails(int tag, string empnumber, string terminal);
+        Task<Terminal_Smf> DeleteOriginalRecord(OriginalRecordModel model);
     }
 }

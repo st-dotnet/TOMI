@@ -9,6 +9,10 @@ namespace TOMI.Data.Database.Entities
 {
    public class Terminal_Smf:EntityBase
     {
+        public Terminal_Smf()
+        {
+            Isdeleted = false;
+        }
         [Key]
         public Guid Id { get; set; }
         public Guid CustomerId { get; set; }
@@ -33,7 +37,8 @@ namespace TOMI.Data.Database.Entities
         public DateTime count_time { get; set; }
         public bool nof { get; set; }
         public bool counted_status { get; set; }
-       // public virtual OrderJob OrderJob { get; set; }
+        public bool Isdeleted { get; set; }
+        // public virtual OrderJob OrderJob { get; set; }
         public virtual Store Store { get; set; }
         public virtual Customer customer { get; set; }
         public string InOut { get; set; }

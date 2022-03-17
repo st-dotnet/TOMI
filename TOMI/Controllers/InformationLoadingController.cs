@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using TOMI.Services.Interfaces;
+using TOMI.Services.Models;
 
 namespace TOMI.Web.Controllers
 {
@@ -90,7 +91,25 @@ namespace TOMI.Web.Controllers
             }
         }
 
-        
+        /// <summary>
+        /// DeleteOriginalRecord
+        /// </summary>
+        /// <returns></returns>
+        [HttpDelete("DeleteOriginalRecord")]
+        public async Task<IActionResult> DeleteOriginalRecord(OriginalRecordModel model)
+        {
+            try
+            {
+                return Ok(await _infomrationLoadingService.DeleteOriginalRecord(model));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+
+
         #endregion
     }
 }

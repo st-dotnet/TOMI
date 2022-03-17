@@ -17,10 +17,7 @@ namespace TOMI.Data.Database.Entities
         public string Tag { get; set; }
         public string Barcode { get; set; }
         public string SalePrice { get; set; }
-        public string ExtPrice { get; set; }
         public string Quantity { get; set; }
-        public string Total_Ext_Price { get; set; }
-        public string Total_Quantity { get; set; }
 
     }
 }

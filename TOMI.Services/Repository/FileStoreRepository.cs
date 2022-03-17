@@ -17,12 +17,12 @@ namespace TOMI.Services.Repository
     public class FileStoreRepository : IFileStoreService
     {
         private readonly IMapper _mapper;
-        private readonly ILogger<FileStoreRepository> _logger;
+        //private readonly ILogger<FileStoreRepository> _logger;
         private readonly TOMIDataContext _context;
 
-        public FileStoreRepository(ILogger<FileStoreRepository> logger, TOMIDataContext context, IMapper mapper)
+        public FileStoreRepository(/*ILogger<FileStoreRepository> logger,*/ TOMIDataContext context, IMapper mapper)
         {
-            _logger = logger;
+            //_logger = logger;
             _context = context;
             _mapper = mapper;
         }

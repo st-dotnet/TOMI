@@ -17,11 +17,11 @@ namespace TOMI.Services.Repository
     public class GroupRepository : IGroupService
     {
         private readonly IMapper _mapper;
-        private readonly ILogger<GroupRepository> _logger;
+        //private readonly ILogger<GroupRepository> _logger;
         private readonly TOMIDataContext _context;
-        public GroupRepository(ILogger<GroupRepository> logger, TOMIDataContext context, IMapper mapper)
+        public GroupRepository(/*ILogger<GroupRepository> logger, */TOMIDataContext context, IMapper mapper)
         {
-            _logger = logger;
+            //_logger = logger;
             _context = context;
             _mapper = mapper;
         }

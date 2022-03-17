@@ -14,6 +14,8 @@ namespace TOMI.Services.Models
         public string PrecVtaNorm { get; set; }
         public string Code { get; set; }
 
-       
+        public string Department { get; set; }
+
+
     }
 }

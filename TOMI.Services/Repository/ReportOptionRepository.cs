@@ -24,7 +24,7 @@ namespace TOMI.Services.Repository
     public class ReportOptionRepository : IReportOptionService
     {
         private readonly IMapper _mapper;
-        private readonly Logger logger;
+      //  private readonly Logger logger;
         private readonly TOMIDataContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
 
@@ -33,15 +33,15 @@ namespace TOMI.Services.Repository
             IMapper mapper,
             IWebHostEnvironment webHostEnvironment)
         {
-            logger = LogManager.GetCurrentClassLogger();
+           // logger = LogManager.GetCurrentClassLogger();
             _context = context;
             _mapper = mapper;
             _webHostEnvironment = webHostEnvironment;
         }
-        public async Task<List<spCodeNotfoundReport>> GetCodeNotFoundAsync()
+        public async Task<List<StockAdjustment>> GetCodeNotFoundAsync()
         {
-            //  return await _context.StockAdjustment.Include(x => x.OrderJob).Where(c => c.NOF == 1).ToListAsync();
-            return  await _context.spCodeNotfoundReport.FromSqlRaw("EXECUTE dbo.spgetCodeNotFoundInFile").ToListAsync();
+              return await _context.StockAdjustment.Include(x => x.OrderJob).Where(c => c.NOF == 1).ToListAsync();
+           // return  await _context.spCodeNotfoundReport.FromSqlRaw("EXECUTE dbo.spgetCodeNotFoundInFile").ToListAsync();
         }
         public async Task<List<StockAdjustment>> GetLabelDetailsAsync(int? tagFrom, int? tagTo)
         {
@@ -69,14 +69,16 @@ namespace TOMI.Services.Repository
             try
             {
                 var query = (from b in _context.OrderJob
-                             join a in _context.Stock on b.Department equals a.Departament
+                             join a in _context.Stock on b.Department equals a.Department
                              select new stockandorder
                              {
                                  SKU = a.SKU,
                                  Description = a.Description,
                                  SOH = a.SOH,
                                  PrecVtaNorm = a.PrecVtaNorm,
-                                 Code = b.Code
+                                 Code = b.Code,
+                                 Department=a.Department
+                                 
                              }).Take(500).ToList();
                 return query;
             }
@@ -90,7 +92,7 @@ namespace TOMI.Services.Repository
             try
             {
                 var query = (from a in _context.Stock
-                             join c in _context.OrderJob on a.Departament equals c.Department
+                             join c in _context.OrderJob on a.Department equals c.Department
                              join b in _context.StockAdjustment on c.Id equals b.SKU
 
                              select new StockAndStockAdjust
@@ -102,8 +104,8 @@ namespace TOMI.Services.Repository
                                  Quantity = (int)b.Quantity,
                                  Barcode = b.Barcode,
                                  Tag = (int)b.Tag,
-                                 Id = b.Id,
-                                 Department = a.Departament
+                                 Rec = b.Rec,
+                                 Department = a.Department
                              }).Take(20).ToList();
 
                 return query;
@@ -302,6 +304,12 @@ namespace TOMI.Services.Repository
             return path;
 
 
+        }
+
+        public async Task<List<BillingReport>> GetBillingReport()
+        {
+             return  await _context.billingReports.FromSqlRaw("EXECUTE dbo.spGenerateBillingReport").ToListAsync();
+            
         }
     }
 }

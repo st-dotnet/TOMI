@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using NLog;
 using TOMI.Data.Database;
 using TOMI.Data.Database.Entities;
 using TOMI.Services.Interfaces.RangesService;
@@ -16,13 +17,14 @@ namespace TOMI.Services.Repository
     public class RangeRepository : IRangesService
     {
         private readonly IMapper _mapper;
-        private readonly ILogger<RangeRepository> _logger;
+        // private readonly Logger logger;
         private readonly TOMIDataContext _context;
-        public RangeRepository(ILogger<RangeRepository> logger, TOMIDataContext context, IMapper mapper)
+        public RangeRepository(TOMIDataContext context, IMapper mapper)
         {
-            _logger = logger;
+          //  _logger = logger;
             _context = context;
             _mapper = mapper;
+          //  logger = LogManager.GetCurrentClassLogger();
         }
 
         public async Task<RangesResponse> DeleteRange(Guid id)
@@ -81,6 +83,7 @@ namespace TOMI.Services.Repository
         {
             try
             {
+                //logger.Info("Hello");
                 Ranges existingRanges = await _context.Ranges.FirstOrDefaultAsync(c => c.Id == rangeModel.Id);
 
                 var ranges = _mapper.Map<Ranges>(rangeModel);
