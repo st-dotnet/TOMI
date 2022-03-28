@@ -9,7 +9,7 @@ namespace TOMI.Services.Models
   public class FileStoreModel
     {
         public string Store { get; set; }
-        public string Date { get; set; }
         public string Category { get; set; }
+        public string Date { get; set; }
     }
 }

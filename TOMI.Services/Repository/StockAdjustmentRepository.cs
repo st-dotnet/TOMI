@@ -325,5 +325,29 @@ namespace TOMI.Services.Repository
                 throw new Exception(ex.ToString());
             }
         }
+
+        public async Task<RangesResponse> VoidTagData(Guid id)
+        {
+            try
+            {
+                Ranges records = await _context.Ranges.FirstOrDefaultAsync(x => x.Id == id);
+               //var tagdata = await _context.Ranges.FirstOrDefaultAsync(x => x.Id == id);
+                if (records != null)
+                {
+                    records.IsDeleted = true;
+                }
+                _context.Ranges.UpdateRange(records);
+                 await _context.SaveChangesAsync();
+                return new RangesResponse { Success = true };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+
+        }
     }
 }
+
+
+               

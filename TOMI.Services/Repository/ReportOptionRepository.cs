@@ -27,16 +27,19 @@ namespace TOMI.Services.Repository
       //  private readonly Logger logger;
         private readonly TOMIDataContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
+        private readonly ILoggerManager _logger;
 
         public ReportOptionRepository(
             TOMIDataContext context,
             IMapper mapper,
-            IWebHostEnvironment webHostEnvironment)
+            IWebHostEnvironment webHostEnvironment,
+            ILoggerManager loggerManager)
         {
            // logger = LogManager.GetCurrentClassLogger();
             _context = context;
             _mapper = mapper;
             _webHostEnvironment = webHostEnvironment;
+            _logger = loggerManager;
         }
         public async Task<List<StockAdjustment>> GetCodeNotFoundAsync()
         {
@@ -310,6 +313,27 @@ namespace TOMI.Services.Repository
         {
              return  await _context.billingReports.FromSqlRaw("EXECUTE dbo.spGenerateBillingReport").ToListAsync();
             
+        }
+        public async Task<List<FileStore>> GetFileStoreAsync(FileStoreModel model)
+        {
+            _logger.LogInfo($"Get Category : {model.Category}");
+            _logger.LogInfo($"Store Number : {model.Store}");
+            _logger.LogInfo($"Store Date : {model.Date}");
+            _logger.LogInfo($"Store Date : {model.Date}");
+            return await _context.FileStore.Where(x => x.Category == model.Category && x.StoreNumber == model.Store && x.FileDate == model.Date && x.Status=="OKAY").ToListAsync();
+        }
+
+        public async Task<List<spgetVoidTagData>> GetVoidTagDataAsync()
+        {
+            try
+            {
+                return await _context.spgetVoidTagData.FromSqlRaw("EXECUTE dbo.spgetVoidTagDetail").ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+
         }
     }
 }

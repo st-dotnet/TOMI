@@ -9,7 +9,6 @@ namespace TOMI.Services.Models
   public  class OriginalRecordModel
     {
         public int tag { get; set; }
-        public int shelf { get; set; }
         public string Terminal { get; set; }
         public string Employee_Number { get; set; }
     }

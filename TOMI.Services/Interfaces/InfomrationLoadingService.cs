@@ -14,7 +14,9 @@ namespace TOMI.Services.Interfaces
         Task<List<spInformationTransmissionDetails>> GetInformationTransmissionDetails();
 
         Task<List<spOriginalTag>> GetInformationforOriginalTag(int tag);
-        Task<List<spTerminalForOriginalDetials>> GetInformationdetails(int tag, string empnumber, string terminal);
+        Task<List<spTerminalForOriginalDetials>> GetInformationfirstsectiondetails(int tag,int empNumber);
+        Task<List<spTerminalForOriginalDetials>> GetInformationsecondsectiondetails(int tag,int empNumber);
         Task<Terminal_Smf> DeleteOriginalRecord(OriginalRecordModel model);
     }
 }
+

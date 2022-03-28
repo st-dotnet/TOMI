@@ -5,6 +5,10 @@ namespace TOMI.Data.Database.Entities
 {
     public class Ranges : EntityBase
     {
+        public Ranges()
+        {
+            IsDeleted = false;
+        }
         [Key]
         public Guid Id { get; set; }
         public string Name { get; set; }

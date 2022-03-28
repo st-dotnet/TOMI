@@ -414,6 +414,7 @@ namespace TOMI.Services.Repository
                                             RecordCount=y.Substring(29,6),
                                         }}).ToList();
 
+                                    _logger.LogInfo($"trailerRecords : {trailerRecords}");
                                     // Replaces the matched
                                     string str = Regex.Replace(trailerRecords[0].RecordCount, regex, "");
                                     if (str == orderJobList.Count.ToString())
@@ -696,7 +697,9 @@ namespace TOMI.Services.Repository
                 _logger.LogInfo($"Get finaldeptartmentDate : {finaldeptartmentDate}");
                 try
                 {
-                    forInnerdeptartmentDate = currentDate.Date.Year.ToString().Substring(2, 2).ToString()+ currentDate.Date.Month.ToString("#00") + currentDate.Date.Day.ToString("#00");
+                    forInnerdeptartmentDate = currentDate.Date.Year.ToString().Substring(2, 2).ToString()
+                        + currentDate.Date.Month.ToString("#00") 
+                        + currentDate.Date.AddDays(-1).Day.ToString("#00");
                     _logger.LogInfo($"Get forInnerdeptartmentDate : {forInnerdeptartmentDate}");
                 }
                 catch (Exception ex)

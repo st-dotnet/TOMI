@@ -29,5 +29,7 @@ namespace TOMI.Services.Interfaces
         //MARBETE
         Task<string> MarbeteDetail(FilterCustomerReportDataModel model);
         Task<List<BillingReport>> GetBillingReport();
+        Task<List<FileStore>> GetFileStoreAsync(FileStoreModel model);
+       Task<List<spgetVoidTagData>> GetVoidTagDataAsync();
     }
 }

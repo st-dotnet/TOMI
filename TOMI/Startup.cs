@@ -74,7 +74,7 @@ namespace TOMI
             services.AddTransient<IStockAdjustmentService, StockAdjustmentRepository>();
             services.AddTransient<IInfoLoadService, InfoLoadRepository>();
             services.AddTransient<IProgramTerminalService, ProgramTerminalRepository>();
-            services.AddTransient<IFileStoreService, FileStoreRepository>();
+           // services.AddTransient<IFileStoreService, FileStoreRepository>();
             services.AddTransient<IReportOptionService, ReportOptionRepository>();
             services.AddTransient<IInfomrationLoadingService,InfomrationLoadingService>();
 

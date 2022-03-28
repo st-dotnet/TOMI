@@ -17,46 +17,43 @@ namespace TOMI.Services.Repository
         private readonly TOMIDataContext _context;
         public InfomrationLoadingService(TOMIDataContext context)
         {
-           _context = context;
+            _context = context;
         }
         public async Task<List<spInformationLoading>> GenerateTerminalSummary()
         {
-           // return await _context.spInformationLoading.FromSqlRaw("EXECUTE dbo.spMaketableQueryForTerminalSMF").ToListAsync();
+            // return await _context.spInformationLoading.FromSqlRaw("EXECUTE dbo.spMaketableQueryForTerminalSMF").ToListAsync();
             return await _context.spInformationLoading.FromSqlRaw("EXECUTE dbo.spgetInformationLoading").ToListAsync();
-       
         }
         public async Task<List<spInformationTransmissionDetails>> GetInformationTransmissionDetails()
         {
 
             return await _context.spInformationTransmissionDetails.FromSqlRaw("EXECUTE dbo.spGetTerminalDetails").ToListAsync();
-        
+
         }
         public async Task<List<spOriginalTag>> GetInformationforOriginalTag(int tag)
         {
-            string StoredProc = "exec spgetInformationforOriginalTag " + "@Tag = " + tag +""; 
-            return await _context.spOriginalTag.FromSqlRaw(StoredProc).ToListAsync(); 
-
+            string StoredProc = "exec spgetInformationforOriginalTag " + "@Tag = " + tag + "";
+            return await _context.spOriginalTag.FromSqlRaw(StoredProc).ToListAsync();
         }
 
-        public async Task<List<spTerminalForOriginalDetials>> GetInformationdetails(int tag, string empnumber, string terminal)
+        public async Task<List<spTerminalForOriginalDetials>> GetInformationfirstsectiondetails(int tag,int empNumber)
         {
-            string StoredProc = "exec spgetTerminalForOriginalDetials " +
-                "@employee = '" + empnumber + "'," + " @tag = " + tag + ", " + "@terminal = '" + terminal + "'";
-
+            string StoredProc = "exec spgetTerminalForOriginalDetialsFirstoption " + "@Tag = " + tag + "," + "@empNumber= " + empNumber + "";
             return await _context.spTerminalForOriginalDetials.FromSqlRaw(StoredProc).ToListAsync();
-
+        }
+        public async Task<List<spTerminalForOriginalDetials>> GetInformationsecondsectiondetails(int tag,int empNumber)
+        {
+            string StoredProc = "exec spgetTerminalForOriginalDetialsSecondoption " + "@Tag = " + tag + "," + "@empNumber= " + empNumber + "";
+            return await _context.spTerminalForOriginalDetials.FromSqlRaw(StoredProc).ToListAsync();
         }
         public async Task<Terminal_Smf> DeleteOriginalRecord(OriginalRecordModel model)
         {
             try
             {
-                var existingRanges = await _context.Terminal_Smf.FirstOrDefaultAsync(x => x.tag == model.tag && x.shelf == model.shelf && x.Employee_Number == model.Employee_Number && x.Terminal == model.Terminal);
+                var existingRanges = await _context.Terminal_Smf.FirstOrDefaultAsync(x => x.tag == model.tag && x.Employee_Number == model.Employee_Number && x.Terminal == model.Terminal);
                 if (existingRanges.Isdeleted == false)
                 {
                     existingRanges.Isdeleted = true;
-
-
-
                     _context.SaveChanges();
                 }
                 return existingRanges;
@@ -67,6 +64,6 @@ namespace TOMI.Services.Repository
             }
 
         }
-
     }
 }
+

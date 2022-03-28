@@ -39,12 +39,15 @@ namespace TOMI.Data.Database
         public DbSet<spCodeNotfoundReport> spCodeNotfoundReport { get; set; }
         public DbSet<Ttransmission_Summary> Ttransmission_Summary { get; set; }
         public DbSet<spInformationLoading> spInformationLoading { get; set; }
+        public DbSet<spgetVoidTagData> spgetVoidTagData { get; set; }
 
         public DbSet<spInformationTransmissionDetails> spInformationTransmissionDetails { get; set; }
 
         public DbSet<spTerminalForOriginalDetials> spTerminalForOriginalDetials { get; set; }
         public DbSet<spOriginalTag> spOriginalTag { get; set; }
+        public DbSet<MTerminalSummary> MTerminalSummary { get; set; }
 
+        public DbSet<BillingReport> billingReports { get; set; }
         public TOMIDataContext(DbContextOptions<TOMIDataContext> options)
             : base(options)
         {

@@ -261,6 +261,43 @@ namespace TOMI.Web.Controllers
                 throw new Exception(ex.ToString());
             }
         }
+        
+        /// <summary>
+        /// GetInfoFileLoadedList
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("GetInfoFileLoadedListAsync")]
+        public async Task<IActionResult> GetInfoFileLoadedListAsync(FileStoreModel model)
+        {
+            try
+            {
+                var response = await _reportOptionRepository.GetFileStoreAsync(model);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        /// <summary>
+        /// GetVoidTagDataAsync
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetVoidTagDataAsync")]
+        public async Task<IActionResult> GetVoidTagDataAsync()
+        {
+            try
+            {
+                var response = await _reportOptionRepository.GetVoidTagDataAsync();
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
         #endregion Public methods
     }
 }

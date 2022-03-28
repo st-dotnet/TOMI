@@ -23,5 +23,6 @@ namespace TOMI.Services.Interfaces
         Task<List<StockAdjustment>> FilterStock(StockAdjustmentFilterModel model);
         Task<List<OrderJob>> GetMasterDataByCustomerId(Guid id);
         Task<StockAdjustmentResponse> VoidTag(int[] tag);
+        Task<RangesResponse> VoidTagData(Guid id);
     }
 }

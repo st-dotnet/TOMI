@@ -75,22 +75,37 @@ namespace TOMI.Web.Controllers
         }
 
         /// <summary>
-        /// GetInformationdetails
+        /// GetInformationfirstSectiondetails
         /// </summary>
         /// <returns></returns>
-        [HttpGet("GetInformationdetails/{tag}/{empnumber}/{terminal}")]
-        public async Task<IActionResult> GetInformationdetails(int tag, string empnumber, string terminal)
+        [HttpGet("GetInformationfirstSectiondetails/{tag}/{empNumber}")]
+        public async Task<IActionResult> GetInformationfirstSectiondetails(int tag,int empNumber)
         {
             try
             {
-                return Ok(await _infomrationLoadingService.GetInformationdetails(tag, empnumber, terminal));
+                return Ok(await _infomrationLoadingService.GetInformationfirstsectiondetails(tag, empNumber));
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.ToString());
             }
         }
-
+        /// <summary>
+        /// GetInformationsecondSectiondetails
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetInformationsecondSectiondetails/{tag}/{empNumber}")]
+        public async Task<IActionResult> GetInformationsecondSectiondetails(int tag, int empNumber)
+        {
+            try
+            {
+                return Ok(await _infomrationLoadingService.GetInformationsecondsectiondetails(tag, empNumber));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
         /// <summary>
         /// DeleteOriginalRecord
         /// </summary>
