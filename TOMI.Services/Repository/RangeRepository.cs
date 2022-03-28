@@ -38,8 +38,7 @@ namespace TOMI.Services.Repository
                     var rangesexist = await _context.StockAdjustment.FirstOrDefaultAsync(x => x.Tag >= existingRanges.TagFrom && x.Tag <= existingRanges.TagTo);
                     if (rangesexist != null)
                     {
-                        return new RangesResponse { Error = "Tag ranges already in used! ", Success = false };
-                        
+                        return new RangesResponse { Error = "Tag ranges already in used! ", Success = false };  
                     }
 
                     _context.Ranges.Remove(existingRanges);

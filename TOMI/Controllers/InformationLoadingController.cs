@@ -79,7 +79,7 @@ namespace TOMI.Web.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("GetInformationfirstSectiondetails/{tag}/{empNumber}")]
-        public async Task<IActionResult> GetInformationfirstSectiondetails(int tag,int empNumber)
+        public async Task<IActionResult> GetInformationfirstSectiondetails(string tag,string empNumber)
         {
             try
             {
@@ -95,7 +95,7 @@ namespace TOMI.Web.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet("GetInformationsecondSectiondetails/{tag}/{empNumber}")]
-        public async Task<IActionResult> GetInformationsecondSectiondetails(int tag, int empNumber)
+        public async Task<IActionResult> GetInformationsecondSectiondetails(string tag, string empNumber)
         {
             try
             {
@@ -110,21 +110,50 @@ namespace TOMI.Web.Controllers
         /// DeleteOriginalRecord
         /// </summary>
         /// <returns></returns>
-        [HttpDelete("DeleteOriginalRecord")]
-        public async Task<IActionResult> DeleteOriginalRecord(OriginalRecordModel model)
+        [HttpDelete("DeleteOriginalRecord/{tag}/{empNumber}/{terminal}")]
+        public async Task<IActionResult> DeleteOriginalRecord(int tag,string empNumber,string terminal)
         {
             try
             {
-                return Ok(await _infomrationLoadingService.DeleteOriginalRecord(model));
+                return Ok(await _infomrationLoadingService.DeleteOriginalRecord(tag,empNumber,terminal));
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.ToString());
             }
         }
-
-
-
+        /// <summary>
+        /// UpdateTag
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("UpdateTag")]
+        public async Task<IActionResult> UpdateTag(UpdateTag updateTag)
+        {
+            try
+            {
+                return Ok(await _infomrationLoadingService.ReNumberTagOption(updateTag));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+        /// <summary>
+        /// MergeNewRecordWithOriginal
+        /// </summary>
+        /// <returns></returns>
+        [HttpPost("MergeNewRecordWithOriginal")]
+        public async Task<IActionResult> MergeNewRecordWithOriginal(MergeWithNewInfloarding mergeWithNewInfloarding)
+        {
+            try
+            {
+                return Ok(await _infomrationLoadingService.MergeNewithOriginal(mergeWithNewInfloarding));
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
         #endregion
     }
 }

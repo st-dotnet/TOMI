@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -36,21 +37,22 @@ namespace TOMI.Services.Repository
             return await _context.spOriginalTag.FromSqlRaw(StoredProc).ToListAsync();
         }
 
-        public async Task<List<spTerminalForOriginalDetials>> GetInformationfirstsectiondetails(int tag,int empNumber)
+        public async Task<List<spTerminalForOriginalDetials>> GetInformationfirstsectiondetails(string tag, string empNumber)
         {
-            string StoredProc = "exec spgetTerminalForOriginalDetialsFirstoption " + "@Tag = " + tag + "," + "@empNumber= " + empNumber + "";
+            string StoredProc = "exec spgetTerminalForOriginalDetialsFirstoption " + "@Tag = " + tag + "," + "@empNumber= '" + empNumber + "'";
             return await _context.spTerminalForOriginalDetials.FromSqlRaw(StoredProc).ToListAsync();
         }
-        public async Task<List<spTerminalForOriginalDetials>> GetInformationsecondsectiondetails(int tag,int empNumber)
+        public async Task<List<spTerminalForOriginalDetials>> GetInformationsecondsectiondetails(string tag, string empNumber)
         {
-            string StoredProc = "exec spgetTerminalForOriginalDetialsSecondoption " + "@Tag = " + tag + "," + "@empNumber= " + empNumber + "";
+            string StoredProc = "exec spgetTerminalForOriginalDetialsSecondoption " + "@Tag = " + tag + "," + "@empNumber= '" + empNumber + "'";
             return await _context.spTerminalForOriginalDetials.FromSqlRaw(StoredProc).ToListAsync();
         }
-        public async Task<Terminal_Smf> DeleteOriginalRecord(OriginalRecordModel model)
+        
+        public async Task<Terminal_Smf> DeleteOriginalRecord(int tag, string empNumber,string terminal)
         {
             try
             {
-                var existingRanges = await _context.Terminal_Smf.FirstOrDefaultAsync(x => x.tag == model.tag && x.Employee_Number == model.Employee_Number && x.Terminal == model.Terminal);
+                var existingRanges = await _context.Terminal_Smf.FirstOrDefaultAsync(x => x.tag == tag && x.Employee_Number==empNumber && x.Terminal== terminal);
                 if (existingRanges.Isdeleted == false)
                 {
                     existingRanges.Isdeleted = true;
@@ -63,6 +65,51 @@ namespace TOMI.Services.Repository
                 throw new Exception(ex.ToString());
             }
 
+        }
+        public async Task<Terminal_SmfResponse> ReNumberTagOption(UpdateTag models)
+        {
+            try
+            {
+                var existingTags = await _context.Terminal_Smf.FirstOrDefaultAsync(x => x.tag == models.Tag && x.Employee_Number == models.EmpNumber && x.Terminal == models.Terminal);
+                if (existingTags.tag== models.NewTag)
+                {
+                    //  throw new Exception("Tag number already exit.");
+                    return new Terminal_SmfResponse { Error = "Tag Number already in used! ", Success = false };
+                }
+                existingTags.tag = models.NewTag;
+                _context.SaveChanges();
+                return new Terminal_SmfResponse { range = existingTags, Success = true };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
+
+        public async Task<MergeWithNewResponse> MergeNewithOriginal(MergeWithNewInfloarding models)
+        {
+            try
+            {
+             
+                var existingNewMerge = await _context.Terminal_Smf.FirstOrDefaultAsync(x => x.tag == models.Tag && x.Employee_Number == models.newEmpNumber && x.Terminal == models.newTerminal);
+                var existingOriginalMerge = await _context.Terminal_Smf.FirstOrDefaultAsync(x => x.tag == models.Tag && x.Employee_Number == models.orginalEmpNumber && x.Terminal == models.orginalTerminal);
+
+                if (existingNewMerge.Employee_Number==null)
+                {
+                    return new MergeWithNewResponse { Error = "Employee Number not exist in the database! ", Success = false };
+                }
+                existingOriginalMerge.Employee_Number = existingNewMerge.Employee_Number;
+                existingOriginalMerge.Terminal = existingNewMerge.Terminal;
+                existingOriginalMerge.Code = existingNewMerge.Code;
+                existingOriginalMerge.total_counted = existingNewMerge.total_counted;
+                existingOriginalMerge.shelf = existingNewMerge.shelf;
+                _context.SaveChanges();
+                return new MergeWithNewResponse { range = existingOriginalMerge, Success = true };
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
         }
     }
 }

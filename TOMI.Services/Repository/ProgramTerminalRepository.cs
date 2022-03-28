@@ -107,16 +107,12 @@ namespace TOMI.Services.Repository
                 if (mf1 != null)
                     await _context.BulkInsertAsync(mf1);
                 return new TerminalResponse { Success = true };
-
-
-                return new TerminalResponse { Success = true };
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.ToString());
             }
         }
-
         public async Task<EmpDataResponse> AddEmployeeData()
         {
             try
