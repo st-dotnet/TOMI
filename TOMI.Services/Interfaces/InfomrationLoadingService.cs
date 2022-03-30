@@ -18,7 +18,6 @@ namespace TOMI.Services.Interfaces
         Task<List<spTerminalForOriginalDetials>> GetInformationsecondsectiondetails(string tag, string empNumber);
         Task<Terminal_Smf> DeleteOriginalRecord(int tag, string empNumber,string terminal);
         Task<Terminal_SmfResponse> ReNumberTagOption(UpdateTag models);
-
         Task<MergeWithNewResponse> MergeNewithOriginal(MergeWithNewInfloarding mergeWithNewInfloarding);
 
     }

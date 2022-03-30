@@ -28,7 +28,8 @@ namespace TOMI.Services.Repository
         private readonly TOMIDataContext _context;
         private readonly IWebHostEnvironment _webHostEnvironment;
         private readonly ILoggerManager _logger;
-
+      
+       
         public ReportOptionRepository(
             TOMIDataContext context,
             IMapper mapper,
@@ -316,6 +317,8 @@ namespace TOMI.Services.Repository
         }
         public async Task<List<FileStore>> GetFileStoreAsync(FileStoreModel model)
         {
+            
+
             _logger.LogInfo($"Get Category : {model.Category}");
             _logger.LogInfo($"Store Number : {model.Store}");
             _logger.LogInfo($"Store Date : {model.Date}");
@@ -334,6 +337,14 @@ namespace TOMI.Services.Repository
                 throw new Exception(ex.ToString());
             }
 
+        }
+        public async Task<List<FileStore>> GetFileStore(FileStoreOffset model)
+        {
+
+            DateTimeOffset dt = DateTimeOffset.Now;
+            TimeSpan ts = model.Offset;
+            DateTimeOffset newDate = dt.Subtract(ts);
+            return await _context.FileStore.Where(x => x.Category == model.Category && x.StoreNumber == model.Store && x.FileDate == model.Date && x.Status == "OKAY").ToListAsync();
         }
     }
 }

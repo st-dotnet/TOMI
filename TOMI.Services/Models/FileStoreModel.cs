@@ -12,4 +12,12 @@ namespace TOMI.Services.Models
         public string Category { get; set; }
         public string Date { get; set; }
     }
+    public class FileStoreOffset
+    {
+        public TimeSpan Offset { get; set; }
+        public string Store { get; set; }
+        public string Category { get; set; }
+        public string Date { get; set; }
+
+    }
 }

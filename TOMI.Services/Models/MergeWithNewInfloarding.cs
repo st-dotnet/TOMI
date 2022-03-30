@@ -7,18 +7,16 @@ using TOMI.Data.Database.Entities;
 
 namespace TOMI.Services.Models
 {
-    public class UpdateTag
+    public class MergeWithNewInfloarding
     {
-
         public int Tag { get; set; }
         public string EmpNumber { get; set; }
         public string Terminal { get; set; }
-        public int NewTag { get; set; }
+        public string EmpNumberOriginal { get; set; }
+        public string TerminalOriginal { get; set; }
     }
-        public class Terminal_SmfResponse : BaseResponse
-        {
+    public class MergeWithNewResponse : BaseResponse
+    {
         public Terminal_Smf terminal_smf { get; set; }
-        }
-        
- 
+    }
 }

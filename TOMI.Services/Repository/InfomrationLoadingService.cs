@@ -36,7 +36,6 @@ namespace TOMI.Services.Repository
             string StoredProc = "exec spgetInformationforOriginalTag " + "@Tag = " + tag + "";
             return await _context.spOriginalTag.FromSqlRaw(StoredProc).ToListAsync();
         }
-
         public async Task<List<spTerminalForOriginalDetials>> GetInformationfirstsectiondetails(string tag, string empNumber)
         {
             string StoredProc = "exec spgetTerminalForOriginalDetialsFirstoption " + "@Tag = " + tag + "," + "@empNumber= '" + empNumber + "'";
@@ -64,7 +63,6 @@ namespace TOMI.Services.Repository
             {
                 throw new Exception(ex.ToString());
             }
-
         }
         public async Task<Terminal_SmfResponse> ReNumberTagOption(UpdateTag models)
         {
@@ -78,33 +76,31 @@ namespace TOMI.Services.Repository
                 }
                 existingTags.tag = models.NewTag;
                 _context.SaveChanges();
-                return new Terminal_SmfResponse { range = existingTags, Success = true };
+                return new Terminal_SmfResponse { terminal_smf = existingTags, Success = true };
             }
             catch (Exception ex)
             {
                 throw new Exception(ex.ToString());
             }
         }
-
         public async Task<MergeWithNewResponse> MergeNewithOriginal(MergeWithNewInfloarding models)
         {
             try
             {
-             
-                var existingNewMerge = await _context.Terminal_Smf.FirstOrDefaultAsync(x => x.tag == models.Tag && x.Employee_Number == models.newEmpNumber && x.Terminal == models.newTerminal);
-                var existingOriginalMerge = await _context.Terminal_Smf.FirstOrDefaultAsync(x => x.tag == models.Tag && x.Employee_Number == models.orginalEmpNumber && x.Terminal == models.orginalTerminal);
-
-                if (existingNewMerge.Employee_Number==null)
+                var existingOriginalMerge  = await _context.Terminal_Smf.FirstOrDefaultAsync(x => x.tag == models.Tag && x.Employee_Number == models.EmpNumberOriginal && x.Terminal == models.TerminalOriginal);
+                var existingNewMerge = await _context.Terminal_Smf.FirstOrDefaultAsync(x => x.tag == models.Tag && x.Employee_Number == models.EmpNumber && x.Terminal == models.Terminal);
+                if (existingOriginalMerge.Employee_Number==null)
                 {
-                    return new MergeWithNewResponse { Error = "Employee Number not exist in the database! ", Success = false };
+                    return new MergeWithNewResponse { Error = "Employee number not exist in the database! ", Success = false };
                 }
                 existingOriginalMerge.Employee_Number = existingNewMerge.Employee_Number;
                 existingOriginalMerge.Terminal = existingNewMerge.Terminal;
                 existingOriginalMerge.Code = existingNewMerge.Code;
                 existingOriginalMerge.total_counted = existingNewMerge.total_counted;
                 existingOriginalMerge.shelf = existingNewMerge.shelf;
+                existingNewMerge.Isdeleted = true;
                 _context.SaveChanges();
-                return new MergeWithNewResponse { range = existingOriginalMerge, Success = true };
+                return new MergeWithNewResponse { terminal_smf = existingOriginalMerge, Success = true };
             }
             catch (Exception ex)
             {
