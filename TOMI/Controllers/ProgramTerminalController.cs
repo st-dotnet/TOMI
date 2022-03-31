@@ -31,13 +31,13 @@ namespace TOMI.Web.Controllers
         /// InsertdataMasterFiletoMF1
         /// </summary>
         /// <returns></returns>
-        [HttpPost]
-        [Route("GenerateMF1")]
-        public async Task<IActionResult> GenerateMF1(TermModel model)
+        [HttpGet]
+        [Route("GenerateMF1/{operation}/{inventoryKey}")]
+        public async Task<IActionResult> GenerateMF1(int operation, int inventoryKey)
         {
             try
             {
-                return Ok(await _programTerminalService.GenerateMF1(model));
+                return Ok(await _programTerminalService.GenerateMF1(operation,inventoryKey));
             }
             catch (Exception ex)
             {

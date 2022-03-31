@@ -23,6 +23,8 @@ namespace TOMI.Services.Models
         public Guid? StoreId { get; set; }
         public DateTime? StockDate { get; set; }
         public string StoreName { get; set; }
+        public double Offset { get; set; }
+
     }
 
     public class FilterCustomerReportDataModel

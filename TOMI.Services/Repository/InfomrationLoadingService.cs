@@ -93,12 +93,15 @@ namespace TOMI.Services.Repository
                 {
                     return new MergeWithNewResponse { Error = "Employee number not exist in the database! ", Success = false };
                 }
-                existingOriginalMerge.Employee_Number = existingNewMerge.Employee_Number;
-                existingOriginalMerge.Terminal = existingNewMerge.Terminal;
-                existingOriginalMerge.Code = existingNewMerge.Code;
-                existingOriginalMerge.total_counted = existingNewMerge.total_counted;
-                existingOriginalMerge.shelf = existingNewMerge.shelf;
-                existingNewMerge.Isdeleted = true;
+                existingNewMerge.Employee_Number = existingOriginalMerge.Employee_Number;
+                existingNewMerge.Terminal = existingOriginalMerge.Terminal;
+                existingNewMerge.Code = existingOriginalMerge.Code;
+                existingNewMerge.total_counted = existingOriginalMerge.total_counted;
+                existingNewMerge.shelf = existingOriginalMerge.shelf;
+                existingOriginalMerge.Isdeleted = true;
+
+                _context.Terminal_Smf.Update(existingOriginalMerge);
+                _context.Terminal_Smf.Update(existingNewMerge);
                 _context.SaveChanges();
                 return new MergeWithNewResponse { terminal_smf = existingOriginalMerge, Success = true };
             }

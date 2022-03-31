@@ -317,8 +317,6 @@ namespace TOMI.Services.Repository
         }
         public async Task<List<FileStore>> GetFileStoreAsync(FileStoreModel model)
         {
-            
-
             _logger.LogInfo($"Get Category : {model.Category}");
             _logger.LogInfo($"Store Number : {model.Store}");
             _logger.LogInfo($"Store Date : {model.Date}");
@@ -341,9 +339,12 @@ namespace TOMI.Services.Repository
         public async Task<List<FileStore>> GetFileStore(FileStoreOffset model)
         {
 
+            _logger.LogInfo($"Get OffSet : {model.Offset}");
+
             DateTimeOffset dt = DateTimeOffset.Now;
             TimeSpan ts = model.Offset;
             DateTimeOffset newDate = dt.Subtract(ts);
+            _logger.LogInfo($"Get NewDate : {newDate}");
             return await _context.FileStore.Where(x => x.Category == model.Category && x.StoreNumber == model.Store && x.FileDate == model.Date && x.Status == "OKAY").ToListAsync();
         }
     }

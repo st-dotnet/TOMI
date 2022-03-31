@@ -298,6 +298,23 @@ namespace TOMI.Web.Controllers
             }
         }
 
+        /// <summary>
+        /// GetFileStore
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("GetFileStore")]
+        public async Task<IActionResult> GetFileStore(FileStoreOffset model)
+        {
+            try
+            {
+                var response = await _reportOptionRepository.GetFileStore(model);
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.ToString());
+            }
+        }
         #endregion Public methods
     }
 }

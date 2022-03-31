@@ -48,6 +48,7 @@ namespace TOMI.Data.Database
         public DbSet<MTerminalSummary> MTerminalSummary { get; set; }
 
         public DbSet<BillingReport> billingReports { get; set; }
+        public DbSet<spGenerateGenerateMF1> spGenerateGenerateMF1 { get; set; }
         public TOMIDataContext(DbContextOptions<TOMIDataContext> options)
             : base(options)
         {

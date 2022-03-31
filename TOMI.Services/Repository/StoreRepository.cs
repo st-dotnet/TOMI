@@ -40,6 +40,8 @@ namespace TOMI.Services.Repository
         private const string categoryFileExtension = "CATE";
         private const string categoryFile = "CATE DIV";
         private readonly ILoggerManager _logger;
+        private static TimeZoneInfo Central_America = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
+        private static TimeZoneInfo India_Standard_Time = TimeZoneInfo.FindSystemTimeZoneById("India Standard Time");
         public StoreRepository(ILoggerManager loggerManager, TOMIDataContext context, IMapper mapper, IConfiguration configuration, IWebHostEnvironment environment)
         {
            // logger = LogManager.GetCurrentClassLogger();
@@ -217,19 +219,20 @@ namespace TOMI.Services.Repository
 
         public async Task<FileUplaodRespone> OrderJobData(FilterDataModel model)
         {
-            //TimeZoneInfo localZones = TimeZoneInfo.Local;
-            //DateTime currentDate = model.StockDate.Value;
-            //logger.Info($"Get jobOrderDate : {currentDate}");
 
-            //DateTime utcTimes = DateTime.UtcNow;
-            //TimeZoneInfo myZones = TimeZoneInfo.CreateCustomTimeZone("Central Standard Time", new TimeSpan(-5, 0, 0), "Central Standard Time", "Central Standard Time");
-            //DateTime custDateTimes = TimeZoneInfo.ConvertTimeFromUtc(utcTimes, myZones);
+         //   DateTime currentTime = TimeZoneInfo.ConvertTimeFromUtc((DateTime)model.StockDate, India_Standard_Time);
+            DateTime currentTime = TimeZoneInfo.ConvertTimeFromUtc((DateTime)model.StockDate, Central_America);
+            _logger.LogInfo($"Standard Time : {currentTime}");
+            _logger.LogInfo($"Get NewDate : {model.StockDate}");
+            _logger.LogInfo($"Get NewDateOffSet : {model.StockDate}");
+            _logger.LogInfo($"Get NewDateOffSet : {model.Offset}");
 
             _logger.LogInfo("OrderJobData method started");
             bool isSaveSuccess = false;
             string fileName;
-            var innerDataError = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
-                model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
+            var innerDataError = currentTime.Date.Day.ToString("#00") + currentTime.Date.Month.ToString("#00") +
+                currentTime.Date.Year.ToString().Substring(2, 2).ToString();
+            _logger.LogInfo($"innerDataError : {innerDataError}");
 
             _logger.LogInfo("innerDataError for check error");
             var forInnerStockDate = string.Empty;
@@ -275,15 +278,15 @@ namespace TOMI.Services.Repository
                         + model.StockDate.Value.Date.Month.ToString("#00")
                         + model.StockDate.Value.Date.AddDays(-2).Day.ToString("#00");
 
-                var jobOrderDate = model.StockDate.Value.Date.Month.ToString("#00") +
-                   model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
+                var jobOrderDate = currentTime.Date.Month.ToString("#00") +
+                   currentTime.Date.Day.ToString("#00");
 
                 _logger.LogInfo($"Get jobOrderDate : {jobOrderDate}");
                 try
                 {
-                    forInnerStockDate = model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString()
-                         + model.StockDate.Value.Date.Month.ToString("#00")
-                         + model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
+                    forInnerStockDate = currentTime.Date.Year.ToString().Substring(2, 2).ToString()
+                         + currentTime.Date.Month.ToString("#00")
+                         + currentTime.Date.Day.ToString("#00");
 
                     _logger.LogInfo($"Get jobOrforInnerStockDatederDate : {forInnerStockDate}");
                 }
@@ -645,21 +648,20 @@ namespace TOMI.Services.Repository
         }
         public async Task<FileUplaodRespone> DepartmentsData(FilterDataModel model)
         {
-            TimeZoneInfo localZones = TimeZoneInfo.Local;
-            DateTime currentDate = model.StockDate.Value;
-            _logger.LogInfo($"Get DepartmentsDate : {currentDate}");
+           // DateTime currentTime = TimeZoneInfo.ConvertTimeFromUtc((DateTime)model.StockDate, India_Standard_Time);
+             DateTime currentTime = TimeZoneInfo.ConvertTimeFromUtc((DateTime)model.StockDate, Central_America);
+            _logger.LogInfo($"Get DepartmentsDate : {currentTime}");
 
             string regex = "^0+(?!$)";
             _logger.LogInfo("DepartmentsData method started");
             bool isSaveSuccess = false;
             string fileName;
-            var innerDataError = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Month.ToString("#00") +
-              model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
+            var innerDataError = currentTime.Date.Day.ToString("#00") + currentTime.Month.ToString("#00") +
+              currentTime.Date.Year.ToString().Substring(2, 2).ToString();
 
             _logger.LogInfo("innerDataError for check error");
-
-            var finaldeptartmentDate = model.StockDate.Value.Date.Month.ToString("#00") +
-              model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
+            var finaldeptartmentDate = currentTime.Date.Month.ToString("#00") +
+             currentTime.Date.Day.ToString("#00");
 
             var departmentPreviousDate = model.StockDate.Value.Date.Month.ToString("#00") +
                     model.StockDate.Value.Date.AddDays(-2).Day.ToString("#00");
@@ -697,9 +699,9 @@ namespace TOMI.Services.Repository
                 _logger.LogInfo($"Get finaldeptartmentDate : {finaldeptartmentDate}");
                 try
                 {
-                    forInnerdeptartmentDate = currentDate.Date.Year.ToString().Substring(2, 2).ToString()
-                        + currentDate.Date.Month.ToString("#00") 
-                        + currentDate.Date.AddDays(-1).Day.ToString("#00");
+                    forInnerdeptartmentDate = currentTime.Date.Year.ToString().Substring(2, 2).ToString()
+                        + currentTime.Date.Month.ToString("#00") 
+                        + currentTime.Date.Day.ToString("#00");
                     _logger.LogInfo($"Get forInnerdeptartmentDate : {forInnerdeptartmentDate}");
                 }
                 catch (Exception ex)
@@ -1029,9 +1031,9 @@ namespace TOMI.Services.Repository
         }
         public async Task<FileUplaodRespone> ReservedData(FilterDataModel model)
         {
-            TimeZoneInfo localZones = TimeZoneInfo.Local;
-            DateTime currentDate = model.StockDate.Value;
-            _logger.LogInfo($"Get ReservedDate : {currentDate}");
+            DateTime currentTime = TimeZoneInfo.ConvertTimeFromUtc((DateTime)model.StockDate, Central_America);
+           // DateTime currentTime = TimeZoneInfo.ConvertTimeFromUtc((DateTime)model.StockDate, India_Standard_Time);
+            _logger.LogInfo($"Get ReservedDate : {currentTime}");
 
             string regex = "^0+(?!$)";
             bool isSaveSuccess = false;
@@ -1063,12 +1065,14 @@ namespace TOMI.Services.Repository
                 var reservedStore = model.StoreId.ToString();
                 var reservedStoreName = model.StoreName.ToString().Substring(0, 4);
 
-                var finalReservedDate = model.StockDate.Value.Date.Month.ToString("#00") +
-                   model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
+                var finalReservedDate = currentTime.Date.Month.ToString("#00") +
+                   currentTime.Date.Day.ToString("#00");
                 _logger.LogInfo($"finalReservedDate : {finalReservedDate}");
+               
                 var ReservedPreviousDate = model.StockDate.Value.Date.Month.ToString("#00") +
                 model.StockDate.Value.Date.AddDays(-2).Day.ToString("#00");
                 _logger.LogInfo($"ReservedPreviousDate : {ReservedPreviousDate}");
+                
                 var ReservedPreviousInnerDate = model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString()
                        + model.StockDate.Value.Date.Month.ToString("#00")
                        + model.StockDate.Value.Date.AddDays(-2).Day.ToString("#00");
@@ -1077,9 +1081,9 @@ namespace TOMI.Services.Repository
                 var finalInnerreservedDate = string.Empty;
                 try
                 {
-                    finalInnerreservedDate = model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString()
-                         + model.StockDate.Value.Date.Month.ToString("#00")
-                         + model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
+                    finalInnerreservedDate = currentTime.Date.Year.ToString().Substring(2, 2).ToString()
+                         + currentTime.Date.Month.ToString("#00")
+                         + currentTime.Date.Day.ToString("#00");
                     _logger.LogInfo($"finalInnerreservedDate : {finalInnerreservedDate}");
                 }
                 catch (Exception ex)
@@ -1482,15 +1486,15 @@ namespace TOMI.Services.Repository
         }
         public async Task<FileUplaodRespone> StockData(FilterDataModel model)
         {
-            TimeZoneInfo localZones = TimeZoneInfo.Local;
-            DateTime currentDate = model.StockDate.Value;
-            _logger.LogInfo($"Get StockDataDate : {currentDate}");
+             DateTime currentTime = TimeZoneInfo.ConvertTimeFromUtc((DateTime)model.StockDate, Central_America);
+          //  DateTime currentTime = TimeZoneInfo.ConvertTimeFromUtc((DateTime)model.StockDate, India_Standard_Time);
+            _logger.LogInfo($"Get StockDataDate : {currentTime}");
 
             string regex = "^0+(?!$)";
             bool isSaveSuccess = false;
             string fileName;
-            var innerDataError = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
-                model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
+            var innerDataError = currentTime.Date.Day.ToString("#00") + currentTime.Date.Month.ToString("#00") +
+                currentTime.Date.Year.ToString().Substring(2, 2).ToString();
             _logger.LogInfo($"Get innerDataError : {innerDataError}");
 
 
@@ -1529,8 +1533,8 @@ namespace TOMI.Services.Repository
                 var stockStore = model.StoreId.ToString();
                 var stockStoreName = model.StoreName.ToString().Substring(0, 4);
 
-                var finalStockDate = model.StockDate.Value.Date.Month.ToString("#00") +
-                   model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
+                var finalStockDate = currentTime.Date.Month.ToString("#00") +
+                   currentTime.Date.Day.ToString("#00");
                 //  var forInnerStockDates = Convert.ToDateTime("35-13-2029");
 
                 _logger.LogInfo($"Get StockData : {finalStockDate}");
@@ -1538,9 +1542,9 @@ namespace TOMI.Services.Repository
                 var forInnerStockDate = string.Empty;
                 try
                 {
-                    forInnerStockDate = model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString()
-                         + model.StockDate.Value.Date.Month.ToString("#00")
-                         + model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
+                    forInnerStockDate = currentTime.Date.Year.ToString().Substring(2, 2).ToString()
+                         + currentTime.Date.Month.ToString("#00")
+                         + currentTime.Date.Day.ToString("#00");
                     _logger.LogInfo($"forInnerStockDate : {forInnerStockDate}");
                 }
                 catch (Exception ex)
@@ -1643,7 +1647,7 @@ namespace TOMI.Services.Repository
                                                 Category=x.Length ==87 ?x.Substring(81,6):null,
                                                 CustomerId = model.CustomerId,
                                                 StoreId = model.StoreId,
-                                                StockDate = currentDate,
+                                                StockDate = currentTime,
                                                 }
                                                 }).ToList();
 
@@ -1788,7 +1792,7 @@ namespace TOMI.Services.Repository
                                         Category=x.Length ==87 ?x.Substring(81,6):null,
                                         CustomerId = model.CustomerId,
                                         StoreId = model.StoreId,
-                                        StockDate = currentDate,
+                                        StockDate = currentTime,
                                     }
                                     }).ToList();
                                     }
@@ -1872,14 +1876,14 @@ namespace TOMI.Services.Repository
         }
         public async Task<FileUplaodRespone> CatergoriesData(FilterDataModel model)
         {
-            TimeZoneInfo localZones = TimeZoneInfo.Local;
-            DateTime currentDate = model.StockDate.Value;
-            _logger.LogInfo($"Get CatergoriesDate : {currentDate}");
+             DateTime currentTime = TimeZoneInfo.ConvertTimeFromUtc((DateTime)model.StockDate, Central_America);
+          //  DateTime currentTime = TimeZoneInfo.ConvertTimeFromUtc((DateTime)model.StockDate, India_Standard_Time);
+            _logger.LogInfo($"Get CatergoriesDate : {currentTime}");
             string regex = "^0+(?!$)";
             bool isSaveSuccess = false;
             string fileName;
-            var innerDataError = model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00") + model.StockDate.Value.Date.Month.ToString("#00") +
-               model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString();
+            var innerDataError = currentTime.Date.Day.ToString("#00") + currentTime.Date.Month.ToString("#00") +
+              currentTime.Date.Year.ToString().Substring(2, 2).ToString();
 
             _logger.LogInfo($"innerDataError : {innerDataError}");
 
@@ -1910,24 +1914,24 @@ namespace TOMI.Services.Repository
                 var caytegoryStore = model.StoreId.ToString();
                 var categoryStoreName = model.StoreName.ToString().Substring(0, 4);
 
-                var finalCategoryDate = model.StockDate.Value.Date.Month.ToString("#00") +
-                   model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00"); ;
+                var finalCategoryDate = currentTime.Date.Month.ToString("#00") +
+                  currentTime.Date.Day.ToString("#00"); ;
                 //  var forInnerStockDates = Convert.ToDateTime("35-13-2029");
                 _logger.LogInfo($"finalCategoryDate : {finalCategoryDate}");
                 var categoryPreviousDate = model.StockDate.Value.Date.Month.ToString("#00") +
                   model.StockDate.Value.Date.AddDays(-2).Day.ToString("#00");
                 _logger.LogInfo($"categoryPreviousDate : {categoryPreviousDate}");
 
-                var CategoryInnerCategoryDate = model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString()
-                         + model.StockDate.Value.Date.Month.ToString("#00")
-                         + model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
+                var CategoryInnerCategoryDate = currentTime.Date.Year.ToString().Substring(2, 2).ToString()
+                         + currentTime.Date.Month.ToString("#00")
+                         + currentTime.Date.Day.ToString("#00");
                 _logger.LogInfo($"CategoryInnerCategoryDate : {CategoryInnerCategoryDate}");
                 var forInnerCategoryDate = string.Empty;
                 try
                 {
-                    forInnerCategoryDate = model.StockDate.Value.Date.Year.ToString().Substring(2, 2).ToString()
-                         + model.StockDate.Value.Date.Month.ToString("#00")
-                         + model.StockDate.Value.Date.AddDays(-1).Day.ToString("#00");
+                    forInnerCategoryDate = currentTime.Date.Year.ToString().Substring(2, 2).ToString()
+                         + currentTime.Date.Month.ToString("#00")
+                         + currentTime.Date.Day.ToString("#00");
 
                     _logger.LogInfo($"forInnerCategoryDate : {forInnerCategoryDate}");
                 }

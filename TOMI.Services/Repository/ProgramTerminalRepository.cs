@@ -31,82 +31,85 @@ namespace TOMI.Services.Repository
             _mapper = mapper;
         }
 
-        public async Task<TerminalResponse> GenerateMF1(TermModel model)
+        public async Task<List<spGenerateGenerateMF1>> GenerateMF1(int operation, int inventoryKey)
         {
             try
             {
-                List<Terminal_Smf> mf1 = new();
-                List<Terminal_Smf> updatemf1 = new();
-                List<Terminal_Department> mf2 = new();
+                string StoredProc = "exec spGenerateMFandDept " + "@operation = " + operation + "," + "@InventoryKey= '" + inventoryKey + "'";
+                return await _context.spGenerateGenerateMF1.FromSqlRaw(StoredProc).ToListAsync();
+                // return  await _context.spGenerateGenerateMF1.FromSqlRaw("EXECUTE dbo.spGenerateGenerateMF1").ToListAsync();
+                //List<Terminal_Smf> mf1 = new();
+                //List<Terminal_Smf> updatemf1 = new();
+                //List<Terminal_Department> mf2 = new();
 
-                var masterdata = await _context.OrderJob.ToListAsync();
+                //var masterdata = await _context.OrderJob.ToListAsync();
 
-                var existingData = from a in _context.Terminal_Smf from b in _context.OrderJob where a.Code == b.Code && a.Department == b.Department && a.inventory_key == model.InventoryKey && a.operation == model.Operation select a;
+                //var existingData = from a in _context.Terminal_Smf from b in _context.OrderJob where a.Code == b.Code && a.Department == b.Department && a.inventory_key == model.InventoryKey && a.operation == model.Operation select a;
 
-                foreach (var item in masterdata)
-                {
-                    var data1 = existingData.FirstOrDefault(x => x.Code == item.Code && x.Department == item.Department);
-                    if (data1 != null)
-                    {
-                        data1.Code = item.Code;
-                        data1.Department = item.Department;
-                        data1.Inventory_Date = item.StockDate;
-                        data1.Sale_Price = Convert.ToDecimal(item.SalePrice);
-                        data1.operation = model.Operation;
-                        data1.inventory_key = model.InventoryKey;
-                        updatemf1.Add(data1);
-                    }
-                    else
-                    {
-                        Terminal_Smf data = new()
-                        {
-                            Code = item.Code,
-                            Department = item.Department,
-                            Inventory_Date = item.StockDate,
-                            Sale_Price = Convert.ToDecimal(item.SalePrice),
-                            operation = model.Operation,
-                            creation_time = DateTime.Now,
-                            sync_to_terminal_status = false,
-                            sync_to_terminal_time = DateTime.Now,
-                            sync_back_from_terminal_status = false,
-                            sync_back_from_terminal_time = DateTime.Now,
-                            count_time = DateTime.Now,
-                            counted_status = false,
-                            CustomerId = (Guid)item.CustomerId,
-                            StoreId = (Guid)item.StoreId,
-                            Id = new Guid(),
-                            inventory_key = model.InventoryKey,
-                            InOut="Out"
-                            
-                        };
+                //foreach (var item in masterdata)
+                //{
+                //    var data1 = existingData.FirstOrDefault(x => x.Code == item.Code && x.Department == item.Department);
+                //    if (data1 != null)
+                //    {
+                //        data1.Code = item.Code;
+                //        data1.Department = item.Department;
+                //        data1.Inventory_Date = item.StockDate;
+                //        data1.Sale_Price = Convert.ToDecimal(item.SalePrice);
+                //        data1.operation = model.Operation;
+                //        data1.inventory_key = model.InventoryKey;
+                //        updatemf1.Add(data1);
+                //    }
+                //    else
+                //    {
+                //        Terminal_Smf data = new()
+                //        {
+                //            Code = item.Code,
+                //            Department = item.Department,
+                //            Inventory_Date = item.StockDate,
+                //            Sale_Price = Convert.ToDecimal(item.SalePrice),
+                //            operation = model.Operation,
+                //            creation_time = DateTime.Now,
+                //            sync_to_terminal_status = false,
+                //            sync_to_terminal_time = DateTime.Now,
+                //            sync_back_from_terminal_status = false,
+                //            sync_back_from_terminal_time = DateTime.Now,
+                //            count_time = DateTime.Now,
+                //            counted_status = false,
+                //            CustomerId = (Guid)item.CustomerId,
+                //            StoreId = (Guid)item.StoreId,
+                //            Id = new Guid(),
+                //            inventory_key = model.InventoryKey,
+                //            InOut="Out"
 
-                        mf1.Add(data);
-                    }
+                //        };
 
-                    Terminal_Department data2 = new Terminal_Department();
-                    Terminal_Department checkMF = new Terminal_Department();
-                    data2.Id = new Guid();
-                    data2.Department = item.Department;
-                    data2.creation_time = DateTime.Now;
-                    var exist = _context.Terminal_Department.FirstOrDefault(x => x.Department == item.Department);
-                    if (exist == null)
-                    {
-                        checkMF = mf2.FirstOrDefault(x => x.Department == item.Department);
-                    }
-                    if (checkMF == null && exist == null)
-                    {
-                        mf2.Add(data2);
-                    }
-                }
-                if (mf2 != null)
-                    await _context.BulkInsertAsync(mf2);
+                //        mf1.Add(data);
+                //    }
 
-                if (updatemf1 != null)
-                    await _context.BulkUpdateAsync(updatemf1);
+                //    Terminal_Department data2 = new Terminal_Department();
+                //    Terminal_Department checkMF = new Terminal_Department();
+                //    data2.Id = new Guid();
+                //    data2.Department = item.Department;
+                //    data2.creation_time = DateTime.Now;
+                //    var exist = _context.Terminal_Department.FirstOrDefault(x => x.Department == item.Department);
+                //    if (exist == null)
+                //    {
+                //        checkMF = mf2.FirstOrDefault(x => x.Department == item.Department);
+                //    }
+                //    if (checkMF == null && exist == null)
+                //    {
+                //        mf2.Add(data2);
+                //    }
+                //}
+                //if (mf2 != null)
+                //    await _context.BulkInsertAsync(mf2);
 
-                if (mf1 != null)
-                    await _context.BulkInsertAsync(mf1);
-                return new TerminalResponse { Success = true };
+                //if (updatemf1 != null)
+                //    await _context.BulkUpdateAsync(updatemf1);
+
+                //if (mf1 != null)
+                //    await _context.BulkInsertAsync(mf1);
+                //return new TerminalResponse { Success = true };
             }
             catch (Exception ex)
             {
